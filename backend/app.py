@@ -559,6 +559,77 @@ def resume_simulation(process_id):
             'message': f'Error resuming simulation: {str(e)}'
         }), 500
 
+@app.route('/api/simulation/zoom/<int:process_id>', methods=['GET'])
+def get_zoom_level(process_id):
+    """
+    Get current zoom level from SUMO GUI
+    """
+    try:
+        result = sim_manager.get_zoom_level(process_id)
+        return jsonify(result)
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': f'Error getting zoom level: {str(e)}'
+        }), 500
+
+@app.route('/api/simulation/zoom/<int:process_id>', methods=['POST'])
+def set_zoom_level(process_id):
+    """
+    Set zoom level in SUMO GUI
+    """
+    try:
+        data = request.json
+        zoom_level = data.get('zoomLevel', 100.0)
+        
+        # Validate zoom level (reasonable range)
+        if not 1.0 <= zoom_level <= 10000.0:
+            return jsonify({
+                'success': False,
+                'message': 'Zoom level must be between 1% and 10000%'
+            }), 400
+        
+        result = sim_manager.set_zoom_level(process_id, zoom_level)
+        
+        if result["success"]:
+            socketio.emit('zoom_changed', {
+                'processId': process_id,
+                'zoomLevel': zoom_level,
+                'timestamp': datetime.now().isoformat()
+            })
+        
+        return jsonify(result)
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': f'Error setting zoom level: {str(e)}'
+        }), 500
+
+@app.route('/api/simulation/center-view/<int:process_id>', methods=['POST'])
+def center_view(process_id):
+    """
+    Center the view to show the entire network
+    """
+    try:
+        result = sim_manager.center_view(process_id)
+        
+        if result["success"]:
+            socketio.emit('view_centered', {
+                'processId': process_id,
+                'zoomLevel': result.get('zoomLevel'),
+                'timestamp': datetime.now().isoformat()
+            })
+        
+        return jsonify(result)
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': f'Error centering view: {str(e)}'
+        }), 500
+
 @app.route('/api/simulation/download-results/<session_id>', methods=['GET'])
 def download_simulation_results(session_id):
     """

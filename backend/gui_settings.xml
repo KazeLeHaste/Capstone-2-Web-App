@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<viewsettings>
+    <scheme name="real world">
+        <vehicles minSize="2.0" exaggerateBy="1.5" constantSize="false" 
+                 showBlinker="true" showName="false" />
+        <edges laneEdgeMode="1" drawCrossingsAndWalkingareas="true" />
+        <junctions drawShape="true" showTLSLinkNo="false" />
+        <background backgroundColor="0.9,0.9,0.9" />
+    </scheme>
+    <viewport zoom="100" x="0" y="0" angle="0.00"/>
+    <delay value="50"/>
+</viewsettings>

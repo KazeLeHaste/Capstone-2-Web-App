@@ -1198,20 +1198,24 @@ class SimulationManager:
             
             sumo_cmd.extend([
                 "-c", config_file.name,  # Use just the filename since we set cwd=session_dir
-                "--delay", "200",  # Add delay to make it visible and controllable
                 "--time-to-teleport", "300",  # Prevent vehicles from getting stuck
                 "--no-warnings"  # Reduce console spam
             ])
             
-            # Add view-only mode settings for GUI (default mode for web app)
+            # Add gaming mode settings for GUI (automatic start and better UX)
             if enable_gui:
+                # Use GUI settings file for proper input handling
+                gui_settings_path = os.path.join(os.path.dirname(__file__), "gui_settings.xml")
                 sumo_cmd.extend([
-                    "--disable-textures",  # Faster rendering
-                    "--window-size", "800,600",  # Set window size
-                    "--window-pos", "100,100",  # Set window position
-                    "--no-step-log"  # Disable step logging for cleaner output
+                    "--gui-settings-file", gui_settings_path,  # Use custom GUI settings
+                    "--start",       # Start simulation automatically
+                    "--game",        # Enable gaming mode
+                    "--game.mode", "tls",  # Traffic Light Signal gaming mode
+                    "--window-size", "1200,800",  # Set consistent window size
+                    "--delay", "50"  # Override delay for more responsive gaming
                 ])
-                # Note: TraCI will control simulation stepping, not user interaction
+                # Gaming mode: Interactive traffic light control and enhanced user experience
+                print(f"DEBUG: Using GUI settings file: {gui_settings_path}")
             else:
                 sumo_cmd.extend(["--quit-on-end"])
             
@@ -1219,17 +1223,41 @@ class SimulationManager:
             if enable_live_data:
                 # Enable TraCI for live data collection
                 sumo_cmd.extend([
-                    "--remote-port", "8813",
-                    "--start"  # Start simulation immediately
+                    "--remote-port", "8813"
                 ])
+                # Add --start flag only if GUI is disabled (GUI mode already adds it above)
+                if not enable_gui:
+                    sumo_cmd.extend(["--start"])  # Start simulation immediately for headless mode
             
             # Launch SUMO process
+            print(f"DEBUG: Executing SUMO command: {' '.join(sumo_cmd)}")
+            print(f"DEBUG: Working directory: {session_dir}")
+            
             process = subprocess.Popen(
                 sumo_cmd,
                 cwd=session_dir,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE
             )
+            
+            # Check if process started successfully
+            import time
+            time.sleep(0.5)  # Give process a moment to start
+            if process.poll() is not None:
+                # Process has already terminated
+                stdout, stderr = process.communicate()
+                error_msg = f"SUMO failed to start. Exit code: {process.returncode}"
+                if stderr:
+                    error_msg += f"\nSTDERR: {stderr}"
+                if stdout:
+                    error_msg += f"\nSTDOUT: {stdout}"
+                print(f"DEBUG: {error_msg}")
+                return {
+                    "success": False,
+                    "message": error_msg
+                }
+            else:
+                print(f"DEBUG: SUMO process started successfully with PID: {process.pid}")
             
             # Store process information
             process_info = {
@@ -1583,6 +1611,151 @@ class SimulationManager:
                 "message": f"Failed to resume simulation: {str(e)}"
             }
 
+    def get_zoom_level(self, process_id: int) -> Dict[str, Any]:
+        """
+        Get current zoom level from SUMO GUI via TraCI
+        
+        Args:
+            process_id: Process identifier
+            
+        Returns:
+            Result dictionary with current zoom level
+        """
+        try:
+            # Find the session with this process ID
+            session_id = None
+            for sid, session_data in self.active_processes.items():
+                if session_data["info"]["processId"] == process_id:
+                    session_id = sid
+                    break
+            
+            if session_id and TRACI_AVAILABLE:
+                try:
+                    # Get zoom level from first view (View #0)
+                    zoom_level = traci.gui.getZoom("View #0")
+                    return {
+                        "success": True,
+                        "zoomLevel": round(zoom_level, 2),
+                        "processId": process_id
+                    }
+                except Exception as traci_e:
+                    print(f"DEBUG: TraCI zoom retrieval error: {traci_e}")
+                    return {
+                        "success": False,
+                        "message": f"Failed to get zoom level: {str(traci_e)}"
+                    }
+            
+            return {
+                "success": False,
+                "message": "Simulation process not found or TraCI not available"
+            }
+            
+        except Exception as e:
+            print(f"DEBUG: Exception in get_zoom_level: {e}")
+            return {
+                "success": False,
+                "message": f"Failed to get zoom level: {str(e)}"
+            }
+
+    def set_zoom_level(self, process_id: int, zoom_level: float) -> Dict[str, Any]:
+        """
+        Set zoom level in SUMO GUI via TraCI
+        
+        Args:
+            process_id: Process identifier
+            zoom_level: New zoom level (percentage, e.g., 100.0 for 100%)
+            
+        Returns:
+            Result dictionary with success status
+        """
+        try:
+            # Find the session with this process ID
+            session_id = None
+            for sid, session_data in self.active_processes.items():
+                if session_data["info"]["processId"] == process_id:
+                    session_id = sid
+                    break
+            
+            if session_id and TRACI_AVAILABLE:
+                try:
+                    # Set zoom level for first view (View #0)
+                    traci.gui.setZoom("View #0", zoom_level)
+                    return {
+                        "success": True,
+                        "zoomLevel": zoom_level,
+                        "processId": process_id
+                    }
+                except Exception as traci_e:
+                    print(f"DEBUG: TraCI zoom setting error: {traci_e}")
+                    return {
+                        "success": False,
+                        "message": f"Failed to set zoom level: {str(traci_e)}"
+                    }
+            
+            return {
+                "success": False,
+                "message": "Simulation process not found or TraCI not available"
+            }
+            
+        except Exception as e:
+            print(f"DEBUG: Exception in set_zoom_level: {e}")
+            return {
+                "success": False,
+                "message": f"Failed to set zoom level: {str(e)}"
+            }
+
+    def center_view(self, process_id: int) -> Dict[str, Any]:
+        """
+        Center the view to show the entire network
+        
+        Args:
+            process_id: Process identifier
+            
+        Returns:
+            Result dictionary with success status
+        """
+        try:
+            # Find the session with this process ID
+            session_id = None
+            for sid, session_data in self.active_processes.items():
+                if session_data["info"]["processId"] == process_id:
+                    session_id = sid
+                    break
+            
+            if session_id and TRACI_AVAILABLE:
+                try:
+                    # Get network boundary and set view to show the entire network
+                    boundary = traci.gui.getBoundary("View #0")
+                    traci.gui.setBoundary("View #0", boundary[0], boundary[1], boundary[2], boundary[3])
+                    
+                    # Also get the new zoom level to return it
+                    zoom_level = traci.gui.getZoom("View #0")
+                    
+                    return {
+                        "success": True,
+                        "message": "View centered successfully",
+                        "zoomLevel": round(zoom_level, 2),
+                        "processId": process_id
+                    }
+                except Exception as traci_e:
+                    print(f"DEBUG: TraCI center view error: {traci_e}")
+                    return {
+                        "success": False,
+                        "message": f"Failed to center view: {str(traci_e)}"
+                    }
+            
+            return {
+                "success": False,
+                "message": "Simulation process not found or TraCI not available"
+            }
+            
+        except Exception as e:
+            print(f"DEBUG: Exception in center_view: {e}")
+            return {
+                "success": False,
+                "message": f"Failed to center view: {str(e)}"
+            }
+
     def cleanup_session(self, session_id: str) -> Dict[str, Any]:
         """
         Clean up session files and processes
@@ -1753,6 +1926,14 @@ class SimulationManager:
                             'timestamp': time.time(),
                             'session_id': session_id
                         }
+                        
+                        # Add zoom level to live data (try to get it, but don't fail if it doesn't work)
+                        try:
+                            zoom_level = traci.gui.getZoom("View #0")
+                            live_data['zoom_level'] = round(zoom_level, 2)
+                        except Exception:
+                            # Zoom might not be available in headless mode
+                            pass
                         
                         # Debug: Print data every few steps
                         step_count += 1

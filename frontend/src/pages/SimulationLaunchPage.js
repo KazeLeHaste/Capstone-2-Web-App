@@ -30,7 +30,10 @@ import {
   Zap,
   BarChart3,
   MapPin,
-  Monitor
+  Monitor,
+  ZoomIn,
+  ZoomOut,
+  Maximize
 } from 'lucide-react';
 import { apiClient } from '../utils/apiClient';
 
@@ -62,6 +65,10 @@ const SimulationLaunchPage = ({ socket }) => {
   });
   
   const [connectionStatus, setConnectionStatus] = useState('disconnected');
+  
+  // Zoom control state
+  const [currentZoom, setCurrentZoom] = useState(100.0);
+  const [isZoomLoading, setIsZoomLoading] = useState(false);
 
   useEffect(() => {
     loadSessionData();
@@ -78,6 +85,19 @@ const SimulationLaunchPage = ({ socket }) => {
       socket.on('connect', () => setConnectionStatus('connected'));
       socket.on('disconnect', () => setConnectionStatus('disconnected'));
       
+      // Zoom control event listeners
+      socket.on('zoom_changed', (data) => {
+        if (data.processId === sumoProcess?.processId) {
+          setCurrentZoom(data.zoomLevel);
+        }
+      });
+      
+      socket.on('view_centered', (data) => {
+        if (data.processId === sumoProcess?.processId && data.zoomLevel) {
+          setCurrentZoom(data.zoomLevel);
+        }
+      });
+      
       return () => {
         socket.off('simulation_stats', handleStatsUpdate);
         socket.off('simulation_data', handleStatsUpdate);
@@ -85,6 +105,8 @@ const SimulationLaunchPage = ({ socket }) => {
         socket.off('connection_status', setConnectionStatus);
         socket.off('connect');
         socket.off('disconnect');
+        socket.off('zoom_changed');
+        socket.off('view_centered');
       };
     } else {
       console.log('No socket available');
@@ -143,6 +165,11 @@ const SimulationLaunchPage = ({ socket }) => {
         averageSpeed: data.avg_speed || 0,
         throughput: data.throughput || 0
       });
+      
+      // Update zoom level if available
+      if (data.zoom_level !== undefined) {
+        setCurrentZoom(data.zoom_level);
+      }
     } else if (stats.simulation_time !== undefined) {
       // Direct format from TraCI
       setLiveStats({
@@ -151,6 +178,11 @@ const SimulationLaunchPage = ({ socket }) => {
         averageSpeed: stats.avg_speed || 0,
         throughput: stats.throughput || 0
       });
+      
+      // Update zoom level if available
+      if (stats.zoom_level !== undefined) {
+        setCurrentZoom(stats.zoom_level);
+      }
     } else {
       // Legacy format
       setLiveStats(stats);
@@ -300,6 +332,89 @@ const SimulationLaunchPage = ({ socket }) => {
       });
     }
   };
+
+  // Zoom control functions
+  const fetchCurrentZoom = async () => {
+    if (!sumoProcess?.processId) return;
+    
+    try {
+      const response = await apiClient.get(`/api/simulation/zoom/${sumoProcess.processId}`);
+      if (response.data.success) {
+        setCurrentZoom(response.data.zoomLevel);
+      }
+    } catch (error) {
+      console.warn('Failed to fetch zoom level:', error);
+    }
+  };
+
+  const handleZoomIn = async () => {
+    if (!sumoProcess?.processId || isZoomLoading) return;
+    
+    setIsZoomLoading(true);
+    try {
+      const newZoom = currentZoom * 1.2; // 20% increase, no max limit
+      const response = await apiClient.post(`/api/simulation/zoom/${sumoProcess.processId}`, {
+        zoomLevel: newZoom
+      });
+      
+      if (response.data.success) {
+        setCurrentZoom(newZoom);
+      }
+    } catch (error) {
+      console.error('Failed to zoom in:', error);
+    } finally {
+      setIsZoomLoading(false);
+    }
+  };
+
+  const handleZoomOut = async () => {
+    if (!sumoProcess?.processId || isZoomLoading) return;
+    
+    setIsZoomLoading(true);
+    try {
+      const newZoom = currentZoom / 1.2; // 20% decrease, no min limit
+      const response = await apiClient.post(`/api/simulation/zoom/${sumoProcess.processId}`, {
+        zoomLevel: newZoom
+      });
+      
+      if (response.data.success) {
+        setCurrentZoom(newZoom);
+      }
+    } catch (error) {
+      console.error('Failed to zoom out:', error);
+    } finally {
+      setIsZoomLoading(false);
+    }
+  };
+
+  const handleCenterView = async () => {
+    if (!sumoProcess?.processId || isZoomLoading) return;
+    
+    setIsZoomLoading(true);
+    try {
+      const response = await apiClient.post(`/api/simulation/center-view/${sumoProcess.processId}`);
+      
+      if (response.data.success) {
+        setCurrentZoom(response.data.zoomLevel || 100.0);
+      }
+    } catch (error) {
+      console.error('Failed to center view:', error);
+    } finally {
+      setIsZoomLoading(false);
+    }
+  };
+
+  // Poll zoom level periodically when simulation is running
+  useEffect(() => {
+    if (simulationState === 'running' && sumoProcess?.processId) {
+      const zoomInterval = setInterval(fetchCurrentZoom, 2000); // Check every 2 seconds
+      
+      // Fetch initial zoom level
+      fetchCurrentZoom();
+      
+      return () => clearInterval(zoomInterval);
+    }
+  }, [simulationState, sumoProcess?.processId]);
 
   const formatTime = (seconds) => {
     const hours = Math.floor(seconds / 3600);
@@ -480,6 +595,72 @@ const SimulationLaunchPage = ({ socket }) => {
                   </button>
                 )}
               </div>
+              
+              {/* Zoom Controls */}
+              {(simulationState === 'running' || simulationState === 'paused') && sumoProcess?.processId && (
+                <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="font-medium text-blue-900">View Controls</div>
+                  </div>
+                  
+                  <div className="flex items-center justify-center gap-3">
+                    <button
+                      onClick={handleZoomOut}
+                      disabled={isZoomLoading}
+                      className="simulation-control-btn secondary"
+                      title="Zoom Out (20%)"
+                    >
+                      <ZoomOut className="w-4 h-4" />
+                    </button>
+                    
+                    <div className="px-4 py-2 bg-white border border-blue-200 rounded-md min-w-[100px] text-center">
+                      <span className="text-sm font-medium text-blue-900">
+                        {currentZoom.toFixed(1)}%
+                      </span>
+                    </div>
+                    
+                    <button
+                      onClick={handleZoomIn}
+                      disabled={isZoomLoading}
+                      className="simulation-control-btn secondary"
+                      title="Zoom In (20%)"
+                    >
+                      <ZoomIn className="w-4 h-4" />
+                    </button>
+                    
+                    <button
+                      onClick={handleCenterView}
+                      disabled={isZoomLoading}
+                      className="simulation-control-btn secondary"
+                      title="Center View"
+                    >
+                      <Maximize className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+              )}
+              
+              {/* Zoom Controls Help Panel */}
+              {(simulationState === 'running' || simulationState === 'paused') && (
+                <div className="mt-4 p-4 bg-amber-50 border border-amber-200 rounded-lg">
+                  <div className="flex items-start gap-3">
+                    <Eye className="w-5 h-5 text-amber-600 mt-0.5 flex-shrink-0" />
+                    <div>
+                      <div className="font-medium text-amber-900 mb-2">SUMO Navigation Controls</div>
+                      <div className="text-sm text-amber-800 space-y-1">
+                        <div><strong>Web Controls:</strong> Use zoom buttons and slider above</div>
+                        <div><strong>Pan:</strong> Left-click and drag in SUMO window</div>
+                        <div><strong>Keyboard Zoom:</strong> + key (zoom in), - key (zoom out)</div>
+                        <div><strong>Reset View:</strong> Home key or Center View button</div>
+                        <div><strong>Move View:</strong> Arrow keys</div>
+                        <div className="text-xs text-amber-700 mt-2 italic">
+                          Note: Use the web controls above for the best zoom experience, especially on devices without numpad.
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
               
               {sumoProcess && (
                 <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded">
