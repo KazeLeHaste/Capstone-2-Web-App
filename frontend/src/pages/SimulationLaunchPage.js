@@ -628,39 +628,12 @@ const SimulationLaunchPage = ({ socket }) => {
                       <ZoomIn className="w-4 h-4" />
                     </button>
                     
-                    <button
-                      onClick={handleCenterView}
-                      disabled={isZoomLoading}
-                      className="simulation-control-btn secondary"
-                      title="Center View"
-                    >
-                      <Maximize className="w-4 h-4" />
-                    </button>
+                    
                   </div>
                 </div>
               )}
               
-              {/* Zoom Controls Help Panel */}
-              {(simulationState === 'running' || simulationState === 'paused') && (
-                <div className="mt-4 p-4 bg-amber-50 border border-amber-200 rounded-lg">
-                  <div className="flex items-start gap-3">
-                    <Eye className="w-5 h-5 text-amber-600 mt-0.5 flex-shrink-0" />
-                    <div>
-                      <div className="font-medium text-amber-900 mb-2">SUMO Navigation Controls</div>
-                      <div className="text-sm text-amber-800 space-y-1">
-                        <div><strong>Web Controls:</strong> Use zoom buttons and slider above</div>
-                        <div><strong>Pan:</strong> Left-click and drag in SUMO window</div>
-                        <div><strong>Keyboard Zoom:</strong> + key (zoom in), - key (zoom out)</div>
-                        <div><strong>Reset View:</strong> Home key or Center View button</div>
-                        <div><strong>Move View:</strong> Arrow keys</div>
-                        <div className="text-xs text-amber-700 mt-2 italic">
-                          Note: Use the web controls above for the best zoom experience, especially on devices without numpad.
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
+          
               
               {sumoProcess && (
                 <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded">

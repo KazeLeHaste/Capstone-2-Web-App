@@ -139,14 +139,7 @@ const HomePage = ({ onShowOnboarding, backendStatus, isConnected }) => {
                 <Book className="btn-icon-left" aria-hidden="true" />
                 Take Tutorial
               </button>
-              <Link
-                to="/simulation-launch"
-                className="btn-success"
-                aria-label="View simulation demo"
-              >
-                <Play className="btn-icon-left" aria-hidden="true" />
-                Launch Demo
-              </Link>
+              
             </div>
           </div>
         </div>
