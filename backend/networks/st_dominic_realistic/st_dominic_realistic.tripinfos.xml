@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- generated on 2025-08-31 16:17:54 by Eclipse SUMO GUI Version 1.24.0
+<sumoConfiguration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/sumoConfiguration.xsd">
+
+    <input>
+        <net-file value="st_dominic_realistic.net.xml"/>
+        <route-files value="routes/osm.bus.rou.xml,routes/osm.motorcycle.rou.xml,routes/osm.passenger.rou.xml,routes/osm.truck.rou.xml"/>
+        <additional-files value="st_dominic_realistic.output_add.xml"/>
+    </input>
+
+    <output>
+        <tripinfo-output value="st_dominic_realistic.tripinfos.xml"/>
+        <statistic-output value="st_dominic_realistic.stats.xml"/>
+    </output>
+
+    <processing>
+        <ignore-route-errors value="true"/>
+        <tls.actuated.jam-threshold value="30"/>
+    </processing>
+
+    <routing>
+        <device.rerouting.adaptation-steps value="18"/>
+        <device.rerouting.adaptation-interval value="10"/>
+    </routing>
+
+    <report>
+        <verbose value="true"/>
+        <duration-log.statistics value="true"/>
+        <no-step-log value="true"/>
+    </report>
+
+    <gui_only>
+        <gui-settings-file value="st_dominic_realistic.osm_view.xml"/>
+    </gui_only>
+
+</sumoConfiguration>
+-->
+
+<tripinfos xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/tripinfo_file.xsd">
+    <tripinfo id="motorcycle0" depart="0.00" departLane="653727192_0" departPos="2.30" departSpeed="0.00" departDelay="0.00" arrival="61.00" arrivalLane="35260359#0_0" arrivalPos="69.17" arrivalSpeed="13.54" duration="61.00" routeLength="721.59" waitingTime="0.00" waitingCount="0" stopTime="0.00" timeLoss="11.25" rerouteNo="0" devices="tripinfo_motorcycle0" vType="motorcycle_motorcycle" speedFactor="1.06" vaporized=""/>
+    <tripinfo id="veh2" depart="34.00" departLane="-35260369#0_0" departPos="5.10" departSpeed="0.00" departDelay="0.97" arrival="94.00" arrivalLane="-1392084244#1_1" arrivalPos="36.93" arrivalSpeed="18.14" duration="60.00" routeLength="723.25" waitingTime="1.00" waitingCount="1" stopTime="0.00" timeLoss="16.03" rerouteNo="0" devices="tripinfo_veh2" vType="veh_passenger" speedFactor="1.09" vaporized=""/>
+</tripinfos>

@@ -1,0 +1,11 @@
+# OSM Importer Requirements
+# Dependencies for processing OSM Web Wizard scenarios
+
+# Core Python libraries (usually included)
+# xml.etree.ElementTree - XML parsing (built-in)
+# pathlib - Path handling (built-in)
+# shutil - File operations (built-in)
+# json - JSON processing (built-in)
+
+# No additional dependencies required for basic functionality
+# The script uses only Python standard library modules
