@@ -393,11 +393,11 @@ const ConfigurationPage = ({ socket }) => {
                 <Info className="w-5 h-5 text-blue-500 mt-1" />
                 <div>
                   <h3 className="font-medium text-gray-900 mb-2">What happens next?</h3>
-                  <ul className="text-sm text-gray-600 space-y-1">
-                    <li>• Your configuration will be saved to a session</li>
-                    <li>• You'll select a network file to apply these settings</li>
-                    <li>• Route files are automatically matched to networks</li>
-                    <li>• SUMO GUI will launch in game mode for interactive simulation</li>
+                  <ul className="list-spaced">
+                    <li>Your configuration will be saved to a session</li>
+                    <li>You'll select a network file to apply these settings</li>
+                    <li>Route files are automatically matched to networks</li>
+                    <li>SUMO GUI will launch in game mode for interactive simulation</li>
                   </ul>
                 </div>
               </div>

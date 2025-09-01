@@ -479,11 +479,11 @@ const NetworkSelectionPage = ({ socket, onLoadingChange }) => {
               <h3 className="info-panel-title">Network Selection</h3>
             </div>
             <div className="info-panel-content">
-              <ul className="space-y-2 text-sm text-gray-600">
-                <li>• Original network files are never modified</li>
-                <li>• Each session gets its own network copy</li>
-                <li>• Your configuration is applied to the copied files</li>
-                <li>• Network modifications are isolated per session</li>
+              <ul className="list-spaced">
+                <li>Original network files are never modified</li>
+                <li>Each session gets its own network copy</li>
+                <li>Your configuration is applied to the copied files</li>
+                <li>Network modifications are isolated per session</li>
               </ul>
             </div>
           </div>
@@ -494,11 +494,11 @@ const NetworkSelectionPage = ({ socket, onLoadingChange }) => {
               <h3 className="info-panel-title">Configuration Applied</h3>
             </div>
             <div className="info-panel-content">
-              <ul className="space-y-2 text-sm text-gray-600">
-                <li>• Speed limit changes to specified edges</li>
-                <li>• Road closures during simulation time</li>
-                <li>• Traffic volume and vehicle type distribution</li>
-                <li>• Advanced SUMO parameters and models</li>
+              <ul className="list-spaced">
+                <li>Speed limit changes to specified edges</li>
+                <li>Road closures during simulation time</li>
+                <li>Traffic volume and vehicle type distribution</li>
+                <li>Advanced SUMO parameters and models</li>
               </ul>
             </div>
           </div>
