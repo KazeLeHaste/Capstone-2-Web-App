@@ -19,6 +19,7 @@ from datetime import datetime
 from sumo_controller import SumoController
 from websocket_handler import WebSocketHandler
 from simulation_manager import SimulationManager
+from analytics_engine import TrafficAnalyticsEngine
 
 # Initialize Flask app
 app = Flask(__name__)
@@ -34,6 +35,7 @@ socketio = SocketIO(app, cors_allowed_origins=["http://localhost:3000", "http://
 sumo_controller = SumoController()
 websocket_handler = WebSocketHandler(socketio, sumo_controller)
 sim_manager = SimulationManager(websocket_handler=websocket_handler)
+analytics_engine = TrafficAnalyticsEngine()
 
 # Add request logging
 @app.before_request
@@ -672,6 +674,263 @@ def cleanup_simulation_session(session_id):
             'success': False,
             'message': f'Error cleaning up session: {str(e)}'
         }), 500
+
+# ============================================================================
+# ANALYTICS ENDPOINTS
+# ============================================================================
+
+@app.route('/api/analytics/session/<session_id>', methods=['GET'])
+def get_session_analytics(session_id):
+    """
+    Get comprehensive analytics for a simulation session
+    """
+    try:
+        # Find session directory
+        session_path = sim_manager.sessions_dir / session_id
+        
+        if not session_path.exists():
+            return jsonify({
+                'success': False,
+                'message': f'Session {session_id} not found'
+            }), 404
+        
+        # Analyze session
+        analytics_data = analytics_engine.analyze_session(str(session_path))
+        
+        if 'error' in analytics_data:
+            return jsonify({
+                'success': False,
+                'message': analytics_data['error']
+            }), 500
+        
+        return jsonify({
+            'success': True,
+            'session_id': session_id,
+            'analytics': analytics_data
+        })
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': f'Error analyzing session: {str(e)}'
+        }), 500
+
+@app.route('/api/analytics/compare', methods=['POST'])
+def compare_sessions():
+    """
+    Compare multiple simulation sessions
+    """
+    try:
+        data = request.get_json()
+        session_ids = data.get('session_ids', [])
+        
+        if len(session_ids) < 2:
+            return jsonify({
+                'success': False,
+                'message': 'At least 2 sessions are required for comparison'
+            }), 400
+        
+        # Validate sessions exist
+        session_paths = []
+        for session_id in session_ids:
+            session_path = sim_manager.sessions_dir / session_id
+            if not session_path.exists():
+                return jsonify({
+                    'success': False,
+                    'message': f'Session {session_id} not found'
+                }), 404
+            session_paths.append(str(session_path))
+        
+        # Perform comparison
+        comparison_data = analytics_engine.compare_sessions(session_paths)
+        
+        return jsonify({
+            'success': True,
+            'comparison': comparison_data
+        })
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': f'Error comparing sessions: {str(e)}'
+        }), 500
+
+@app.route('/api/analytics/sessions', methods=['GET'])
+def list_analyzed_sessions():
+    """
+    Get list of sessions available for analysis
+    """
+    try:
+        sessions = []
+        
+        # Scan sessions directory
+        for session_dir in sim_manager.sessions_dir.iterdir():
+            if session_dir.is_dir() and not session_dir.name.startswith('.'):
+                # Check if session has output files
+                has_tripinfo = bool(list(session_dir.glob('*.tripinfos.xml')))
+                has_summary = bool(list(session_dir.glob('*summary.xml')))
+                has_stats = bool(list(session_dir.glob('*.stats.xml')))
+                
+                # Load session metadata if available
+                metadata_file = session_dir / 'session_metadata.json'
+                metadata = {}
+                if metadata_file.exists():
+                    try:
+                        with open(metadata_file, 'r') as f:
+                            metadata = json.load(f)
+                    except:
+                        pass
+                
+                session_info = {
+                    'session_id': session_dir.name,
+                    'path': str(session_dir),
+                    'has_tripinfo': has_tripinfo,
+                    'has_summary': has_summary,
+                    'has_stats': has_stats,
+                    'can_analyze': has_tripinfo or has_summary,
+                    'metadata': metadata,
+                    'created_at': metadata.get('created_at'),
+                    'network_id': metadata.get('network_id')
+                }
+                
+                sessions.append(session_info)
+        
+        # Sort by creation time (newest first)
+        sessions.sort(key=lambda x: x.get('created_at', ''), reverse=True)
+        
+        return jsonify({
+            'success': True,
+            'sessions': sessions,
+            'total_count': len(sessions),
+            'analyzable_count': sum(1 for s in sessions if s['can_analyze'])
+        })
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': f'Error listing sessions: {str(e)}'
+        }), 500
+
+@app.route('/api/analytics/kpis/<session_id>', methods=['GET'])
+def get_session_kpis(session_id):
+    """
+    Get just the KPIs for a session (lightweight endpoint)
+    """
+    try:
+        session_path = sim_manager.sessions_dir / session_id
+        
+        if not session_path.exists():
+            return jsonify({
+                'success': False,
+                'message': f'Session {session_id} not found'
+            }), 404
+        
+        # Quick KPI extraction
+        tripinfo_file = analytics_engine._find_file(session_path, "*.tripinfos.xml")
+        stats_file = analytics_engine._find_file(session_path, "*.stats.xml")
+        summary_file = analytics_engine._find_file(session_path, "*summary.xml")
+        
+        kpis = analytics_engine._extract_kpis(tripinfo_file, stats_file, summary_file)
+        
+        return jsonify({
+            'success': True,
+            'session_id': session_id,
+            'kpis': kpis.__dict__,
+            'extracted_at': datetime.now().isoformat()
+        })
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': f'Error extracting KPIs: {str(e)}'
+        }), 500
+
+@app.route('/api/analytics/recommendations/<session_id>', methods=['GET'])
+def get_session_recommendations(session_id):
+    """
+    Get recommendations for a session
+    """
+    try:
+        session_path = sim_manager.sessions_dir / session_id
+        
+        if not session_path.exists():
+            return jsonify({
+                'success': False,
+                'message': f'Session {session_id} not found'
+            }), 404
+        
+        # Extract KPIs and generate recommendations
+        tripinfo_file = analytics_engine._find_file(session_path, "*.tripinfos.xml")
+        stats_file = analytics_engine._find_file(session_path, "*.stats.xml")
+        summary_file = analytics_engine._find_file(session_path, "*summary.xml")
+        
+        kpis = analytics_engine._extract_kpis(tripinfo_file, stats_file, summary_file)
+        recommendations = analytics_engine._generate_recommendations(kpis)
+        
+        return jsonify({
+            'success': True,
+            'session_id': session_id,
+            'recommendations': recommendations,
+            'total_recommendations': len(recommendations),
+            'high_priority_count': sum(1 for r in recommendations if r['priority'] == 'high'),
+            'generated_at': datetime.now().isoformat()
+        })
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': f'Error generating recommendations: {str(e)}'
+        }), 500
+
+@app.route('/api/analytics/export/<session_id>', methods=['GET'])
+def export_session_analytics(session_id):
+    """
+    Export session analytics as JSON file
+    """
+    try:
+        session_path = sim_manager.sessions_dir / session_id
+        
+        if not session_path.exists():
+            return jsonify({
+                'success': False,
+                'message': f'Session {session_id} not found'
+            }), 404
+        
+        # Get full analytics
+        analytics_data = analytics_engine.analyze_session(str(session_path))
+        
+        if 'error' in analytics_data:
+            return jsonify({
+                'success': False,
+                'message': analytics_data['error']
+            }), 500
+        
+        # Create export data
+        export_data = {
+            'export_info': {
+                'session_id': session_id,
+                'exported_at': datetime.now().isoformat(),
+                'export_version': '1.0'
+            },
+            'analytics': analytics_data
+        }
+        
+        # Return as downloadable JSON
+        response = jsonify(export_data)
+        response.headers['Content-Disposition'] = f'attachment; filename=analytics_{session_id}.json'
+        response.headers['Content-Type'] = 'application/json'
+        
+        return response
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': f'Error exporting analytics: {str(e)}'
+        }), 500
+
+# ============================================================================
+# END ANALYTICS ENDPOINTS
+# ============================================================================
 
 # ============================================================================
 # END NEW SIMULATION WORKFLOW ENDPOINTS

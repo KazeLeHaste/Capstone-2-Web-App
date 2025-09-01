@@ -1243,6 +1243,38 @@ class SimulationManager:
                 "--no-warnings"  # Reduce console spam
             ])
             
+            # Extract end time from config and add --end parameter for automatic termination
+            # This ensures SUMO will automatically terminate when the simulation time is reached
+            duration_seconds = None
+            
+            # Try different ways to get the duration from config
+            if 'sumo_end' in config and 'sumo_begin' in config and config.get('sumo_end') is not None and config.get('sumo_begin') is not None:
+                # Frontend sends sumo_begin and sumo_end
+                begin_time = config.get('sumo_begin', 0)
+                end_time = config.get('sumo_end', 60)
+                duration_seconds = end_time - begin_time
+                print(f"DEBUG: Using sumo_end-sumo_begin: {end_time} - {begin_time} = {duration_seconds} seconds")
+            elif 'duration' in config and config.get('duration') is not None:
+                # Direct duration field
+                duration_seconds = config.get('duration')
+                print(f"DEBUG: Using direct duration: {duration_seconds} seconds")
+            elif 'endTime' in config and config.get('endTime') is not None:
+                # Frontend sends endTime - beginTime as duration
+                begin_time = config.get('beginTime', 0)
+                end_time = config.get('endTime', 60)
+                duration_seconds = end_time - begin_time
+                print(f"DEBUG: Using endTime-beginTime: {end_time} - {begin_time} = {duration_seconds} seconds")
+            else:
+                # Default fallback
+                duration_seconds = 60  # 1 minute default to match frontend default
+                print(f"DEBUG: Using default duration: {duration_seconds} seconds")
+            
+            if duration_seconds and duration_seconds > 0:
+                sumo_cmd.extend(["--end", str(duration_seconds)])
+                print(f"DEBUG: Adding SUMO --end parameter: {duration_seconds} seconds")
+            else:
+                print(f"DEBUG: No valid duration found, SUMO will run indefinitely")
+            
             # Add traffic intensity scaling if specified
             traffic_intensity = config.get('sumo_traffic_intensity', 1.0)
             if traffic_intensity != 1.0:
@@ -1541,6 +1573,9 @@ class SimulationManager:
             for session_id, data in self.active_processes.items():
                 if data["info"]["processId"] == process_id:
                     process = data["process"]
+                    session_path = data["info"]["sessionPath"]
+                    
+                    # Terminate the process
                     process.terminate()
                     
                     # Wait for process to finish
@@ -1549,12 +1584,49 @@ class SimulationManager:
                     except subprocess.TimeoutExpired:
                         process.kill()
                     
+                    # Parse and save session statistics for manual stops too
+                    print(f"Parsing simulation output for manually stopped session {session_id}")
+                    try:
+                        session_stats = self._parse_sumo_output_files(Path(session_path))
+                        if session_stats:
+                            # Save session statistics to a JSON file
+                            stats_file = Path(session_path) / "session_statistics.json"
+                            with open(stats_file, 'w') as f:
+                                json.dump({
+                                    'session_id': session_id,
+                                    'completed_at': datetime.now().isoformat(),
+                                    'completion_reason': 'Manually stopped',
+                                    'statistics': session_stats,
+                                    'can_analyze': True
+                                }, f, indent=2)
+                            print(f"Session statistics saved to {stats_file}")
+                    except Exception as e:
+                        print(f"Error parsing session statistics for {session_id}: {e}")
+                    
                     # Remove from active processes
                     del self.active_processes[session_id]
                     
+                    # Broadcast simulation stopped via WebSocket
+                    if self.websocket_handler:
+                        self.websocket_handler.broadcast_simulation_status('stopped', 'Simulation manually stopped', {
+                            'session_id': session_id,
+                            'reason': 'Manually stopped',
+                            'process_id': process_id
+                        })
+                        
+                        # Send session completed event
+                        completion_data = {
+                            'session_id': session_id,
+                            'reason': 'Manually stopped',
+                            'completed_at': datetime.now().isoformat(),
+                            'can_analyze': True
+                        }
+                        self.websocket_handler.broadcast_message('session_completed', completion_data)
+                    
                     return {
                         "success": True,
-                        "message": "Simulation stopped successfully"
+                        "message": "Simulation stopped successfully",
+                        "session_id": session_id
                     }
             
             return {
@@ -1850,10 +1922,32 @@ class SimulationManager:
             try:
                 # Extract configuration settings
                 step_length = config.get('stepLength', 1.0)  # Default to 1 second
-                duration = config.get('duration', 3600)  # Default to 1 hour
+                
+                # Extract duration using the same logic as in launch_simulation
+                duration_seconds = None
+                if 'sumo_end' in config and 'sumo_begin' in config and config.get('sumo_end') is not None and config.get('sumo_begin') is not None:
+                    # Frontend sends sumo_begin and sumo_end
+                    begin_time = config.get('sumo_begin', 0)
+                    end_time = config.get('sumo_end', 60)
+                    duration_seconds = end_time - begin_time
+                    print(f"DEBUG: Data thread using sumo_end-sumo_begin: {end_time} - {begin_time} = {duration_seconds} seconds")
+                elif 'duration' in config and config.get('duration') is not None:
+                    # Direct duration field
+                    duration_seconds = config.get('duration')
+                    print(f"DEBUG: Data thread using direct duration: {duration_seconds} seconds")
+                elif 'endTime' in config and config.get('endTime') is not None:
+                    # Frontend sends endTime - beginTime as duration
+                    begin_time = config.get('beginTime', 0)
+                    end_time = config.get('endTime', 60)
+                    duration_seconds = end_time - begin_time
+                    print(f"DEBUG: Data thread using endTime-beginTime: {end_time} - {begin_time} = {duration_seconds} seconds")
+                else:
+                    # Default fallback
+                    duration_seconds = 60  # 1 minute default to match frontend default
+                    print(f"DEBUG: Data thread using default duration: {duration_seconds} seconds")
                 
                 print(f"Starting data collection for session {session_id}")
-                print(f"Step length: {step_length}s, Duration: {duration}s")
+                print(f"Step length: {step_length}s, Duration: {duration_seconds}s")
                 
                 # Connect to SUMO TraCI
                 print(f"Connecting to SUMO TraCI on port {port} for session {session_id}")
@@ -1931,14 +2025,18 @@ class SimulationManager:
                         last_sim_time = sim_time
                         
                         # Check if simulation has reached configured duration
-                        if sim_time >= duration:
-                            print(f"Simulation reached configured duration ({duration}s) for session {session_id}")
+                        if sim_time >= duration_seconds:
+                            print(f"Simulation reached configured duration ({duration_seconds}s) for session {session_id}")
+                            # Properly stop the simulation
+                            self._handle_simulation_completion(session_id, "Duration reached")
                             break
                         
                         # Check if simulation is running
                         min_expected_vehicles = traci.simulation.getMinExpectedNumber()
                         if min_expected_vehicles == 0 and sim_time > 60:  # Allow some time for vehicles to spawn
                             print(f"No more vehicles expected, simulation ending for session {session_id}")
+                            # Properly stop the simulation
+                            self._handle_simulation_completion(session_id, "All vehicles completed")
                             break
                         
                         # Log progress based on step length
@@ -2017,3 +2115,81 @@ class SimulationManager:
         # Start the data collection thread
         data_thread = threading.Thread(target=collect_data, daemon=True)
         data_thread.start()
+
+    def _handle_simulation_completion(self, session_id: str, reason: str):
+        """
+        Handle proper simulation completion and cleanup
+        
+        Args:
+            session_id: Session identifier
+            reason: Reason for completion (e.g., "Duration reached", "All vehicles completed")
+        """
+        try:
+            print(f"Handling simulation completion for session {session_id}: {reason}")
+            
+            # Stop the SUMO process if it's still running
+            if session_id in self.active_processes:
+                process_data = self.active_processes[session_id]
+                process = process_data["process"]
+                process_id = process_data["info"]["processId"]
+                session_path = process_data["info"]["sessionPath"]
+                
+                # Terminate the process gracefully
+                if process.poll() is None:  # Process is still running
+                    print(f"Terminating SUMO process {process_id} for session {session_id}")
+                    process.terminate()
+                    
+                    # Wait for process to finish
+                    try:
+                        process.wait(timeout=10)
+                        print(f"SUMO process {process_id} terminated gracefully")
+                    except subprocess.TimeoutExpired:
+                        print(f"SUMO process {process_id} didn't terminate gracefully, force killing")
+                        process.kill()
+                
+                # Parse and save session statistics 
+                print(f"Parsing simulation output for session {session_id}")
+                try:
+                    session_stats = self._parse_sumo_output_files(Path(session_path))
+                    if session_stats:
+                        # Save session statistics to a JSON file
+                        stats_file = Path(session_path) / "session_statistics.json"
+                        with open(stats_file, 'w') as f:
+                            json.dump({
+                                'session_id': session_id,
+                                'completed_at': datetime.now().isoformat(),
+                                'completion_reason': reason,
+                                'statistics': session_stats,
+                                'can_analyze': True
+                            }, f, indent=2)
+                        print(f"Session statistics saved to {stats_file}")
+                    else:
+                        print(f"Warning: No statistics could be parsed for session {session_id}")
+                except Exception as e:
+                    print(f"Error parsing session statistics for {session_id}: {e}")
+                
+                # Remove from active processes
+                del self.active_processes[session_id]
+                print(f"Removed session {session_id} from active processes")
+                
+                # Broadcast simulation completion via WebSocket
+                if self.websocket_handler:
+                    self.websocket_handler.broadcast_simulation_status('completed', f"Simulation completed: {reason}", {
+                        'session_id': session_id,
+                        'reason': reason,
+                        'process_id': process_id
+                    })
+                    
+                    # Also send session completed event for UI updates
+                    completion_data = {
+                        'session_id': session_id,
+                        'reason': reason,
+                        'completed_at': datetime.now().isoformat(),
+                        'can_analyze': True  # Session is now ready for analysis
+                    }
+                    self.websocket_handler.broadcast_message('session_completed', completion_data)
+                
+                print(f"Simulation completion handled successfully for session {session_id}")
+                
+        except Exception as e:
+            print(f"Error handling simulation completion for session {session_id}: {e}")

@@ -75,6 +75,7 @@ const SimulationPage = ({ socket }) => {
       socket.on('simulation_stats', handleStatsUpdate);
       socket.on('simulation_data', handleStatsUpdate); // Also listen for simulation_data
       socket.on('simulation_status', handleStatusUpdate);
+      socket.on('session_completed', handleSessionCompleted);
       socket.on('connection_status', setConnectionStatus);
       socket.on('connect', () => setConnectionStatus('connected'));
       socket.on('disconnect', () => setConnectionStatus('disconnected'));
@@ -96,6 +97,7 @@ const SimulationPage = ({ socket }) => {
         socket.off('simulation_stats', handleStatsUpdate);
         socket.off('simulation_data', handleStatsUpdate);
         socket.off('simulation_status', handleStatusUpdate);
+        socket.off('session_completed', handleSessionCompleted);
         socket.off('connection_status', setConnectionStatus);
         socket.off('connect');
         socket.off('disconnect');
@@ -184,9 +186,48 @@ const SimulationPage = ({ socket }) => {
   };
 
   const handleStatusUpdate = (status) => {
-    setSimulationState(status.state);
+    console.log('Status update received:', status);
+    
+    if (status.status === 'completed' || status.status === 'stopped') {
+      setSimulationState('finished');
+      console.log(`Simulation ${status.status}: ${status.message}`);
+      
+      // Show completion notification
+      if (status.reason) {
+        console.log(`Completion reason: ${status.reason}`);
+      }
+    } else {
+      setSimulationState(status.status || status.state);
+    }
+    
     if (status.error) {
       setError(status.error);
+    }
+  };
+
+  const handleSessionCompleted = (completionData) => {
+    console.log('Session completed:', completionData);
+    
+    // Update simulation state to finished
+    setSimulationState('finished');
+    
+    // Clear the SUMO process reference since it's no longer running
+    setSumoProcess(null);
+    
+    // Show completion message
+    const message = `Simulation completed: ${completionData.reason}`;
+    console.log(message);
+    
+    // You could show a toast notification here
+    // toast.success(message);
+    
+    // Update session data to indicate it can be analyzed
+    if (sessionData) {
+      setSessionData(prev => ({
+        ...prev,
+        can_analyze: true,
+        completed_at: completionData.completed_at
+      }));
     }
   };
 
@@ -410,6 +451,7 @@ const SimulationPage = ({ socket }) => {
       case 'running': return 'text-green-600';
       case 'paused': return 'text-yellow-600';
       case 'stopped': return 'text-gray-600';
+      case 'finished': return 'text-blue-600';
       case 'error': return 'text-red-600';
       case 'launching': return 'text-blue-600';
       default: return 'text-gray-600';
@@ -423,6 +465,7 @@ const SimulationPage = ({ socket }) => {
       case 'running': return 'Running';
       case 'paused': return 'Paused';
       case 'stopped': return 'Stopped';
+      case 'finished': return 'Completed';
       case 'error': return 'Error';
       default: return 'Unknown';
     }
@@ -571,6 +614,25 @@ const SimulationPage = ({ socket }) => {
                     <RotateCcw className="w-4 h-4" />
                     Restart
                   </button>
+                )}
+                
+                {simulationState === 'finished' && sessionData?.sessionId && (
+                  <>
+                    <Link
+                      to={`/analytics?session=${sessionData.sessionId}`}
+                      className="simulation-control-btn primary"
+                    >
+                      <BarChart3 className="w-4 h-4" />
+                      View Results
+                    </Link>
+                    <button
+                      onClick={handleLaunchSimulation}
+                      className="simulation-control-btn"
+                    >
+                      <RotateCcw className="w-4 h-4" />
+                      Run Again
+                    </button>
+                  </>
                 )}
               </div>
               

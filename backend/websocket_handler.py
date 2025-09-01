@@ -94,13 +94,14 @@ class WebSocketHandler:
         except Exception as e:
             print(f"Error broadcasting simulation data: {e}")
     
-    def broadcast_simulation_status(self, status: str, message: str = None):
+    def broadcast_simulation_status(self, status: str, message: str = None, extra_data: Dict[str, Any] = None):
         """
         Broadcast simulation status change to all connected clients
         
         Args:
-            status: Status string ('initializing', 'running', 'stopped', 'error', 'finished')
+            status: Status string ('initializing', 'running', 'stopped', 'error', 'finished', 'completed')
             message: Optional status message
+            extra_data: Additional data to include in the broadcast
         """
         if not self.connected_clients:
             return
@@ -113,11 +114,33 @@ class WebSocketHandler:
                 'timestamp': time.time()
             }
             
+            # Add any extra data provided
+            if extra_data:
+                status_data.update(extra_data)
+            
             self.socketio.emit('simulation_status', status_data)
             print(f"Broadcasted status: {status} to {len(self.connected_clients)} clients")
             
         except Exception as e:
             print(f"Error broadcasting simulation status: {e}")
+    
+    def broadcast_message(self, event_name: str, data: Dict[str, Any]):
+        """
+        Broadcast a custom message to all connected clients
+        
+        Args:
+            event_name: Name of the event to emit
+            data: Data to broadcast
+        """
+        if not self.connected_clients:
+            return
+        
+        try:
+            self.socketio.emit(event_name, data)
+            print(f"Broadcasted event '{event_name}' to {len(self.connected_clients)} clients")
+            
+        except Exception as e:
+            print(f"Error broadcasting event '{event_name}': {e}")
     
     def broadcast_error(self, error_message: str, error_type: str = 'general'):
         """

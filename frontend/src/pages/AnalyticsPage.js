@@ -1,521 +1,511 @@
 /**
- * Analytics Page Component
+ * Enhanced Analytics Page Component
  * 
- * Displays comprehensive analytics and statistics from traffic simulation results.
- * Features charts, graphs, and exportable reports.
+ * Comprehensive analytics dashboard with KPI tracking, visualizations,
+ * recommendations, session comparison, and report export functionality.
  * 
  * Author: Traffic Simulator Team
- * Date: August 2025
+ * Date: September 2025
  */
 
-import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect, useCallback } from 'react';
+import { Link, useSearchParams } from 'react-router-dom';
+import axios from 'axios';
 import { 
   BarChart3, 
   TrendingUp, 
-  Users, 
-  Clock, 
   Activity,
   Download,
   RefreshCw,
   ArrowLeft,
   FileText,
-  PieChart,
   LineChart,
-  Info,
-  AlertCircle
+  AlertCircle,
+  AlertTriangle,
+  GitCompare,
+  Eye,
+  Calendar,
+  Database
 } from 'lucide-react';
 
+// Import our new components
+import KPIDashboard from '../components/KPIDashboard';
+import AnalyticsCharts from '../components/AnalyticsCharts';
+import RecommendationsPanel from '../components/RecommendationsPanel';
+import SessionComparison from '../components/SessionComparison';
+import { exportAnalyticsAsPDF } from '../utils/reportExport';
+
 const AnalyticsPage = ({ socket, simulationData, simulationStatus }) => {
+  const [searchParams] = useSearchParams();
+  const sessionIdFromUrl = searchParams.get('session');
+  
+  // State management
   const [analyticsData, setAnalyticsData] = useState(null);
-  const [timeSeriesData, setTimeSeriesData] = useState([]);
+  const [availableSessions, setAvailableSessions] = useState([]);
+  const [selectedSession, setSelectedSession] = useState(sessionIdFromUrl || '');
   const [loading, setLoading] = useState(false);
-  const [selectedMetric, setSelectedMetric] = useState('vehicles');
-  const [timeRange, setTimeRange] = useState('all');
-  
-  useEffect(() => {
-    if (simulationData) {
-      updateAnalytics(simulationData);
+  const [error, setError] = useState(null);
+  const [activeTab, setActiveTab] = useState('overview');
+  const [showComparison, setShowComparison] = useState(false);
+  const [selectedSessionsForComparison, setSelectedSessionsForComparison] = useState([]);
+  const [refreshInterval, setRefreshInterval] = useState(null);
+
+  const loadAvailableSessions = useCallback(async () => {
+    try {
+      const response = await axios.get('/api/analytics/sessions');
+      if (response.data.success) {
+        setAvailableSessions(response.data.sessions);
+        
+        // Auto-select the first analyzable session if none selected
+        if (!selectedSession && response.data.sessions.length > 0) {
+          const firstAnalyzable = response.data.sessions.find(s => s.can_analyze);
+          if (firstAnalyzable) {
+            setSelectedSession(firstAnalyzable.session_id);
+          }
+        }
+      }
+    } catch (err) {
+      console.error('Error loading sessions:', err);
     }
-  }, [simulationData]);
-  
+  }, [selectedSession]);
+
+  const loadSessionAnalytics = useCallback(async (sessionId, silent = false) => {
+    try {
+      if (!silent) {
+        setLoading(true);
+        setError(null);
+      }
+
+      const response = await axios.get(`/api/analytics/session/${sessionId}`);
+      
+      if (response.data.success) {
+        setAnalyticsData(response.data.analytics);
+      } else {
+        setError(response.data.message);
+      }
+    } catch (err) {
+      const errorMessage = err.response?.data?.message || 'Failed to load analytics data';
+      setError(errorMessage);
+    } finally {
+      if (!silent) {
+        setLoading(false);
+      }
+    }
+  }, []);
+
+  // Load available sessions on component mount
   useEffect(() => {
-    // Listen for analytics data from socket
-    if (socket) {
-      socket.on('analytics_data', handleAnalyticsData);
+    loadAvailableSessions();
+  }, [loadAvailableSessions]);
+
+  // Load analytics for selected session
+  useEffect(() => {
+    if (selectedSession) {
+      loadSessionAnalytics(selectedSession);
+    }
+  }, [selectedSession, loadSessionAnalytics]);
+
+  // Auto-refresh for live sessions
+  useEffect(() => {
+    if (simulationStatus === 'running' && selectedSession) {
+      const interval = setInterval(() => {
+        loadSessionAnalytics(selectedSession, true); // Silent refresh
+      }, 10000); // Refresh every 10 seconds
+      
+      setRefreshInterval(interval);
       
       return () => {
-        socket.off('analytics_data', handleAnalyticsData);
+        if (interval) clearInterval(interval);
       };
+    } else {
+      if (refreshInterval) {
+        clearInterval(refreshInterval);
+        setRefreshInterval(null);
+      }
     }
-  }, [socket]);
-  
-  const handleAnalyticsData = (data) => {
-    setAnalyticsData(data.data);
+  }, [simulationStatus, selectedSession, refreshInterval, loadSessionAnalytics]);
+
+  const handleSessionChange = (sessionId) => {
+    setSelectedSession(sessionId);
+    setAnalyticsData(null);
+    setError(null);
   };
-  
-  const updateAnalytics = (data) => {
-    if (!data) return;
-    
-    const newDataPoint = {
-      timestamp: data.timestamp || Date.now(),
-      vehicles: data.statistics?.total_vehicles || 0,
-      averageSpeed: calculateAverageSpeed(data.vehicles || []),
-      totalDistance: calculateTotalDistance(data.vehicles || []),
-      density: calculateDensity(data.edges || []),
-      flow: calculateFlow(data.edges || [])
-    };
-    
-    setTimeSeriesData(prev => {
-      const updated = [...prev, newDataPoint];
-      // Keep only last 100 data points to prevent memory issues
-      return updated.slice(-100);
-    });
+
+  const handleRefresh = () => {
+    if (selectedSession) {
+      loadSessionAnalytics(selectedSession);
+    }
   };
-  
-  const calculateAverageSpeed = (vehicles) => {
-    if (vehicles.length === 0) return 0;
-    const totalSpeed = vehicles.reduce((sum, vehicle) => sum + (vehicle.speed || 0), 0);
-    return totalSpeed / vehicles.length;
-  };
-  
-  const calculateTotalDistance = (vehicles) => {
-    return vehicles.reduce((sum, vehicle) => sum + (vehicle.distance || 0), 0);
-  };
-  
-  const calculateDensity = (edges) => {
-    if (edges.length === 0) return 0;
-    const totalOccupancy = edges.reduce((sum, edge) => sum + (edge.occupancy || 0), 0);
-    return totalOccupancy / edges.length;
-  };
-  
-  const calculateFlow = (edges) => {
-    if (edges.length === 0) return 0;
-    const totalFlow = edges.reduce((sum, edge) => sum + (edge.vehicle_count || 0), 0);
-    return totalFlow;
-  };
-  
-  const getCurrentStats = () => {
-    if (!simulationData) return null;
+
+  const handleExportPDF = async () => {
+    if (!analyticsData || !selectedSession) return;
     
-    const vehicles = simulationData.vehicles || [];
-    const edges = simulationData.edges || [];
-    
-    return {
-      totalVehicles: vehicles.length,
-      averageSpeed: calculateAverageSpeed(vehicles).toFixed(1),
-      maxSpeed: vehicles.length > 0 ? Math.max(...vehicles.map(v => v.speed || 0)).toFixed(1) : 0,
-      totalDistance: (calculateTotalDistance(vehicles) / 1000).toFixed(1),
-      density: (calculateDensity(edges) * 100).toFixed(1),
-      totalEdges: edges.length,
-      averageVehiclesPerEdge: edges.length > 0 ? (calculateFlow(edges) / edges.length).toFixed(1) : 0,
-      simulationTime: simulationData.statistics?.simulation_time || 0
-    };
+    try {
+      await exportAnalyticsAsPDF(analyticsData, selectedSession);
+    } catch (err) {
+      alert('Failed to export PDF: ' + err.message);
+    }
   };
-  
-  const getVehicleTypeDistribution = () => {
-    if (!simulationData?.vehicles) return [];
-    
-    const distribution = {};
-    simulationData.vehicles.forEach(vehicle => {
-      const type = vehicle.type || 'unknown';
-      distribution[type] = (distribution[type] || 0) + 1;
-    });
-    
-    return Object.entries(distribution).map(([type, count]) => ({
-      type,
-      count,
-      percentage: simulationData.vehicles.length > 0 ? (count / simulationData.vehicles.length * 100).toFixed(1) : 0
-    }));
-  };
-  
-  const getSpeedDistribution = () => {
-    if (!simulationData?.vehicles) return [];
-    
-    const speedRanges = [
-      { range: '0-5 m/s', min: 0, max: 5, count: 0 },
-      { range: '5-10 m/s', min: 5, max: 10, count: 0 },
-      { range: '10-15 m/s', min: 10, max: 15, count: 0 },
-      { range: '15-20 m/s', min: 15, max: 20, count: 0 },
-      { range: '>20 m/s', min: 20, max: Infinity, count: 0 }
-    ];
-    
-    simulationData.vehicles.forEach(vehicle => {
-      const speed = vehicle.speed || 0;
-      const range = speedRanges.find(r => speed >= r.min && speed < r.max);
-      if (range) range.count++;
-    });
-    
-    return speedRanges;
-  };
-  
-  const getTimeSeries = () => {
-    const filteredData = timeRange === 'all' 
-      ? timeSeriesData 
-      : timeSeriesData.slice(-parseInt(timeRange));
-    
-    return filteredData.map((point, index) => ({
-      ...point,
-      index,
-      time: new Date(point.timestamp).toLocaleTimeString()
-    }));
-  };
-  
+
   const handleExportData = () => {
-    const data = {
-      currentStats: getCurrentStats(),
-      vehicleTypes: getVehicleTypeDistribution(),
-      speedDistribution: getSpeedDistribution(),
-      timeSeries: getTimeSeries(),
-      exportTime: new Date().toISOString()
+    if (!analyticsData) return;
+    
+    const exportData = {
+      session_id: selectedSession,
+      exported_at: new Date().toISOString(),
+      kpis: analyticsData.kpis,
+      recommendations: analyticsData.recommendations,
+      time_series: analyticsData.time_series
     };
     
-    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `traffic_simulation_analytics_${Date.now()}.json`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
+    const dataStr = JSON.stringify(exportData, null, 2);
+    const dataBlob = new Blob([dataStr], { type: 'application/json' });
+    const url = URL.createObjectURL(dataBlob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `analytics_${selectedSession}_${new Date().toISOString().split('T')[0]}.json`;
+    link.click();
     URL.revokeObjectURL(url);
   };
-  
-  const currentStats = getCurrentStats();
-  const vehicleTypes = getVehicleTypeDistribution();
-  const speedDistribution = getSpeedDistribution();
-  const timeSeries = getTimeSeries();
-  
+
+  const handleCompareToggle = () => {
+    setShowComparison(!showComparison);
+    if (!showComparison) {
+      // Reset comparison selection
+      setSelectedSessionsForComparison([]);
+    }
+  };
+
+  const handleSessionSelectionForComparison = (sessionId, checked) => {
+    if (checked) {
+      if (selectedSessionsForComparison.length < 4) { // Limit to 4 sessions
+        setSelectedSessionsForComparison([...selectedSessionsForComparison, sessionId]);
+      }
+    } else {
+      setSelectedSessionsForComparison(selectedSessionsForComparison.filter(id => id !== sessionId));
+    }
+  };
+
+  const canStartComparison = selectedSessionsForComparison.length >= 2;
+
+  // Tab configurations
+  const tabs = [
+    { id: 'overview', name: 'Overview', icon: BarChart3 },
+    { id: 'kpis', name: 'KPIs', icon: TrendingUp },
+    { id: 'charts', name: 'Charts', icon: LineChart },
+    { id: 'recommendations', name: 'Recommendations', icon: AlertCircle },
+  ];
+
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-7xl mx-auto px-4">
-        {/* Header */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">
-                Simulation Analytics
+    <div className="min-h-screen bg-gray-50">
+      {/* Header */}
+      <div className="bg-white shadow-sm border-b">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16">
+            <div className="flex items-center">
+              <Link to="/simulation" className="text-gray-400 hover:text-gray-600 mr-4">
+                <ArrowLeft className="w-6 h-6" />
+              </Link>
+              <h1 className="text-xl font-semibold text-gray-900 flex items-center">
+                <Activity className="w-6 h-6 mr-3 text-blue-600" />
+                Analytics Dashboard
               </h1>
-              <p className="text-gray-600">
-                Real-time analysis and statistics from your traffic simulation
-              </p>
             </div>
             
             <div className="flex items-center space-x-3">
-              <button
-                onClick={handleExportData}
-                disabled={!currentStats}
-                className="btn btn-outline flex items-center space-x-2"
+              {/* Session Selector */}
+              <select
+                value={selectedSession}
+                onChange={(e) => handleSessionChange(e.target.value)}
+                className="border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                disabled={loading}
               >
-                <Download className="w-4 h-4" />
-                <span>Export Data</span>
-              </button>
-              
+                <option value="">Select a session...</option>
+                {availableSessions
+                  .filter(session => session.can_analyze)
+                  .map(session => (
+                    <option key={session.session_id} value={session.session_id}>
+                      {session.network_id || 'Unknown Network'} - {
+                        new Date(session.created_at).toLocaleDateString()
+                      }
+                    </option>
+                  ))}
+              </select>
+
+              {/* Action Buttons */}
               <button
-                onClick={() => window.location.reload()}
-                className="btn btn-secondary flex items-center space-x-2"
+                onClick={handleRefresh}
+                disabled={!selectedSession || loading}
+                className="p-2 text-gray-400 hover:text-gray-600 disabled:opacity-50"
+                title="Refresh Data"
               >
-                <RefreshCw className="w-4 h-4" />
-                <span>Refresh</span>
+                <RefreshCw className={`w-5 h-5 ${loading ? 'animate-spin' : ''}`} />
               </button>
+
+              <button
+                onClick={handleCompareToggle}
+                className="flex items-center px-3 py-2 text-sm border border-gray-300 rounded-md hover:bg-gray-50"
+              >
+                <GitCompare className="w-4 h-4 mr-2" />
+                Compare Sessions
+              </button>
+
+              <button
+                onClick={handleExportPDF}
+                disabled={!analyticsData}
+                className="flex items-center px-3 py-2 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
+              >
+                <Download className="w-4 h-4 mr-2" />
+                Export PDF
+              </button>
+
+              <div className="relative">
+                <button
+                  onClick={handleExportData}
+                  disabled={!analyticsData}
+                  className="flex items-center px-3 py-2 text-sm border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50"
+                >
+                  <FileText className="w-4 h-4 mr-2" />
+                  Export Data
+                </button>
+              </div>
             </div>
           </div>
         </div>
-        
-        {/* Status */}
-        <div className="mb-6">
-          <div className={`inline-flex items-center space-x-2 px-3 py-2 rounded-lg ${
-            simulationStatus === 'running' ? 'bg-green-100 text-green-800' :
-            simulationStatus === 'finished' ? 'bg-blue-100 text-blue-800' :
-            'bg-gray-100 text-gray-800'
-          }`}>
-            <Activity className="w-4 h-4" />
-            <span className="font-medium">
-              Simulation Status: {simulationStatus === 'running' ? 'Running' : 
-                              simulationStatus === 'finished' ? 'Finished' : 'Stopped'}
-            </span>
-          </div>
-        </div>
-        
-        {!currentStats && (
-          <div className="text-center py-12">
-            <BarChart3 className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">
-              No Analytics Data Available
-            </h3>
-            <p className="text-gray-600 mb-4">
-              Start a simulation to generate analytics data and insights.
-            </p>
-            <Link to="/simulation" className="btn btn-primary">
-              Go to Simulation
-            </Link>
-          </div>
-        )}
-        
-        {currentStats && (
-          <>
-            {/* Key Metrics */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-              <div className="card">
-                <div className="card-body">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm text-gray-600">Total Vehicles</p>
-                      <p className="text-2xl font-bold text-gray-900">{currentStats.totalVehicles}</p>
-                    </div>
-                    <Users className="w-8 h-8 text-blue-600" />
-                  </div>
-                </div>
-              </div>
-              
-              <div className="card">
-                <div className="card-body">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm text-gray-600">Average Speed</p>
-                      <p className="text-2xl font-bold text-gray-900">{currentStats.averageSpeed} <span className="text-sm text-gray-500">m/s</span></p>
-                    </div>
-                    <TrendingUp className="w-8 h-8 text-green-600" />
-                  </div>
-                </div>
-              </div>
-              
-              <div className="card">
-                <div className="card-body">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm text-gray-600">Total Distance</p>
-                      <p className="text-2xl font-bold text-gray-900">{currentStats.totalDistance} <span className="text-sm text-gray-500">km</span></p>
-                    </div>
-                    <Activity className="w-8 h-8 text-purple-600" />
-                  </div>
-                </div>
-              </div>
-              
-              <div className="card">
-                <div className="card-body">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm text-gray-600">Simulation Time</p>
-                      <p className="text-2xl font-bold text-gray-900">{currentStats.simulationTime.toFixed(0)} <span className="text-sm text-gray-500">s</span></p>
-                    </div>
-                    <Clock className="w-8 h-8 text-orange-600" />
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            {/* Charts Section */}
-            <div className="grid lg:grid-cols-2 gap-8 mb-8">
-              {/* Vehicle Type Distribution */}
-              <div className="card">
-                <div className="card-header">
-                  <h3 className="text-lg font-semibold flex items-center space-x-2">
-                    <PieChart className="w-5 h-5" />
-                    <span>Vehicle Type Distribution</span>
-                  </h3>
-                </div>
-                <div className="card-body">
-                  {vehicleTypes.length > 0 ? (
-                    <div className="space-y-4">
-                      {vehicleTypes.map((type, index) => (
-                        <div key={type.type} className="flex items-center justify-between">
-                          <div className="flex items-center space-x-3">
-                            <div className={`w-4 h-4 rounded ${
-                              index === 0 ? 'bg-blue-500' : 
-                              index === 1 ? 'bg-red-500' : 'bg-green-500'
-                            }`}></div>
-                            <span className="font-medium capitalize">{type.type}</span>
-                          </div>
-                          <div className="text-right">
-                            <div className="font-semibold">{type.count}</div>
-                            <div className="text-sm text-gray-500">{type.percentage}%</div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <p className="text-gray-500 text-center py-8">No vehicle data available</p>
-                  )}
-                </div>
-              </div>
-              
-              {/* Speed Distribution */}
-              <div className="card">
-                <div className="card-header">
-                  <h3 className="text-lg font-semibold flex items-center space-x-2">
-                    <BarChart3 className="w-5 h-5" />
-                    <span>Speed Distribution</span>
-                  </h3>
-                </div>
-                <div className="card-body">
-                  <div className="space-y-3">
-                    {speedDistribution.map((range, index) => (
-                      <div key={range.range} className="flex items-center justify-between">
-                        <span className="text-sm font-medium">{range.range}</span>
-                        <div className="flex items-center space-x-3">
-                          <div className="w-24 bg-gray-200 rounded-full h-2">
-                            <div 
-                              className="bg-blue-600 h-2 rounded-full"
-                              style={{ 
-                                width: currentStats.totalVehicles > 0 
-                                  ? `${(range.count / currentStats.totalVehicles * 100)}%` 
-                                  : '0%' 
-                              }}
-                            ></div>
-                          </div>
-                          <span className="text-sm text-gray-600 w-8">{range.count}</span>
-                        </div>
-                      </div>
+      </div>
+
+      {/* Session Comparison Selector */}
+      {showComparison && (
+        <div className="bg-blue-50 border-b border-blue-200">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-sm font-medium text-blue-900 mb-2">
+                  Select sessions to compare (choose 2-4 sessions):
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
+                  {availableSessions
+                    .filter(session => session.can_analyze)
+                    .slice(0, 8) // Limit displayed sessions
+                    .map(session => (
+                      <label key={session.session_id} className="flex items-center">
+                        <input
+                          type="checkbox"
+                          checked={selectedSessionsForComparison.includes(session.session_id)}
+                          onChange={(e) => handleSessionSelectionForComparison(session.session_id, e.target.checked)}
+                          disabled={!selectedSessionsForComparison.includes(session.session_id) && selectedSessionsForComparison.length >= 4}
+                          className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                        />
+                        <span className="ml-2 text-sm text-blue-800">
+                          {session.network_id || 'Unknown'} - {new Date(session.created_at).toLocaleDateString()}
+                        </span>
+                      </label>
                     ))}
-                  </div>
                 </div>
+              </div>
+              
+              <div className="flex items-center space-x-2">
+                <button
+                  onClick={() => setShowComparison(false)}
+                  className="px-3 py-2 text-sm text-blue-700 hover:text-blue-800"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={() => {
+                    // Open comparison modal with selected sessions
+                    // This will be handled by the SessionComparison component
+                  }}
+                  disabled={!canStartComparison}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 text-sm"
+                >
+                  Compare ({selectedSessionsForComparison.length})
+                </button>
               </div>
             </div>
-            
-            {/* Time Series */}
-            <div className="card mb-8">
-              <div className="card-header">
-                <div className="flex items-center justify-between">
-                  <h3 className="text-lg font-semibold flex items-center space-x-2">
-                    <LineChart className="w-5 h-5" />
-                    <span>Time Series Data</span>
-                  </h3>
-                  
-                  <div className="flex items-center space-x-3">
-                    <select
-                      value={selectedMetric}
-                      onChange={(e) => setSelectedMetric(e.target.value)}
-                      className="text-sm border rounded px-2 py-1"
-                    >
-                      <option value="vehicles">Vehicle Count</option>
-                      <option value="averageSpeed">Average Speed</option>
-                      <option value="density">Traffic Density</option>
-                      <option value="flow">Traffic Flow</option>
-                    </select>
-                    
-                    <select
-                      value={timeRange}
-                      onChange={(e) => setTimeRange(e.target.value)}
-                      className="text-sm border rounded px-2 py-1"
-                    >
-                      <option value="all">All Data</option>
-                      <option value="50">Last 50 Points</option>
-                      <option value="20">Last 20 Points</option>
-                      <option value="10">Last 10 Points</option>
-                    </select>
+          </div>
+        </div>
+      )}
+
+      {/* Main Content */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        {/* Session Info Bar */}
+        {selectedSession && (
+          <div className="bg-white rounded-lg shadow-sm border p-4 mb-6">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-6">
+                <div className="flex items-center">
+                  <Database className="w-5 h-5 text-gray-400 mr-2" />
+                  <div>
+                    <p className="text-sm font-medium text-gray-900">Session ID</p>
+                    <p className="text-xs text-gray-500">{selectedSession}</p>
                   </div>
                 </div>
-              </div>
-              <div className="card-body">
-                {timeSeries.length > 0 ? (
-                  <div className="h-64 relative">
-                    <div className="absolute inset-0 flex items-end space-x-1 px-4 pb-4">
-                      {timeSeries.map((point, index) => {
-                        const maxValue = Math.max(...timeSeries.map(p => p[selectedMetric] || 0));
-                        const height = maxValue > 0 ? (point[selectedMetric] / maxValue) * 100 : 0;
-                        
-                        return (
-                          <div
-                            key={index}
-                            className="flex-1 bg-blue-500 rounded-t opacity-80 hover:opacity-100 transition-opacity"
-                            style={{ height: `${height}%`, minHeight: '2px' }}
-                            title={`${point.time}: ${point[selectedMetric]?.toFixed?.(2) || point[selectedMetric]}`}
-                          ></div>
-                        );
-                      })}
-                    </div>
-                    
-                    <div className="absolute bottom-0 left-4 right-4 text-xs text-gray-500 text-center">
-                      Time →
+                
+                {analyticsData?.analysis_timestamp && (
+                  <div className="flex items-center">
+                    <Calendar className="w-5 h-5 text-gray-400 mr-2" />
+                    <div>
+                      <p className="text-sm font-medium text-gray-900">Analyzed</p>
+                      <p className="text-xs text-gray-500">
+                        {new Date(analyticsData.analysis_timestamp).toLocaleString()}
+                      </p>
                     </div>
                   </div>
-                ) : (
-                  <div className="h-64 flex items-center justify-center">
-                    <p className="text-gray-500">No time series data available yet</p>
+                )}
+
+                {simulationStatus === 'running' && (
+                  <div className="flex items-center">
+                    <div className="flex items-center px-2 py-1 bg-green-100 text-green-800 rounded-full">
+                      <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse mr-2"></div>
+                      <span className="text-xs font-medium">Live Session</span>
+                    </div>
                   </div>
                 )}
               </div>
+
+              {analyticsData?.recommendations && (
+                <div className="text-right">
+                  <p className="text-sm font-medium text-gray-900">
+                    {analyticsData.recommendations.length} Recommendations
+                  </p>
+                  <p className="text-xs text-gray-500">
+                    {analyticsData.recommendations.filter(r => r.priority === 'high').length} High Priority
+                  </p>
+                </div>
+              )}
             </div>
-            
-            {/* Detailed Statistics */}
-            <div className="grid md:grid-cols-2 gap-8">
-              <div className="card">
-                <div className="card-header">
-                  <h3 className="text-lg font-semibold">Performance Metrics</h3>
-                </div>
-                <div className="card-body space-y-3">
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Max Speed Recorded</span>
-                    <span className="font-medium">{currentStats.maxSpeed} m/s</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Traffic Density</span>
-                    <span className="font-medium">{currentStats.density}%</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Network Edges</span>
-                    <span className="font-medium">{currentStats.totalEdges}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Avg Vehicles/Edge</span>
-                    <span className="font-medium">{currentStats.averageVehiclesPerEdge}</span>
-                  </div>
-                </div>
-              </div>
-              
-              <div className="card">
-                <div className="card-header">
-                  <h3 className="text-lg font-semibold flex items-center space-x-2">
-                    <Info className="w-5 h-5" />
-                    <span>Analysis Summary</span>
-                  </h3>
-                </div>
-                <div className="card-body">
-                  <div className="space-y-3 text-sm">
-                    <div className="p-3 bg-blue-50 border border-blue-200 rounded">
-                      <h4 className="font-medium text-blue-900">Traffic Flow</h4>
-                      <p className="text-blue-800">
-                        {currentStats.averageSpeed > 10 ? 'Good' : 
-                         currentStats.averageSpeed > 5 ? 'Moderate' : 'Congested'} traffic flow 
-                        with average speed of {currentStats.averageSpeed} m/s
-                      </p>
-                    </div>
-                    
-                    <div className="p-3 bg-green-50 border border-green-200 rounded">
-                      <h4 className="font-medium text-green-900">Vehicle Distribution</h4>
-                      <p className="text-green-800">
-                        {currentStats.totalVehicles} vehicles currently active in the simulation
-                      </p>
-                    </div>
-                    
-                    <div className="p-3 bg-yellow-50 border border-yellow-200 rounded">
-                      <h4 className="font-medium text-yellow-900">Network Utilization</h4>
-                      <p className="text-yellow-800">
-                        {currentStats.density}% average occupancy across {currentStats.totalEdges} road segments
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </>
+          </div>
         )}
-        
-        {/* Navigation */}
-        <div className="flex justify-between items-center mt-8">
-          <Link to="/simulation" className="btn btn-secondary flex items-center space-x-2">
-            <ArrowLeft className="w-4 h-4" />
-            <span>Back to Simulation</span>
-          </Link>
-          
-          <Link to="/" className="btn btn-primary">
-            Return to Home
-          </Link>
-        </div>
+
+        {/* Error State */}
+        {error && (
+          <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+            <div className="flex items-center">
+              <AlertCircle className="w-5 h-5 text-red-400 mr-3" />
+              <div>
+                <h3 className="text-sm font-medium text-red-800">Error Loading Analytics</h3>
+                <p className="text-sm text-red-700 mt-1">{error}</p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* No Session Selected State */}
+        {!selectedSession && !loading && (
+          <div className="text-center py-12">
+            <Eye className="mx-auto h-12 w-12 text-gray-400" />
+            <h3 className="mt-4 text-lg font-medium text-gray-900">Select a Session to Analyze</h3>
+            <p className="mt-2 text-gray-500">
+              Choose a simulation session from the dropdown above to view detailed analytics.
+            </p>
+            {availableSessions.filter(s => s.can_analyze).length === 0 && (
+              <p className="mt-2 text-sm text-gray-400">
+                No analyzable sessions found. Run a simulation to generate analytics data.
+              </p>
+            )}
+          </div>
+        )}
+
+        {/* Loading State */}
+        {loading && (
+          <div className="text-center py-12">
+            <RefreshCw className="mx-auto h-8 w-8 text-blue-500 animate-spin" />
+            <p className="mt-4 text-gray-600">Loading analytics data...</p>
+          </div>
+        )}
+
+        {/* Analytics Content */}
+        {analyticsData && !loading && !error && (
+          <div className="space-y-6">
+            {/* Tab Navigation */}
+            <div className="border-b border-gray-200">
+              <nav className="-mb-px flex space-x-8">
+                {tabs.map(tab => {
+                  const Icon = tab.icon;
+                  return (
+                    <button
+                      key={tab.id}
+                      onClick={() => setActiveTab(tab.id)}
+                      className={`py-2 px-1 border-b-2 font-medium text-sm flex items-center ${
+                        activeTab === tab.id
+                          ? 'border-blue-500 text-blue-600'
+                          : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                      }`}
+                    >
+                      <Icon className="w-4 h-4 mr-2" />
+                      {tab.name}
+                    </button>
+                  );
+                })}
+              </nav>
+            </div>
+
+            {/* Tab Content */}
+            <div className="min-h-[400px]">
+              {activeTab === 'overview' && (
+                <div className="space-y-6">
+                  <KPIDashboard kpis={analyticsData.kpis} loading={false} />
+                  
+                  {analyticsData.recommendations && analyticsData.recommendations.length > 0 && (
+                    <div className="bg-white rounded-lg border p-6">
+                      <h3 className="text-lg font-semibold text-gray-900 mb-4">Top Recommendations</h3>
+                      <div className="space-y-3">
+                        {analyticsData.recommendations
+                          .filter(r => r.priority === 'high')
+                          .slice(0, 3)
+                          .map((rec, index) => (
+                            <div key={index} className="flex items-start p-3 bg-red-50 border border-red-200 rounded-lg">
+                              <AlertTriangle className="w-5 h-5 text-red-500 mr-3 mt-0.5" />
+                              <div>
+                                <p className="text-sm font-medium text-red-800">{rec.category.toUpperCase()}</p>
+                                <p className="text-sm text-red-700">{rec.message}</p>
+                              </div>
+                            </div>
+                          ))}
+                        {analyticsData.recommendations.filter(r => r.priority === 'high').length === 0 && (
+                          <div className="text-center py-4 text-green-600">
+                            <p>No high-priority recommendations. Performance looks good!</p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {activeTab === 'kpis' && (
+                <KPIDashboard kpis={analyticsData.kpis} loading={false} />
+              )}
+
+              {activeTab === 'charts' && (
+                <AnalyticsCharts analyticsData={analyticsData} loading={false} />
+              )}
+
+              {activeTab === 'recommendations' && (
+                <RecommendationsPanel 
+                  recommendations={analyticsData.recommendations} 
+                  loading={false} 
+                />
+              )}
+            </div>
+          </div>
+        )}
       </div>
+
+      {/* Session Comparison Modal */}
+      {canStartComparison && (
+        <SessionComparison
+          selectedSessions={selectedSessionsForComparison}
+          onClose={() => {
+            setShowComparison(false);
+            setSelectedSessionsForComparison([]);
+          }}
+        />
+      )}
     </div>
   );
 };
 
 export default AnalyticsPage;
+
