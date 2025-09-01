@@ -16,6 +16,7 @@ import threading
 import time
 import json
 from datetime import datetime
+from pathlib import Path
 from sumo_controller import SumoController
 from websocket_handler import WebSocketHandler
 from simulation_manager import SimulationManager
@@ -68,10 +69,42 @@ def api_status():
     """
     return jsonify({
         'backend_status': 'running',
-        'simulation_active': simulation_active,
+        'simulation_active': len(sim_manager.active_processes) > 0,
         'sumo_available': sumo_controller.check_sumo_availability(),
         'connected_clients': len(websocket_handler.connected_clients)
     })
+
+@app.route('/api/simulation/sync', methods=['POST'])
+def sync_simulation_state():
+    """
+    Force synchronization of frontend with backend simulation state
+    """
+    try:
+        active_sessions = []
+        for session_id, data in sim_manager.active_processes.items():
+            process = data["process"]
+            if process.poll() is None:  # Process is still running
+                active_sessions.append({
+                    'session_id': session_id,
+                    'process_id': data["info"]["processId"],
+                    'start_time': data["info"]["startTime"]
+                })
+        
+        # If no active sessions, broadcast that all simulations are completed
+        if not active_sessions:
+            websocket_handler.broadcast_simulation_status('idle', 'No active simulations', {})
+        
+        return jsonify({
+            'success': True,
+            'simulation_active': len(active_sessions) > 0,
+            'active_sessions': active_sessions
+        })
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
 
 @app.route('/api/networks')
 def get_networks():
@@ -675,6 +708,152 @@ def cleanup_simulation_session(session_id):
             'message': f'Error cleaning up session: {str(e)}'
         }), 500
 
+@app.route('/api/simulation/save-session', methods=['POST'])
+def save_simulation_session():
+    """
+    Manually save simulation session data and statistics
+    """
+    try:
+        data = request.json
+        session_id = data.get('sessionId')
+        session_path = data.get('sessionPath')
+        force = data.get('force', False)
+        
+        if not session_id:
+            return jsonify({
+                'success': False,
+                'message': 'Session ID is required'
+            }), 400
+        
+        # If session path is not provided, try to infer it
+        if not session_path:
+            session_path = str(sim_manager.sessions_dir / session_id)
+        
+        session_path = Path(session_path)
+        
+        # Check if session directory exists
+        if not session_path.exists():
+            return jsonify({
+                'success': False,
+                'message': f'Session directory not found: {session_path}'
+            }), 404
+        
+        # Check if session is already saved (has metadata)
+        metadata_file = session_path / 'session_metadata.json'
+        if metadata_file.exists() and not force:
+            return jsonify({
+                'success': True,
+                'message': 'Session already saved',
+                'already_saved': True
+            })
+        
+        # Try to parse SUMO output files and save session data
+        try:
+            session_stats = sim_manager._parse_sumo_output_files(session_path)
+            current_time = datetime.now().isoformat()
+            
+            if session_stats:
+                # Save session statistics
+                stats_file = session_path / "session_statistics.json"
+                with open(stats_file, 'w') as f:
+                    json.dump({
+                        'session_id': session_id,
+                        'saved_at': current_time,
+                        'completion_reason': 'Manual save',
+                        'statistics': session_stats,
+                        'can_analyze': True
+                    }, f, indent=2)
+                
+                # Save session metadata for the analytics API
+                config_file = session_path / "config.json"
+                network_id = "unknown"
+                if config_file.exists():
+                    try:
+                        with open(config_file, 'r') as f:
+                            config_data = json.load(f)
+                            network_id = config_data.get('network_id', 'unknown')
+                            if network_id == 'unknown':
+                                # Try to infer from SUMO files
+                                sumo_files = list(session_path.glob('*.sumocfg'))
+                                if sumo_files:
+                                    network_id = sumo_files[0].stem
+                    except:
+                        pass
+                
+                metadata = {
+                    'session_id': session_id,
+                    'created_at': current_time,
+                    'completed_at': current_time,
+                    'completion_reason': 'Manual save',
+                    'network_id': network_id,
+                    'can_analyze': True,
+                    'has_statistics': True,
+                    'status': 'saved'
+                }
+                
+                with open(metadata_file, 'w') as f:
+                    json.dump(metadata, f, indent=2)
+                
+                return jsonify({
+                    'success': True,
+                    'message': 'Session saved successfully',
+                    'has_statistics': True,
+                    'can_analyze': True
+                })
+            
+            else:
+                # No statistics found, save basic metadata
+                metadata = {
+                    'session_id': session_id,
+                    'created_at': current_time,
+                    'completed_at': current_time,
+                    'completion_reason': 'Manual save (no data)',
+                    'network_id': 'unknown',
+                    'can_analyze': False,
+                    'has_statistics': False,
+                    'status': 'saved_no_data'
+                }
+                
+                with open(metadata_file, 'w') as f:
+                    json.dump(metadata, f, indent=2)
+                
+                return jsonify({
+                    'success': True,
+                    'message': 'Session saved (no simulation data found)',
+                    'has_statistics': False,
+                    'can_analyze': False
+                })
+                
+        except Exception as parse_error:
+            # Failed to parse, save basic metadata
+            metadata = {
+                'session_id': session_id,
+                'created_at': datetime.now().isoformat(),
+                'completed_at': datetime.now().isoformat(),
+                'completion_reason': 'Manual save (with errors)',
+                'network_id': 'unknown',
+                'can_analyze': False,
+                'has_statistics': False,
+                'status': 'saved_with_errors',
+                'error': str(parse_error)
+            }
+            
+            with open(metadata_file, 'w') as f:
+                json.dump(metadata, f, indent=2)
+            
+            return jsonify({
+                'success': False,
+                'message': f'Session saved with errors: {str(parse_error)}',
+                'has_statistics': False,
+                'can_analyze': False
+            }), 500
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': f'Error saving session: {str(e)}'
+        }), 500
+
 # ============================================================================
 # ANALYTICS ENDPOINTS
 # ============================================================================
@@ -796,7 +975,13 @@ def list_analyzed_sessions():
                 sessions.append(session_info)
         
         # Sort by creation time (newest first)
-        sessions.sort(key=lambda x: x.get('created_at', ''), reverse=True)
+        def sort_key(session):
+            created_at = session.get('created_at')
+            if created_at is None:
+                return '0'
+            return str(created_at)
+        
+        sessions.sort(key=sort_key, reverse=True)
         
         return jsonify({
             'success': True,

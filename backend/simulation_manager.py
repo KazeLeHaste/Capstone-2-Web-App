@@ -50,6 +50,9 @@ class SimulationManager:
         self.active_processes = {}
         self.websocket_handler = websocket_handler
         
+        # Start periodic process monitoring
+        self._start_process_monitor()
+        
         # Ensure directories exist
         self.base_networks_dir.mkdir(exist_ok=True)
         self.sessions_dir.mkdir(exist_ok=True)
@@ -1344,6 +1347,7 @@ class SimulationManager:
             process_info = {
                 "processId": process.pid,
                 "sessionId": session_id,
+                "sessionPath": session_path,
                 "command": " ".join(sumo_cmd),
                 "port": 8813 if enable_live_data else None,
                 "startTime": datetime.now().isoformat()
@@ -1575,7 +1579,54 @@ class SimulationManager:
                     process = data["process"]
                     session_path = data["info"]["sessionPath"]
                     
-                    # Terminate the process
+                    # Check if the process is still running
+                    if process.poll() is not None:
+                        # Process has already terminated, just clean up
+                        print(f"Process {process_id} has already terminated, cleaning up session {session_id}")
+                        
+                        # Parse and save session statistics
+                        try:
+                            session_stats = self._parse_sumo_output_files(Path(session_path))
+                            if session_stats:
+                                stats_file = Path(session_path) / "session_statistics.json"
+                                with open(stats_file, 'w') as f:
+                                    json.dump({
+                                        'session_id': session_id,
+                                        'completed_at': datetime.now().isoformat(),
+                                        'completion_reason': 'Process ended (detected)',
+                                        'statistics': session_stats,
+                                        'can_analyze': True
+                                    }, f, indent=2)
+                                print(f"Session statistics saved to {stats_file}")
+                        except Exception as e:
+                            print(f"Error parsing session statistics for {session_id}: {e}")
+                        
+                        # Remove from active processes
+                        del self.active_processes[session_id]
+                        
+                        # Broadcast simulation completion
+                        if self.websocket_handler:
+                            self.websocket_handler.broadcast_simulation_status('completed', 'Simulation completed (detected)', {
+                                'session_id': session_id,
+                                'reason': 'Process ended (detected)',
+                                'process_id': process_id
+                            })
+                            
+                            completion_data = {
+                                'session_id': session_id,
+                                'reason': 'Process ended (detected)',
+                                'completed_at': datetime.now().isoformat(),
+                                'can_analyze': True
+                            }
+                            self.websocket_handler.broadcast_message('session_completed', completion_data)
+                        
+                        return {
+                            "success": True,
+                            "message": "Simulation was already completed, cleaned up successfully",
+                            "session_id": session_id
+                        }
+                    
+                    # Process is still running, terminate it
                     process.terminate()
                     
                     # Wait for process to finish
@@ -2125,6 +2176,7 @@ class SimulationManager:
             reason: Reason for completion (e.g., "Duration reached", "All vehicles completed")
         """
         try:
+            import time  # Import here for sleep functionality
             print(f"Handling simulation completion for session {session_id}: {reason}")
             
             # Stop the SUMO process if it's still running
@@ -2136,37 +2188,125 @@ class SimulationManager:
                 
                 # Terminate the process gracefully
                 if process.poll() is None:  # Process is still running
-                    print(f"Terminating SUMO process {process_id} for session {session_id}")
+                    print(f"Gracefully stopping SUMO process {process_id} for session {session_id}")
+                    
+                    # Try to close TraCI connection first to signal SUMO to finish writing files
+                    try:
+                        import traci
+                        if traci.isLoaded():
+                            print("Closing TraCI connection to allow SUMO to finish writing files...")
+                            traci.close()
+                            time.sleep(2)  # Give SUMO time to flush files
+                    except Exception as e:
+                        print(f"Error closing TraCI: {e}")
+                    
+                    # Send SIGTERM first (graceful shutdown)
                     process.terminate()
                     
-                    # Wait for process to finish
+                    # Wait longer for process to finish writing files
                     try:
-                        process.wait(timeout=10)
+                        process.wait(timeout=15)  # Increased timeout
                         print(f"SUMO process {process_id} terminated gracefully")
                     except subprocess.TimeoutExpired:
-                        print(f"SUMO process {process_id} didn't terminate gracefully, force killing")
+                        print(f"SUMO process {process_id} didn't terminate gracefully within 15s, force killing")
                         process.kill()
+                        # Even after killing, give a moment for file system to sync
+                        time.sleep(1)
                 
                 # Parse and save session statistics 
                 print(f"Parsing simulation output for session {session_id}")
                 try:
                     session_stats = self._parse_sumo_output_files(Path(session_path))
+                    current_time = datetime.now().isoformat()
+                    
                     if session_stats:
                         # Save session statistics to a JSON file
                         stats_file = Path(session_path) / "session_statistics.json"
                         with open(stats_file, 'w') as f:
                             json.dump({
                                 'session_id': session_id,
-                                'completed_at': datetime.now().isoformat(),
+                                'completed_at': current_time,
                                 'completion_reason': reason,
                                 'statistics': session_stats,
                                 'can_analyze': True
                             }, f, indent=2)
                         print(f"Session statistics saved to {stats_file}")
+                        
+                        # Also save session metadata for the analytics API
+                        metadata_file = Path(session_path) / "session_metadata.json"
+                        
+                        # Try to load existing config to get network info
+                        config_file = Path(session_path) / "config.json"
+                        network_id = "unknown"
+                        if config_file.exists():
+                            try:
+                                with open(config_file, 'r') as f:
+                                    config_data = json.load(f)
+                                    # Extract network info from config or session path
+                                    network_id = config_data.get('network_id', 'unknown')
+                                    if network_id == 'unknown':
+                                        # Try to infer from SUMO files in the directory
+                                        sumo_files = list(Path(session_path).glob('*.sumocfg'))
+                                        if sumo_files:
+                                            network_id = sumo_files[0].stem
+                            except Exception as e:
+                                print(f"Could not load config for network ID: {e}")
+                        
+                        metadata = {
+                            'session_id': session_id,
+                            'created_at': current_time,
+                            'completed_at': current_time,
+                            'completion_reason': reason,
+                            'network_id': network_id,
+                            'can_analyze': True,
+                            'has_statistics': True,
+                            'status': 'completed'
+                        }
+                        
+                        with open(metadata_file, 'w') as f:
+                            json.dump(metadata, f, indent=2)
+                        print(f"Session metadata saved to {metadata_file}")
                     else:
                         print(f"Warning: No statistics could be parsed for session {session_id}")
+                        
+                        # Still save metadata even without statistics
+                        metadata_file = Path(session_path) / "session_metadata.json"
+                        metadata = {
+                            'session_id': session_id,
+                            'created_at': current_time,
+                            'completed_at': current_time,
+                            'completion_reason': reason,
+                            'network_id': 'unknown',
+                            'can_analyze': False,
+                            'has_statistics': False,
+                            'status': 'completed_no_data'
+                        }
+                        with open(metadata_file, 'w') as f:
+                            json.dump(metadata, f, indent=2)
+                        print(f"Session metadata (no stats) saved to {metadata_file}")
+                        
                 except Exception as e:
                     print(f"Error parsing session statistics for {session_id}: {e}")
+                    
+                    # Save basic metadata even if statistics parsing failed
+                    try:
+                        metadata_file = Path(session_path) / "session_metadata.json"
+                        metadata = {
+                            'session_id': session_id,
+                            'created_at': datetime.now().isoformat(),
+                            'completed_at': datetime.now().isoformat(),
+                            'completion_reason': f"{reason} (with errors)",
+                            'network_id': 'unknown',
+                            'can_analyze': False,
+                            'has_statistics': False,
+                            'status': 'completed_with_errors',
+                            'error': str(e)
+                        }
+                        with open(metadata_file, 'w') as f:
+                            json.dump(metadata, f, indent=2)
+                        print(f"Basic session metadata saved despite errors")
+                    except Exception as meta_error:
+                        print(f"Failed to save even basic metadata: {meta_error}")
                 
                 # Remove from active processes
                 del self.active_processes[session_id]
@@ -2193,3 +2333,78 @@ class SimulationManager:
                 
         except Exception as e:
             print(f"Error handling simulation completion for session {session_id}: {e}")
+
+    def _start_process_monitor(self):
+        """
+        Start a background thread to periodically check for ended simulations
+        """
+        def monitor_processes():
+            while True:
+                try:
+                    # Check every 10 seconds
+                    import time
+                    time.sleep(10)
+                    
+                    # Check for dead processes
+                    orphaned_sessions = []
+                    for session_id, data in self.active_processes.copy().items():
+                        process = data["process"]
+                        if process.poll() is not None:  # Process has ended
+                            print(f"Detected ended simulation process for session {session_id}")
+                            orphaned_sessions.append(session_id)
+                    
+                    # Clean up orphaned sessions
+                    for session_id in orphaned_sessions:
+                        try:
+                            data = self.active_processes[session_id]
+                            process_id = data["info"]["processId"]
+                            session_path = data["info"]["sessionPath"]
+                            
+                            # Parse and save session statistics
+                            try:
+                                session_stats = self._parse_sumo_output_files(Path(session_path))
+                                if session_stats:
+                                    stats_file = Path(session_path) / "session_statistics.json"
+                                    with open(stats_file, 'w') as f:
+                                        json.dump({
+                                            'session_id': session_id,
+                                            'completed_at': datetime.now().isoformat(),
+                                            'completion_reason': 'Natural completion (detected)',
+                                            'statistics': session_stats,
+                                            'can_analyze': True
+                                        }, f, indent=2)
+                                    print(f"Session statistics saved to {stats_file}")
+                            except Exception as e:
+                                print(f"Error parsing session statistics for {session_id}: {e}")
+                            
+                            # Remove from active processes
+                            del self.active_processes[session_id]
+                            
+                            # Broadcast completion
+                            if self.websocket_handler:
+                                self.websocket_handler.broadcast_simulation_status('completed', 'Simulation completed', {
+                                    'session_id': session_id,
+                                    'reason': 'Natural completion (detected)',
+                                    'process_id': process_id
+                                })
+                                
+                                completion_data = {
+                                    'session_id': session_id,
+                                    'reason': 'Natural completion (detected)',
+                                    'completed_at': datetime.now().isoformat(),
+                                    'can_analyze': True
+                                }
+                                self.websocket_handler.broadcast_message('session_completed', completion_data)
+                            
+                            print(f"Cleaned up orphaned session {session_id}")
+                            
+                        except Exception as e:
+                            print(f"Error cleaning up orphaned session {session_id}: {e}")
+                            
+                except Exception as e:
+                    print(f"Error in process monitor: {e}")
+        
+        # Start monitoring thread
+        monitor_thread = threading.Thread(target=monitor_processes, daemon=True)
+        monitor_thread.start()
+        print("Process monitor thread started")

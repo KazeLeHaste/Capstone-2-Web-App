@@ -32,6 +32,7 @@ class TrafficKPIs:
     avg_waiting_time: float = 0.0
     max_waiting_time: float = 0.0
     avg_time_loss: float = 0.0
+    simulation_duration: float = 0.0
     
     # Speed metrics
     avg_speed: float = 0.0
@@ -48,6 +49,9 @@ class TrafficKPIs:
     
     # Efficiency metrics
     throughput: float = 0.0  # vehicles per hour
+    
+    # Additional info
+    notes: str = ""
     flow_rate: float = 0.0   # vehicles per second
     
     # Safety metrics
@@ -235,11 +239,18 @@ class TrafficAnalyticsEngine:
         # Calculate derived metrics
         kpis = self._calculate_derived_metrics(kpis)
         
+        # If no completed trips, try to extract basic simulation info
+        if kpis.total_vehicles_completed == 0:
+            kpis = self._extract_basic_simulation_info(tripinfo_file, kpis)
+        
         return kpis
     
     def _process_tripinfo_file(self, tripinfo_file: Path, kpis: TrafficKPIs) -> TrafficKPIs:
         """Process tripinfo.xml file for vehicle trip data"""
         try:
+            # Try to repair the file if it's incomplete
+            self._repair_xml_file_if_needed(tripinfo_file)
+            
             tree = ET.parse(tripinfo_file)
             root = tree.getroot()
             
@@ -313,6 +324,9 @@ class TrafficAnalyticsEngine:
     def _process_stats_file(self, stats_file: Path, kpis: TrafficKPIs) -> TrafficKPIs:
         """Process stats.xml file for overall statistics"""
         try:
+            # Try to repair the file if it's incomplete
+            self._repair_xml_file_if_needed(stats_file)
+            
             tree = ET.parse(stats_file)
             root = tree.getroot()
             
@@ -362,6 +376,108 @@ class TrafficAnalyticsEngine:
             print(f"Error processing summary file: {e}")
         
         return kpis
+    
+    def _extract_basic_simulation_info(self, tripinfo_file: Optional[Path], kpis: TrafficKPIs) -> TrafficKPIs:
+        """
+        Extract basic simulation information from configuration when no trips completed.
+        This helps provide some analytics even for very short simulations.
+        """
+        try:
+            if not tripinfo_file or not tripinfo_file.exists():
+                return kpis
+                
+            # Parse the XML to get simulation configuration
+            tree = ET.parse(tripinfo_file)
+            root = tree.getroot()
+            
+            # Look for SUMO configuration in the XML comments/header
+            config_text = str(tree)
+            
+            # Extract simulation duration from config
+            if '<end value="' in config_text:
+                start_idx = config_text.find('<end value="') + 12
+                end_idx = config_text.find('"', start_idx)
+                if end_idx > start_idx:
+                    try:
+                        sim_duration = float(config_text[start_idx:end_idx])
+                        kpis.simulation_duration = sim_duration
+                    except:
+                        pass
+            
+            # Extract scale factor if available
+            if '<scale value="' in config_text:
+                start_idx = config_text.find('<scale value="') + 14
+                end_idx = config_text.find('"', start_idx)
+                if end_idx > start_idx:
+                    try:
+                        scale_factor = float(config_text[start_idx:end_idx])
+                        # Estimate vehicles based on scale factor (rough approximation)
+                        kpis.total_vehicles_loaded = int(scale_factor * 10)  # Very rough estimate
+                    except:
+                        pass
+            
+            # If we have a session directory, check route files for better vehicle count estimation
+            session_path = tripinfo_file.parent
+            routes_dir = session_path / "routes"
+            if routes_dir.exists():
+                vehicle_count = 0
+                for route_file in routes_dir.glob("*.xml"):
+                    try:
+                        route_tree = ET.parse(route_file)
+                        route_root = route_tree.getroot()
+                        # Count vehicle definitions
+                        vehicles = route_root.findall('.//vehicle')
+                        vehicle_count += len(vehicles)
+                    except:
+                        continue
+                
+                if vehicle_count > 0:
+                    kpis.total_vehicles_loaded = vehicle_count
+                    # For short simulations, assume vehicles were running but didn't complete
+                    kpis.total_vehicles_running = vehicle_count
+                    
+                    # Provide a message indicating this is partial data
+                    kpis.notes = f"Simulation too short ({getattr(kpis, 'simulation_duration', 'unknown')}s) for vehicles to complete trips. Stats based on loaded vehicles."
+            
+        except Exception as e:
+            print(f"Error extracting basic simulation info: {e}")
+        
+        return kpis
+    
+    def _repair_xml_file_if_needed(self, xml_file: Path):
+        """
+        Repair XML files that weren't properly closed by SUMO
+        """
+        try:
+            with open(xml_file, 'r', encoding='utf-8') as f:
+                content = f.read()
+            
+            # Check if tripinfos file is incomplete
+            if xml_file.name.endswith('tripinfos.xml'):
+                if '<tripinfos' in content and not content.strip().endswith('</tripinfos>'):
+                    print(f"Repairing incomplete tripinfos file: {xml_file}")
+                    # Add closing tag
+                    if not content.strip().endswith('>'):
+                        content += '>'
+                    content += '\n</tripinfos>'
+                    
+                    # Write back the repaired content
+                    with open(xml_file, 'w', encoding='utf-8') as f:
+                        f.write(content)
+            
+            # Check if stats file is incomplete  
+            elif xml_file.name.endswith('stats.xml'):
+                if content.strip() and not content.strip().endswith('>'):
+                    print(f"Repairing incomplete stats file: {xml_file}")
+                    # For stats file, we might need to add proper structure
+                    if '<statistics>' not in content:
+                        content += '\n<statistics>\n</statistics>'
+                    
+                    with open(xml_file, 'w', encoding='utf-8') as f:
+                        f.write(content)
+            
+        except Exception as e:
+            print(f"Error repairing XML file {xml_file}: {e}")
     
     def _calculate_derived_metrics(self, kpis: TrafficKPIs) -> TrafficKPIs:
         """Calculate derived metrics from basic KPIs"""

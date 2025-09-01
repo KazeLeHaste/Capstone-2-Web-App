@@ -27,7 +27,8 @@ import {
   BarChart3,
   Monitor,
   ZoomIn,
-  ZoomOut
+  ZoomOut,
+  Save
 } from 'lucide-react';
 import { apiClient } from '../utils/apiClient';
 
@@ -38,9 +39,10 @@ const SimulationPage = ({ socket }) => {
   
   const [sessionData, setSessionData] = useState(null);
   const [config, setConfig] = useState(null);
-  const [simulationState, setSimulationState] = useState('ready'); // ready, launching, running, paused, stopped, error
+  const [simulationState, setSimulationState] = useState('ready'); // ready, launching, running, paused, stopped, error, finished
   const [error, setError] = useState(null);
   const [sumoProcess, setSumoProcess] = useState(null);
+  const [sessionSaved, setSessionSaved] = useState(false);
   
   // Live statistics
   const [liveStats, setLiveStats] = useState({
@@ -218,14 +220,16 @@ const SimulationPage = ({ socket }) => {
     const message = `Simulation completed: ${completionData.reason}`;
     console.log(message);
     
-    // You could show a toast notification here
-    // toast.success(message);
+    // Mark session as saved if the backend indicates it can be analyzed
+    if (completionData.can_analyze) {
+      setSessionSaved(true);
+    }
     
     // Update session data to indicate it can be analyzed
     if (sessionData) {
       setSessionData(prev => ({
         ...prev,
-        can_analyze: true,
+        can_analyze: completionData.can_analyze || false,
         completed_at: completionData.completed_at
       }));
     }
@@ -354,6 +358,41 @@ const SimulationPage = ({ socket }) => {
     } catch (err) {
       console.error('Error stopping simulation:', err);
       setError('Failed to stop simulation');
+    }
+  };
+
+  const handleSaveSession = async () => {
+    if (!sessionData?.sessionId) return;
+
+    try {
+      setError(null); // Clear any previous errors
+      
+      // Force save session data by calling a backend endpoint
+      const response = await apiClient.post('/api/simulation/save-session', {
+        sessionId: sessionData.sessionId,
+        sessionPath: sessionData.sessionPath,
+        force: true // Force save even if already saved
+      });
+      
+      if (response.data.success) {
+        // Update session data to indicate it's saved and can be analyzed
+        setSessionData(prev => ({
+          ...prev,
+          can_analyze: true,
+          saved_at: new Date().toISOString()
+        }));
+        
+        // Mark as saved
+        setSessionSaved(true);
+        
+        // Show success message (you could add a toast notification here)
+        console.log('Session saved successfully');
+      } else {
+        setError('Failed to save session: ' + (response.data.message || 'Unknown error'));
+      }
+    } catch (err) {
+      console.error('Error saving session:', err);
+      setError('Failed to save session data');
     }
   };
 
@@ -618,13 +657,23 @@ const SimulationPage = ({ socket }) => {
                 
                 {simulationState === 'finished' && sessionData?.sessionId && (
                   <>
-                    <Link
-                      to={`/analytics?session=${sessionData.sessionId}`}
-                      className="simulation-control-btn primary"
-                    >
-                      <BarChart3 className="w-4 h-4" />
-                      View Results
-                    </Link>
+                    {sessionSaved || sessionData?.can_analyze ? (
+                      <Link
+                        to={`/analytics?session=${sessionData.sessionId}`}
+                        className="simulation-control-btn primary"
+                      >
+                        <BarChart3 className="w-4 h-4" />
+                        View Results
+                      </Link>
+                    ) : (
+                      <button
+                        onClick={handleSaveSession}
+                        className="simulation-control-btn primary"
+                      >
+                        <Save className="w-4 h-4" />
+                        Save Session
+                      </button>
+                    )}
                     <button
                       onClick={handleLaunchSimulation}
                       className="simulation-control-btn"
