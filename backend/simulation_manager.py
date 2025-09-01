@@ -212,6 +212,11 @@ class SimulationManager:
             Result dictionary with session path
         """
         try:
+            # Map frontend configuration to backend configuration
+            if 'trafficIntensity' in config:
+                config['sumo_traffic_intensity'] = config['trafficIntensity']
+                print(f"DEBUG: Mapped trafficIntensity {config['trafficIntensity']} to sumo_traffic_intensity")
+            
             session_dir = self.sessions_dir / session_id
             session_dir.mkdir(exist_ok=True)
             
@@ -973,12 +978,12 @@ class SimulationManager:
     
     def _generate_sumo_config(self, session_dir: Path, network_id: str, config: Dict[str, Any]):
         """
-        Generate SUMO configuration file
+        Generate SUMO configuration file with simplified essential parameters
         
         Args:
             session_dir: Session directory
             network_id: Network identifier
-            config: Configuration parameters
+            config: Configuration parameters with simplified structure
         """
         config_file = session_dir / f"{network_id}.sumocfg"
         additional_file = session_dir / f"{network_id}.add.xml"
@@ -990,18 +995,34 @@ class SimulationManager:
         # Generate GUI settings file
         self._generate_gui_settings_file(gui_settings_file)
         
-        # Automatically determine simulation duration from route file
+        # Extract simplified SUMO parameters from config
+        # These come from the frontend as sumo_begin, sumo_end, etc.
+        begin_time = config.get('sumo_begin', 0)  # From --begin parameter
+        end_time = config.get('sumo_end', 1800)   # From --end parameter
+        step_length = config.get('sumo_step_length', 1.0)  # From --step-length parameter
+        time_to_teleport = config.get('sumo_time_to_teleport', 300)  # From --time-to-teleport parameter
+        traffic_intensity = config.get('sumo_traffic_intensity', 1.0)  # Traffic intensity multiplier
+        
+        # Fallback to original config structure for backward compatibility
+        if 'original_config' in config:
+            original = config['original_config']
+            begin_time = original.get('beginTime', begin_time)
+            end_time = original.get('endTime', end_time)
+            step_length = original.get('stepLength', step_length)
+            time_to_teleport = original.get('timeToTeleport', time_to_teleport)
+        
+        # Auto-calculate duration if not provided or if it's too short
         route_file = session_dir / f"{network_id}.rou.xml"
         auto_duration = self._calculate_simulation_duration(route_file)
         
-        # Use provided duration or auto-calculated if not provided or zero
-        provided_duration = config.get('duration')
-        if provided_duration is None or provided_duration <= 0:
-            simulation_duration = auto_duration
+        # Use the larger of provided end_time or auto-calculated duration
+        if end_time <= begin_time or end_time < 300:  # Minimum 5 minutes
+            simulation_end_time = max(auto_duration, begin_time + 1800)  # At least 30 minutes
         else:
-            simulation_duration = provided_duration
+            simulation_end_time = max(end_time, auto_duration)
         
-        # SUMO configuration template
+        # SUMO configuration template with essential parameters only
+        # This follows SUMO documentation structure exactly
         sumo_config = f'''<?xml version="1.0" encoding="UTF-8"?>
 <configuration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/sumoConfiguration.xsd">
 
@@ -1012,13 +1033,13 @@ class SimulationManager:
     </input>
 
     <time>
-        <begin value="0"/>
-        <end value="{simulation_duration}"/>
-        <step-length value="{config.get('stepLength', 1.0)}"/>
+        <begin value="{begin_time}"/>
+        <end value="{simulation_end_time}"/>
+        <step-length value="{step_length}"/>
     </time>
 
     <processing>
-        <time-to-teleport value="{config.get('teleportTime', 300)}"/>
+        <time-to-teleport value="{time_to_teleport}"/>
         <lateral-resolution value="0.8"/>
     </processing>
 
@@ -1045,6 +1066,17 @@ class SimulationManager:
         
         with open(config_file, 'w') as f:
             f.write(sumo_config)
+            
+        # Log the configuration for debugging
+        print(f"DEBUG: Generated SUMO config with:")
+        print(f"  Begin time: {begin_time}s")
+        print(f"  End time: {simulation_end_time}s")
+        print(f"  Duration: {simulation_end_time - begin_time}s")
+        print(f"  Step length: {step_length}s")
+        print(f"  Time to teleport: {time_to_teleport}s")
+        print(f"  Traffic intensity: {traffic_intensity}x")
+        if traffic_intensity != 1.0:
+            print(f"  Traffic scaling: enabled via --scale parameter")
     
     def _calculate_simulation_duration(self, route_file: Path) -> int:
         """
@@ -1092,36 +1124,45 @@ class SimulationManager:
         
         Args:
             additional_file: Path to additional file
-            config: Configuration parameters
+            config: Configuration parameters (simplified structure)
         """
-        additional_content = '''<?xml version="1.0" encoding="UTF-8"?>
+        additional_content = f'''<?xml version="1.0" encoding="UTF-8"?>
 <additional xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/additional_file.xsd">
 
-    <!-- Road Closures -->'''
+    <!-- Simple additional file for essential simulation configuration -->
+    <!-- Traffic intensity is now controlled via SUMO's --scale parameter -->
+    
+    <!-- Detectors for Live Data Collection -->
+    <!-- Basic detectors can be added here in future versions -->
+    
+</additional>'''
         
-        # Add road closures
-        road_closures = config.get('roadClosures', [])
-        for closure in road_closures:
-            edge_id = closure.get('edgeId')
-            start_time = closure.get('startTime', 0)
-            end_time = closure.get('endTime', 1800)
+        # Check if we have the original config with advanced features (backward compatibility)
+        if 'original_config' in config:
+            original = config['original_config']
+            road_closures = original.get('roadClosures', [])
             
-            if edge_id:
-                additional_content += f'''
+            if road_closures:
+                additional_content = additional_content.replace(
+                    '<!-- Basic detectors can be added here in future versions -->',
+                    '''<!-- Road Closures from advanced configuration -->'''
+                )
+                
+                for closure in road_closures:
+                    edge_id = closure.get('edgeId')
+                    start_time = closure.get('startTime', 0)
+                    end_time = closure.get('endTime', 1800)
+                    
+                    if edge_id:
+                        # Add closingRerouter for this edge
+                        closure_xml = f'''
     <closingRerouter id="closure_{edge_id}" edges="{edge_id}" file="closure_{edge_id}.xml">
         <interval begin="{start_time}" end="{end_time}"/>
     </closingRerouter>'''
-        
-        # Add detectors for live data collection
-        additional_content += '''
-    
-    <!-- Traffic Light Programs -->
-    <!-- Note: Traffic light programs would be added here based on configuration -->
-    
-    <!-- Detectors for Live Data -->
-    <!-- Detectors would be added here based on configuration -->
-    
-</additional>'''
+                        additional_content = additional_content.replace(
+                            '<!-- Basic detectors can be added here in future versions -->',
+                            closure_xml + '\n    <!-- Basic detectors can be added here in future versions -->'
+                        )
         
         with open(additional_file, 'w') as f:
             f.write(additional_content)
@@ -1201,6 +1242,14 @@ class SimulationManager:
                 "--time-to-teleport", "300",  # Prevent vehicles from getting stuck
                 "--no-warnings"  # Reduce console spam
             ])
+            
+            # Add traffic intensity scaling if specified
+            traffic_intensity = config.get('sumo_traffic_intensity', 1.0)
+            if traffic_intensity != 1.0:
+                sumo_cmd.extend(["--scale", str(traffic_intensity)])
+                print(f"DEBUG: Adding traffic scaling: --scale {traffic_intensity}")
+            else:
+                print(f"DEBUG: No traffic scaling (intensity = 1.0)")
             
             # Add gaming mode settings for GUI (automatic start and better UX)
             if enable_gui:

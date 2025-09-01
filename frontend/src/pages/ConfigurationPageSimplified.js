@@ -12,6 +12,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { 
+  Settings, 
   Clock, 
   Car, 
   Zap,
@@ -41,9 +42,6 @@ const ConfigurationPage = ({ socket }) => {
     
     // Core SUMO Processing Parameters
     timeToTeleport: 300, // Time to teleport stuck vehicles in seconds (SUMO --time-to-teleport parameter) - default 300s
-    
-    // Traffic Intensity Control (SUMO Calibrator/Flow Parameters)
-    trafficIntensity: 1.0, // Traffic intensity multiplier (1.0 = normal, 2.0 = double traffic, 0.5 = half traffic)
     
     // Optional Traffic Volume Control (if supported by backend)
     // This would require backend logic to modify route files or vehicle counts
@@ -89,9 +87,6 @@ const ConfigurationPage = ({ socket }) => {
           sumo_end: config.endTime,         // Maps to --end parameter  
           sumo_step_length: config.stepLength, // Maps to --step-length parameter
           sumo_time_to_teleport: config.timeToTeleport, // Maps to --time-to-teleport parameter
-          
-          // Traffic Intensity Control (for SUMO calibrators and flow generation)
-          sumo_traffic_intensity: config.trafficIntensity, // Maps to flow rate multiplier in calibrators
           
           // Keep original config for frontend reference
           original_config: config
@@ -314,53 +309,6 @@ const ConfigurationPage = ({ socket }) => {
               </div>
             </div>
 
-            {/* Traffic Intensity Control */}
-            <div className="config-section">
-              <div className="config-section-header">
-                <RefreshCw className="config-section-icon" />
-                <h2 className="config-section-title">Traffic Intensity</h2>
-                <div className="config-section-help">
-                  <HelpCircle className="w-4 h-4 text-gray-400" />
-                  <span className="config-help-text">Control the density of traffic in the simulation</span>
-                </div>
-              </div>
-              <div className="space-y-4">
-                <div className="config-form-group">
-                  <label className="config-label">
-                    Traffic Intensity Multiplier
-                    <span className="config-help-text ml-2">1.0 = normal traffic, 2.0 = double traffic, 0.5 = half traffic</span>
-                  </label>
-                  <input
-                    type="number"
-                    value={config.trafficIntensity}
-                    onChange={(e) => handleConfigChange('trafficIntensity', parseFloat(e.target.value) || 1.0)}
-                    className="config-input"
-                    min="0.1"
-                    max="5.0"
-                    step="0.1"
-                    placeholder="1.0"
-                  />
-                  <span className="config-help-text">
-                    Multiplies the base traffic volume. Range: 0.1x to 5.0x normal traffic.
-                  </span>
-                  <div className="mt-2 p-3 bg-blue-50 rounded-lg">
-                    <div className="flex items-center text-sm text-blue-700">
-                      <Info className="w-4 h-4 mr-2" />
-                      <div>
-                        <div><strong>Current Setting:</strong> {(config.trafficIntensity * 100).toFixed(0)}% of normal traffic</div>
-                        <div className="text-blue-600">
-                          {config.trafficIntensity < 0.8 ? "Light traffic conditions" :
-                           config.trafficIntensity <= 1.2 ? "Normal traffic conditions" :
-                           config.trafficIntensity <= 2.0 ? "Heavy traffic conditions" :
-                           "Very heavy traffic conditions"}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
             {/* Future Feature Placeholders - Commented for now */}
             {/*
             <div className="config-section">
@@ -428,10 +376,6 @@ const ConfigurationPage = ({ socket }) => {
                 <span className="config-preview-label">Time to Teleport:</span>
                 <span className="config-preview-value">{config.timeToTeleport}s</span>
               </div>
-              <div className="config-preview-item">
-                <span className="config-preview-label">Traffic Intensity:</span>
-                <span className="config-preview-value">{(config.trafficIntensity * 100).toFixed(0)}% ({config.trafficIntensity}x)</span>
-              </div>
             </div>
 
             {/* SUMO Command Preview */}
@@ -439,9 +383,6 @@ const ConfigurationPage = ({ socket }) => {
               <h4 className="text-sm font-medium text-gray-700 mb-2">SUMO Parameters:</h4>
               <div className="bg-gray-900 text-green-400 p-3 rounded text-xs font-mono">
                 --begin {config.beginTime} --end {config.endTime} --step-length {config.stepLength} --time-to-teleport {config.timeToTeleport}
-              </div>
-              <div className="mt-2 text-xs text-gray-600">
-                Traffic intensity will be applied via calibrators (flow multiplier: {config.trafficIntensity}x)
               </div>
             </div>
           </div>

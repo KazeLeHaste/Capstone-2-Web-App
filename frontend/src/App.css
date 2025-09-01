@@ -3689,3 +3689,78 @@ code {
 .space-x-4 > * + * {
   margin-left: 1rem;
 }
+
+/* Additional styles for simplified configuration page */
+.config-section-help {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  margin-left: 0.5rem;
+}
+
+.config-info-panel {
+  background: #e6f3ff;
+  border: 1px solid #b3d9ff;
+  border-radius: 0.5rem;
+  padding: 1rem;
+}
+
+.config-preview-panel {
+  background: white;
+  border-radius: 0.5rem;
+  padding: 1.5rem;
+  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+  height: fit-content;
+}
+
+.config-preview-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--color-gray-900);
+  margin-bottom: 1rem;
+}
+
+.config-preview-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.config-preview-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.config-preview-label {
+  font-weight: 500;
+  color: var(--color-gray-700);
+}
+
+.config-preview-value {
+  font-weight: 600;
+  color: var(--color-gray-900);
+}
+
+.config-command-preview {
+  border-top: 1px solid var(--color-gray-200);
+  padding-top: 1rem;
+}
+
+.config-back-button {
+  display: flex;
+  align-items: center;
+}
+
+.config-action-buttons {
+  display: flex;
+  align-items: center;
+}
+
+/* Mobile responsiveness for config grid */
+@media (max-width: 1024px) {
+  .config-grid {
+    grid-template-columns: 1fr;
+  }
+}

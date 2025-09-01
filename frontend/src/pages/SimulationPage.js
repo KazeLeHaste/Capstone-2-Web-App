@@ -639,7 +639,7 @@ const SimulationPage = ({ socket }) => {
                   <div className="simulation-stat-card">
                     <Clock className="simulation-stat-icon" />
                     <div className="simulation-stat-value">
-                      {formatTime(liveStats.simulationTime)}
+                      {formatTime(liveStats.simulationTime || 0)}
                     </div>
                     <div className="simulation-stat-label">Simulation Time</div>
                   </div>
@@ -647,7 +647,7 @@ const SimulationPage = ({ socket }) => {
                   <div className="simulation-stat-card">
                     <Car className="simulation-stat-icon" />
                     <div className="simulation-stat-value">
-                      {liveStats.runningVehicles}
+                      {liveStats.runningVehicles || 0}
                     </div>
                     <div className="simulation-stat-label">Active Vehicles</div>
                   </div>
@@ -655,7 +655,7 @@ const SimulationPage = ({ socket }) => {
                   <div className="simulation-stat-card">
                     <TrendingUp className="simulation-stat-icon" />
                     <div className="simulation-stat-value">
-                      {liveStats.averageSpeed.toFixed(1)} km/h
+                      {(liveStats.averageSpeed || 0).toFixed(1)} km/h
                     </div>
                     <div className="simulation-stat-label">Avg Speed</div>
                   </div>
@@ -663,7 +663,7 @@ const SimulationPage = ({ socket }) => {
                   <div className="simulation-stat-card">
                     <Activity className="simulation-stat-icon" />
                     <div className="simulation-stat-value">
-                      {liveStats.throughput}
+                      {liveStats.throughput || 0}
                     </div>
                     <div className="simulation-stat-label">Throughput/hr</div>
                   </div>
@@ -683,16 +683,56 @@ const SimulationPage = ({ socket }) => {
               </div>
               <div className="space-y-2 text-sm">
                 <div>
-                  <span className="font-medium">Duration:</span> {Math.floor(config.config.duration / 60)} min
+                  {config.config.original_config ? (
+                    // Simplified configuration structure
+                    <span className="font-medium">Duration:</span>
+                  ) : (
+                    // Legacy configuration structure
+                    <span className="font-medium">Duration:</span>
+                  )}
+                  {" "}
+                  {config.config.original_config 
+                    ? Math.floor(((config.config.sumo_end || 0) - (config.config.sumo_begin || 0)) / 60)
+                    : Math.floor((config.config.duration || 0) / 60)
+                  } min
                 </div>
                 <div>
-                  <span className="font-medium">Traffic Volume:</span> {Math.round(config.config.trafficVolume * 100)}%
+                  {config.config.original_config ? (
+                    // Simplified configuration structure - show traffic intensity
+                    <>
+                      <span className="font-medium">Traffic Intensity:</span> {((config.config.sumo_traffic_intensity || 1.0) * 100).toFixed(0)}% ({config.config.sumo_traffic_intensity || 1.0}x)
+                    </>
+                  ) : (
+                    // Legacy configuration structure - show old traffic volume
+                    <>
+                      <span className="font-medium">Traffic Volume:</span> {Math.round((config.config.trafficVolume || 0) * 100)}%
+                    </>
+                  )}
                 </div>
                 <div>
-                  <span className="font-medium">Step Length:</span> {config.config.stepLength}s
+                  {config.config.original_config ? (
+                    // Simplified configuration structure
+                    <>
+                      <span className="font-medium">Step Length:</span> {config.config.sumo_step_length || 1.0}s
+                    </>
+                  ) : (
+                    // Legacy configuration structure
+                    <>
+                      <span className="font-medium">Step Length:</span> {config.config.stepLength || 1.0}s
+                    </>
+                  )}
                 </div>
                 <div>
-                  <span className="font-medium">Modifications:</span> {config.config.speedLimits.length + config.config.roadClosures.length} items
+                  {config.config.original_config ? (
+                    <span className="font-medium">Configuration:</span>
+                  ) : (
+                    <span className="font-medium">Modifications:</span>
+                  )}
+                  {" "}
+                  {config.config.original_config 
+                    ? "Simplified (Essential parameters only)"
+                    : `${(config.config.speedLimits || []).length + (config.config.roadClosures || []).length} items`
+                  }
                 </div>
               </div>
             </div>

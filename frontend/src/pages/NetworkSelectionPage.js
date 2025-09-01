@@ -326,9 +326,23 @@ const NetworkSelectionPage = ({ socket, onLoadingChange }) => {
               </div>
               <div className="text-sm text-blue-800">
                 Session: <code className="bg-blue-100 px-1 rounded">{sessionId}</code> | 
-                Duration: {Math.floor(sessionConfig.config.duration / 60)}min | 
-                Traffic: {Math.round(sessionConfig.config.trafficVolume * 100)}% | 
-                Modifications: {sessionConfig.config.speedLimits.length + sessionConfig.config.roadClosures.length} items
+                {/* Handle both simplified and legacy configuration structures */}
+                {sessionConfig.config.original_config ? (
+                  // Simplified configuration structure
+                  <>
+                    Duration: {Math.floor((sessionConfig.config.sumo_end - sessionConfig.config.sumo_begin) / 60)}min | 
+                    Step: {sessionConfig.config.sumo_step_length}s | 
+                    Teleport: {sessionConfig.config.sumo_time_to_teleport}s | 
+                    Traffic: {((sessionConfig.config.sumo_traffic_intensity || 1.0) * 100).toFixed(0)}%
+                  </>
+                ) : (
+                  // Legacy configuration structure (backward compatibility)
+                  <>
+                    Duration: {Math.floor((sessionConfig.config.duration || 1800) / 60)}min | 
+                    Traffic: {Math.round((sessionConfig.config.trafficVolume || 0.5) * 100)}% | 
+                    Modifications: {(sessionConfig.config.speedLimits || []).length + (sessionConfig.config.roadClosures || []).length} items
+                  </>
+                )}
               </div>
             </div>
           )}

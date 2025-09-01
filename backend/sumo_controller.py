@@ -120,6 +120,11 @@ class SumoController:
                 "--start"
             ]
             
+            # Add traffic intensity scaling if specified
+            traffic_intensity = config.get('sumo_traffic_intensity', 1.0)
+            if traffic_intensity != 1.0:
+                sumo_cmd.extend(["--scale", str(traffic_intensity)])
+            
             # Start SUMO process
             self.sumo_process = subprocess.Popen(
                 sumo_cmd,
