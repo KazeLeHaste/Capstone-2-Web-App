@@ -30,9 +30,9 @@ const Navigation = ({ isConnected, backendStatus, simulationStatus }) => {
   
   const navigationItems = [
     { path: '/', label: 'Home', icon: Home },
-    { path: '/network-selection', label: 'Network', icon: Network },
     { path: '/configuration', label: 'Configuration', icon: Settings },
-    { path: '/simulation-launch', label: 'Simulation', icon: Play },
+    { path: '/network-selection', label: 'Network', icon: Network },
+    { path: '/simulation', label: 'Simulation', icon: Play },
     { path: '/analytics', label: 'Analytics', icon: BarChart3 }
   ];
   

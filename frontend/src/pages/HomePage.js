@@ -16,16 +16,10 @@ import {
   Network, 
   BarChart3, 
   Settings, 
-  CheckCircle, 
-  AlertCircle,
-  Info,
-  ExternalLink,
   Book,
   Zap,
   Users,
   Globe,
-  ArrowRight,
-  Download,
   Server,
   Car,
   MapPin,
@@ -124,7 +118,7 @@ const HomePage = ({ onShowOnboarding, backendStatus, isConnected }) => {
             
             <div className="hero-buttons">
               <Link
-                to="/simulation-setup"
+                to="/configuration"
                 className="btn-primary"
                 aria-label="Start simulation configuration"
               >
@@ -332,7 +326,7 @@ const HomePage = ({ onShowOnboarding, backendStatus, isConnected }) => {
           
           <div className="text-center">
             <Link
-              to="/simulation-setup"
+              to="/configuration"
               className="btn-primary btn-large"
               aria-label="Start building your traffic simulation"
             >
@@ -361,21 +355,21 @@ const HomePage = ({ onShowOnboarding, backendStatus, isConnected }) => {
                 title: "Configuration Setup",
                 description: "Configure simulation parameters",
                 icon: Settings,
-                path: "/simulation-setup",
+                path: "/configuration",
                 color: "blue"
               },
               {
                 title: "Network Selection",
                 description: "Choose your network",
                 icon: Network,
-                path: "/network-selection-enhanced",
+                path: "/network-selection",
                 color: "green"
               },
               {
                 title: "Launch Simulation",
                 description: "Start SUMO simulation",
                 icon: Play,
-                path: "/simulation-launch",
+                path: "/simulation",
                 color: "purple"
               },
               {

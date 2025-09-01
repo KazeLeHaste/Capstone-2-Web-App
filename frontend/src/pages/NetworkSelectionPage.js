@@ -1,102 +1,196 @@
 /**
  * Network Selection Page Component
  * 
- * Allows users to select from available SUMO network files
- * or upload custom network configurations.
+ * Works with saved configurations to allow users to select predefined networks.
+ * Copies selected networks to session folders and applies configurations.
  * 
  * Author: Traffic Simulator Team
  * Date: August 2025
  */
 
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { 
   Network, 
-  Upload, 
-  Eye, 
-  Download, 
+  CheckCircle, 
   RefreshCw, 
-  AlertCircle,
-  CheckCircle,
-  Info,
-  ArrowRight,
+  Download,
+  Eye,
   MapPin,
+  Users,
+  ArrowLeft,
+  AlertCircle,
+  Info,
+  FileText,
+  Folder,
+  Copy,
+  Settings,
   Clock,
-  Users
+  Car,
+  Zap
 } from 'lucide-react';
-import { api } from '../utils/apiClient';
+import { apiClient } from '../utils/apiClient';
 
 const NetworkSelectionPage = ({ socket, onLoadingChange }) => {
+  const navigate = useNavigate();
+  const location = useLocation();
+  
   const [networks, setNetworks] = useState([]);
   const [selectedNetwork, setSelectedNetwork] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [copying, setCopying] = useState(false);
   const [error, setError] = useState(null);
-  const [uploadMode, setUploadMode] = useState(false);
+  const [success, setSuccess] = useState(false);
   
+  // Configuration from previous step
+  const [sessionConfig, setSessionConfig] = useState(null);
+  const [sessionId, setSessionId] = useState(null);
+
   useEffect(() => {
+    console.log('NetworkSelectionPage: Component mounted');
+    // Load session configuration
+    loadSessionConfiguration();
     loadNetworks();
   }, []);
-  
-  const loadNetworks = async () => {
+
+  const loadSessionConfiguration = () => {
+    console.log('Loading session configuration...');
     try {
-      setLoading(true);
-      setError(null);
+      // Try to get config from navigation state first
+      if (location.state?.sessionId && location.state?.config) {
+        console.log('Found config in navigation state:', location.state);
+        setSessionId(location.state.sessionId);
+        setSessionConfig(location.state.config);
+        return;
+      }
+
+      // Fallback to localStorage
+      const storedSessionId = localStorage.getItem('simulation_session_id');
+      const storedConfig = localStorage.getItem('simulation_config');
       
-      const response = await api.getNetworks();
-      
-      if (response.data.success) {
-        setNetworks(response.data.networks);
+      if (storedSessionId && storedConfig) {
+        setSessionId(storedSessionId);
+        setSessionConfig(JSON.parse(storedConfig));
       } else {
-        setError(response.data.error || 'Failed to load networks');
+        setError('No configuration found. Please complete the configuration step first.');
       }
     } catch (err) {
-      setError('Unable to connect to server. Please check your connection.');
+      console.error('Error loading session configuration:', err);
+      setError('Invalid configuration data. Please restart the configuration process.');
+    }
+  };
+
+  const loadNetworks = async () => {
+    console.log('Loading networks...');
+    try {
+      setLoading(true);
+      if (onLoadingChange) onLoadingChange(true);
+
+      const response = await apiClient.get('/api/networks/available');
+      console.log('Networks API response:', response.data);
+      
+      if (response.data.success) {
+        setNetworks(response.data.networks || []);
+      } else {
+        setError(response.data.message || 'Failed to load networks');
+      }
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to load networks');
       console.error('Error loading networks:', err);
     } finally {
       setLoading(false);
+      if (onLoadingChange) onLoadingChange(false);
     }
   };
-  
+
   const handleNetworkSelect = (network) => {
     setSelectedNetwork(network);
-    
-    // Store selected network in localStorage for next step
-    localStorage.setItem('selected_network', JSON.stringify(network));
-    
-    // Notify parent of selection
-    if (socket) {
-      socket.emit('network_selected', { network: network.id });
-    }
+    setError(null);
   };
-  
-  const handleUpload = (event) => {
-    const file = event.target.files[0];
-    if (!file) return;
-    
-    // Basic file validation
-    if (!file.name.endsWith('.net.xml')) {
-      setError('Please select a valid SUMO network file (.net.xml)');
+
+  const handleCopyAndProceed = async () => {
+    if (!selectedNetwork || !sessionId || !sessionConfig) {
+      setError('Missing required data for network setup');
       return;
     }
-    
-    // TODO: Implement file upload functionality
-    console.log('File selected for upload:', file.name);
-    setError('File upload functionality is not yet implemented. Please use one of the predefined networks.');
+
+    try {
+      setCopying(true);
+      setError(null);
+
+      // Copy network to session folder and apply configurations
+      const requestData = {
+        sessionId,
+        networkId: selectedNetwork.id,
+        networkPath: selectedNetwork.path,
+        config: sessionConfig.config
+      };
+
+      const response = await apiClient.post('/api/simulation/setup-network', requestData);
+      
+      if (response.data.success) {
+        setSuccess(true);
+        
+        // Store session data for simulation
+        const sessionData = {
+          sessionId,
+          networkId: selectedNetwork.id,
+          networkName: selectedNetwork.name,
+          sessionPath: response.data.sessionPath,
+          configApplied: true,
+          timestamp: new Date().toISOString()
+        };
+        
+        localStorage.setItem('simulation_session_data', JSON.stringify(sessionData));
+        
+        // Notify via socket if available
+        if (socket) {
+          socket.emit('network_setup_complete', sessionData);
+        }
+        
+        // Navigate to simulation launch after a brief delay
+        setTimeout(() => {
+          navigate('/simulation', { 
+            state: { sessionData, config: sessionConfig } 
+          });
+        }, 1500);
+      } else {
+        setError(response.data.message || 'Failed to setup network');
+      }
+
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to setup network');
+      console.error('Error setting up network:', err);
+    } finally {
+      setCopying(false);
+    }
   };
-  
+
+  const handleReturnToConfig = () => {
+    // Clear current session data
+    localStorage.removeItem('simulation_session_id');
+    localStorage.removeItem('simulation_config');
+    navigate('/configuration');
+  };
+
   const NetworkCard = ({ network, isSelected, onSelect }) => (
     <div 
-      className={`network-card ${isSelected ? 'selected' : ''}`}
+      className={`network-card ${isSelected ? 'selected' : ''} ${network.isOsmScenario ? 'osm-scenario' : ''}`}
       onClick={() => onSelect(network)}
     >
       <div className="network-card-header">
         <div className="network-card-info">
           <div className={`network-icon ${isSelected ? 'selected' : ''}`}>
-            <Network />
+            {network.isOsmScenario ? <Zap /> : <Network />}
           </div>
           <div>
             <h3 className="network-card-title">{network.name}</h3>
             <p className="network-card-id">ID: {network.id}</p>
+            {network.isOsmScenario && (
+              <span className="osm-badge">
+                🌍 OSM Realistic Traffic
+              </span>
+            )}
           </div>
         </div>
         
@@ -109,16 +203,57 @@ const NetworkSelectionPage = ({ socket, onLoadingChange }) => {
         {network.description}
       </p>
       
+      {/* OSM Scenario Features */}
+      {network.isOsmScenario && network.vehicleTypes && network.vehicleTypes.length > 0 && (
+        <div className="osm-features">
+          <h4 className="osm-features-title">Available Vehicle Types:</h4>
+          <div className="vehicle-types-list">
+            {network.vehicleTypes.map((vehicleType) => (
+              <span key={vehicleType} className="vehicle-type-badge">
+                {vehicleType === 'passenger' && <Car className="w-3 h-3" />}
+                {vehicleType === 'truck' && '🚛'}
+                {vehicleType === 'bus' && '🚌'}
+                {vehicleType === 'motorcycle' && '🏍️'}
+                {vehicleType}
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
+      
+      <div className="network-card-stats">
+        <div className="network-stat">
+          <MapPin className="w-4 h-4" />
+          <span>{network.edges || 0} edges</span>
+        </div>
+        <div className="network-stat">
+          <Users className="w-4 h-4" />
+          <span>{network.junctions || 0} junctions</span>
+        </div>
+        <div className="network-stat">
+          <FileText className="w-4 h-4" />
+          <span>{network.fileSize || 'Unknown'}</span>
+        </div>
+        {network.lanes && (
+          <div className="network-stat">
+            <span>{network.lanes} lanes</span>
+          </div>
+        )}
+      </div>
+      
       <div className="network-card-footer">
         <div className="network-card-meta">
           <div className="network-card-meta-item">
-            <MapPin />
-            <span>Network</span>
+            <Clock className="w-4 h-4" />
+            <span>Modified: {network.lastModified || 'Unknown'}</span>
           </div>
-          <div className="network-card-meta-item">
-            <Users />
-            <span>Multi-agent</span>
-          </div>
+          {network.routeSource && (
+            <div className="network-card-meta-item">
+              <span className={`route-source-badge ${network.isOsmScenario ? 'osm' : 'generated'}`}>
+                {network.routeSource}
+              </span>
+            </div>
+          )}
         </div>
         
         <div className="network-card-actions">
@@ -128,6 +263,7 @@ const NetworkSelectionPage = ({ socket, onLoadingChange }) => {
               e.stopPropagation();
               console.log('Preview network:', network.id);
             }}
+            title="Preview network"
           >
             <Eye />
           </button>
@@ -137,6 +273,7 @@ const NetworkSelectionPage = ({ socket, onLoadingChange }) => {
               e.stopPropagation();
               console.log('Download network:', network.id);
             }}
+            title="Download network files"
           >
             <Download />
           </button>
@@ -144,19 +281,73 @@ const NetworkSelectionPage = ({ socket, onLoadingChange }) => {
       </div>
     </div>
   );
-  
+
+  if (!sessionConfig || !sessionId) {
+    return (
+      <div className="network-page">
+        <div className="network-container">
+          <div className="text-center py-12">
+            <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
+            <h2 className="text-xl font-semibold text-gray-900 mb-2">
+              Configuration Required
+            </h2>
+            <p className="text-gray-600 mb-6">
+              Please complete the simulation configuration before selecting a network.
+            </p>
+            <Link
+              to="/configuration"
+              className="btn btn-primary"
+            >
+              Go to Configuration
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="network-page">
-      <div className="max-w-6xl mx-auto px-4">
+      <div className="network-container">
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            Select Traffic Network
+            Select Network
           </h1>
           <p className="text-gray-600">
-            Choose a predefined network or upload your own SUMO network file to begin simulation.
+            Choose a predefined network to apply your configuration. The selected network will be copied to your session folder.
           </p>
+          
+          {sessionConfig && (
+            <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+              <div className="flex items-center space-x-2 mb-2">
+                <Settings className="w-5 h-5 text-blue-600" />
+                <span className="font-medium text-blue-900">Active Configuration</span>
+              </div>
+              <div className="text-sm text-blue-800">
+                Session: <code className="bg-blue-100 px-1 rounded">{sessionId}</code> | 
+                Duration: {Math.floor(sessionConfig.config.duration / 60)}min | 
+                Traffic: {Math.round(sessionConfig.config.trafficVolume * 100)}% | 
+                Modifications: {sessionConfig.config.speedLimits.length + sessionConfig.config.roadClosures.length} items
+              </div>
+            </div>
+          )}
         </div>
+        
+        {/* Error/Success Messages */}
+        {error && (
+          <div className="alert alert-error mb-6">
+            <AlertCircle className="w-5 h-5" />
+            <span>{error}</span>
+          </div>
+        )}
+
+        {success && (
+          <div className="alert alert-success mb-6">
+            <CheckCircle className="w-5 h-5" />
+            <span>Network setup completed successfully! Launching simulation...</span>
+          </div>
+        )}
         
         {/* Actions */}
         <div className="flex flex-col sm:flex-row gap-4 mb-8">
@@ -170,56 +361,13 @@ const NetworkSelectionPage = ({ socket, onLoadingChange }) => {
           </button>
           
           <button
-            onClick={() => setUploadMode(!uploadMode)}
+            onClick={handleReturnToConfig}
             className="btn btn-outline flex items-center space-x-2"
           >
-            <Upload className="w-4 h-4" />
-            <span>Upload Custom Network</span>
+            <Settings className="w-4 h-4" />
+            <span>Modify Configuration</span>
           </button>
         </div>
-        
-        {/* Upload Section */}
-        {uploadMode && (
-          <div className="bg-white rounded-lg p-6 mb-8 border-2 border-dashed border-gray-300">
-            <div className="text-center">
-              <Upload className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                Upload SUMO Network File
-              </h3>
-              <p className="text-gray-600 mb-4">
-                Select a .net.xml file exported from SUMO or created with netconvert
-              </p>
-              
-              <input
-                type="file"
-                accept=".xml,.net.xml"
-                onChange={handleUpload}
-                className="hidden"
-                id="network-upload"
-              />
-              
-              <label
-                htmlFor="network-upload"
-                className="btn btn-primary cursor-pointer"
-              >
-                Choose File
-              </label>
-              
-              <div className="mt-4 text-sm text-gray-500">
-                <p>Supported formats: .net.xml</p>
-                <p>Maximum file size: 10MB</p>
-              </div>
-            </div>
-          </div>
-        )}
-        
-        {/* Error Display */}
-        {error && (
-          <div className="alert alert-error mb-8">
-            <AlertCircle className="w-5 h-5" />
-            <span>{error}</span>
-          </div>
-        )}
         
         {/* Loading State */}
         {loading && (
@@ -232,127 +380,136 @@ const NetworkSelectionPage = ({ socket, onLoadingChange }) => {
         )}
         
         {/* Networks Grid */}
-        {!loading && networks.length > 0 && (
-          <div>
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-semibold text-gray-900">
-                Available Networks ({networks.length})
-              </h2>
-              
-              {selectedNetwork && (
-                <div className="flex items-center space-x-2 text-green-600">
-                  <CheckCircle className="w-5 h-5" />
-                  <span className="font-medium">Network Selected</span>
+        {!loading && (
+          <>
+            {networks.length > 0 ? (
+              <>
+                <div className="networks-header">
+                  <h2 className="networks-title">Available Networks</h2>
+                  <div className="networks-status">
+                    <CheckCircle />
+                    <span className="networks-status-text">{networks.length} networks found</span>
+                  </div>
                 </div>
-              )}
-            </div>
-            
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-              {networks.map((network) => (
-                <NetworkCard
-                  key={network.id}
-                  network={network}
-                  isSelected={selectedNetwork?.id === network.id}
-                  onSelect={handleNetworkSelect}
-                />
-              ))}
-            </div>
-          </div>
-        )}
-        
-        {/* No Networks Available */}
-        {!loading && networks.length === 0 && !error && (
-          <div className="text-center py-12">
-            <Network className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">
-              No Networks Available
-            </h3>
-            <p className="text-gray-600 mb-4">
-              No SUMO network files were found. You can upload your own network file or check the server configuration.
-            </p>
-            <button
-              onClick={() => setUploadMode(true)}
-              className="btn btn-primary"
-            >
-              Upload Network File
-            </button>
-          </div>
-        )}
-        
-        {/* Selected Network Info */}
-        {selectedNetwork && (
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-8">
-            <div className="flex items-start space-x-4">
-              <div className="w-12 h-12 bg-blue-200 rounded-lg flex items-center justify-center">
-                <CheckCircle className="w-6 h-6 text-blue-600" />
-              </div>
-              
-              <div className="flex-1">
-                <h3 className="text-lg font-semibold text-blue-900 mb-2">
-                  Selected Network: {selectedNetwork.name}
-                </h3>
-                <p className="text-blue-800 mb-4">
-                  {selectedNetwork.description}
-                </p>
                 
-                <div className="flex items-center space-x-6 text-sm text-blue-700">
-                  <div className="flex items-center space-x-1">
-                    <Info className="w-4 h-4" />
-                    <span>ID: {selectedNetwork.id}</span>
-                  </div>
-                  <div className="flex items-center space-x-1">
-                    <Clock className="w-4 h-4" />
-                    <span>Ready for configuration</span>
-                  </div>
+                <div className="networks-grid">
+                  {networks.map((network) => (
+                    <NetworkCard
+                      key={network.id}
+                      network={network}
+                      isSelected={selectedNetwork?.id === network.id}
+                      onSelect={handleNetworkSelect}
+                    />
+                  ))}
                 </div>
+                
+                {/* Selection Actions */}
+                {selectedNetwork && (
+                  <div className="mt-8 p-6 bg-green-50 border border-green-200 rounded-lg">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h3 className="text-lg font-semibold text-green-900 mb-1">
+                          Selected: {selectedNetwork.name}
+                        </h3>
+                        <p className="text-green-700">
+                          This network will be copied to your session folder and your configuration will be applied.
+                        </p>
+                      </div>
+                      <button
+                        onClick={handleCopyAndProceed}
+                        disabled={copying}
+                        className="btn btn-success flex items-center space-x-2"
+                      >
+                        {copying ? (
+                          <>
+                            <RefreshCw className="w-4 h-4 animate-spin" />
+                            <span>Setting up...</span>
+                          </>
+                        ) : (
+                          <>
+                            <Copy className="w-4 h-4" />
+                            <span>Setup & Continue</span>
+                          </>
+                        )}
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </>
+            ) : (
+              <div className="no-networks-container">
+                <div className="no-networks-icon">
+                  <Folder />
+                </div>
+                <h3 className="no-networks-title">No Networks Available</h3>
+                <p className="no-networks-description">
+                  No SUMO network files were found. Please ensure networks are available in the configured directory.
+                </p>
+                <button
+                  onClick={loadNetworks}
+                  className="btn btn-primary"
+                >
+                  <RefreshCw className="w-4 h-4 mr-2" />
+                  Retry
+                </button>
               </div>
-            </div>
-          </div>
+            )}
+          </>
         )}
         
-        {/* Navigation */}
-        <div className="flex justify-between items-center">
-          <Link to="/" className="btn btn-secondary">
-            ← Back to Home
-          </Link>
+        {/* Information Panel */}
+        <div className="mt-12 grid md:grid-cols-2 gap-6">
+          <div className="info-panel">
+            <div className="info-panel-header">
+              <Info className="info-panel-icon" />
+              <h3 className="info-panel-title">Network Selection</h3>
+            </div>
+            <div className="info-panel-content">
+              <ul className="space-y-2 text-sm text-gray-600">
+                <li>• Original network files are never modified</li>
+                <li>• Each session gets its own network copy</li>
+                <li>• Your configuration is applied to the copied files</li>
+                <li>• Network modifications are isolated per session</li>
+              </ul>
+            </div>
+          </div>
           
-          {selectedNetwork && (
-            <Link 
-              to="/configuration" 
-              className="btn btn-primary flex items-center space-x-2"
-            >
-              <span>Continue to Configuration</span>
-              <ArrowRight className="w-4 h-4" />
-            </Link>
-          )}
+          <div className="info-panel">
+            <div className="info-panel-header">
+              <FileText className="info-panel-icon" />
+              <h3 className="info-panel-title">Configuration Applied</h3>
+            </div>
+            <div className="info-panel-content">
+              <ul className="space-y-2 text-sm text-gray-600">
+                <li>• Speed limit changes to specified edges</li>
+                <li>• Road closures during simulation time</li>
+                <li>• Traffic volume and vehicle type distribution</li>
+                <li>• Advanced SUMO parameters and models</li>
+              </ul>
+            </div>
+          </div>
         </div>
         
-        {/* Help Section */}
-        <div className="mt-12 bg-white rounded-lg p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">
-            Need Help?
-          </h3>
+        {/* Navigation */}
+        <div className="flex justify-between items-center mt-8 pt-6 border-t border-gray-200">
+          <Link 
+            to="/configuration" 
+            className="btn btn-secondary flex items-center space-x-2"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            <span>Back to Configuration</span>
+          </Link>
           
-          <div className="grid md:grid-cols-2 gap-6 text-sm">
-            <div>
-              <h4 className="font-medium text-gray-900 mb-2">Network Requirements</h4>
-              <ul className="text-gray-600 space-y-1">
-                <li>• Valid SUMO network file (.net.xml)</li>
-                <li>• Properly connected road network</li>
-                <li>• Contains edges and junctions</li>
-                <li>• Compatible with SUMO version 1.15+</li>
-              </ul>
-            </div>
-            
-            <div>
-              <h4 className="font-medium text-gray-900 mb-2">Creating Networks</h4>
-              <ul className="text-gray-600 space-y-1">
-                <li>• Use SUMO's netconvert tool</li>
-                <li>• Import from OpenStreetMap</li>
-                <li>• Create with netedit GUI</li>
-                <li>• Generate programmatically</li>
-              </ul>
-            </div>
+          <div className="flex items-center space-x-4">
+            {selectedNetwork ? (
+              <span className="text-green-600 text-sm font-medium">
+                Network selected: {selectedNetwork.name}
+              </span>
+            ) : (
+              <span className="text-gray-500 text-sm">
+                Select a network to continue
+              </span>
+            )}
           </div>
         </div>
       </div>

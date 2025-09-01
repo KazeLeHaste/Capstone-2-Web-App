@@ -19,11 +19,6 @@ import ConfigurationPage from './pages/ConfigurationPage';
 import SimulationPage from './pages/SimulationPage';
 import AnalyticsPage from './pages/AnalyticsPage';
 
-// New workflow pages
-import SimulationSetupPage from './pages/SimulationSetupPage';
-import NetworkSelectionPageEnhanced from './pages/NetworkSelectionPageEnhanced';
-import SimulationLaunchPage from './pages/SimulationLaunchPage';
-
 // Import components
 import Navigation from './components/Navigation';
 import OnboardingModal from './components/OnboardingModal';
@@ -143,11 +138,11 @@ function App() {
                 } 
               />
               
-              {/* New Configuration-First Workflow */}
+              {/* Configuration-first workflow */}
               <Route 
-                path="/simulation-setup" 
+                path="/configuration" 
                 element={
-                  <SimulationSetupPage 
+                  <ConfigurationPage 
                     socket={socket}
                   />
                 } 
@@ -155,35 +150,7 @@ function App() {
               <Route 
                 path="/network-selection" 
                 element={
-                  <NetworkSelectionPageEnhanced 
-                    socket={socket}
-                    onLoadingChange={handleLoadingChange}
-                  />
-                } 
-              />
-              <Route 
-                path="/simulation-launch" 
-                element={
-                  <SimulationLaunchPage 
-                    socket={socket}
-                  />
-                } 
-              />
-              
-              {/* Legacy Routes */}
-              <Route 
-                path="/network-legacy" 
-                element={
                   <NetworkSelectionPage 
-                    socket={socket}
-                    onLoadingChange={handleLoadingChange}
-                  />
-                } 
-              />
-              <Route 
-                path="/configuration" 
-                element={
-                  <ConfigurationPage 
                     socket={socket}
                     onLoadingChange={handleLoadingChange}
                   />
@@ -194,9 +161,6 @@ function App() {
                 element={
                   <SimulationPage 
                     socket={socket}
-                    simulationData={simulationData}
-                    simulationStatus={simulationStatus}
-                    onLoadingChange={handleLoadingChange}
                   />
                 } 
               />
