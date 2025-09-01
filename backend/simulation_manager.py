@@ -1233,6 +1233,9 @@ class SimulationManager:
             
             config_file = config_files[0]
             
+            # Extract network_id from config file name (remove .sumocfg extension)
+            network_id = config_file.stem if config_file.suffix == '.sumocfg' else config_file.name.replace('.sumocfg', '')
+            
             # Prepare SUMO command
             sumo_path = "C:\\Program Files (x86)\\Eclipse\\Sumo\\bin"
             if enable_gui:
@@ -1257,26 +1260,41 @@ class SimulationManager:
                 end_time = config.get('sumo_end', 60)
                 duration_seconds = end_time - begin_time
                 print(f"DEBUG: Using sumo_end-sumo_begin: {end_time} - {begin_time} = {duration_seconds} seconds")
+                
+                # Update the SUMO configuration file with correct timing
+                self._update_sumo_config_timing(session_dir, network_id, begin_time, end_time)
+                
             elif 'duration' in config and config.get('duration') is not None:
                 # Direct duration field
                 duration_seconds = config.get('duration')
+                begin_time = 0
+                end_time = duration_seconds
                 print(f"DEBUG: Using direct duration: {duration_seconds} seconds")
+                
+                # Update the SUMO configuration file with correct timing
+                self._update_sumo_config_timing(session_dir, network_id, begin_time, end_time)
+                
             elif 'endTime' in config and config.get('endTime') is not None:
                 # Frontend sends endTime - beginTime as duration
                 begin_time = config.get('beginTime', 0)
                 end_time = config.get('endTime', 60)
                 duration_seconds = end_time - begin_time
                 print(f"DEBUG: Using endTime-beginTime: {end_time} - {begin_time} = {duration_seconds} seconds")
+                
+                # Update the SUMO configuration file with correct timing
+                self._update_sumo_config_timing(session_dir, network_id, begin_time, end_time)
+                
             else:
                 # Default fallback
                 duration_seconds = 60  # 1 minute default to match frontend default
+                begin_time = 0
+                end_time = 60
                 print(f"DEBUG: Using default duration: {duration_seconds} seconds")
-            
-            if duration_seconds and duration_seconds > 0:
-                sumo_cmd.extend(["--end", str(duration_seconds)])
-                print(f"DEBUG: Adding SUMO --end parameter: {duration_seconds} seconds")
-            else:
-                print(f"DEBUG: No valid duration found, SUMO will run indefinitely")
+                
+                # Update the SUMO configuration file with correct timing
+                self._update_sumo_config_timing(session_dir, network_id, begin_time, end_time)
+
+            # Note: We no longer add --end parameter to command line since we update the config file directly
             
             # Add traffic intensity scaling if specified
             traffic_intensity = config.get('sumo_traffic_intensity', 1.0)
@@ -2408,3 +2426,51 @@ class SimulationManager:
         monitor_thread = threading.Thread(target=monitor_processes, daemon=True)
         monitor_thread.start()
         print("Process monitor thread started")
+
+    def _update_sumo_config_timing(self, session_dir: Path, network_id: str, begin_time: int, end_time: int) -> None:
+        """
+        Update the SUMO configuration file with correct begin and end times
+        
+        Args:
+            session_dir: Path to session directory
+            network_id: Network identifier
+            begin_time: Simulation begin time in seconds
+            end_time: Simulation end time in seconds
+        """
+        config_file = session_dir / f"{network_id}.sumocfg"
+        
+        if not config_file.exists():
+            print(f"WARNING: SUMO config file not found: {config_file}")
+            return
+            
+        try:
+            # Parse the existing configuration file
+            tree = ET.parse(config_file)
+            root = tree.getroot()
+            
+            # Find or create the time element
+            time_elem = root.find('time')
+            if time_elem is None:
+                time_elem = ET.SubElement(root, 'time')
+            
+            # Update begin time
+            begin_elem = time_elem.find('begin')
+            if begin_elem is None:
+                begin_elem = ET.SubElement(time_elem, 'begin')
+            begin_elem.set('value', str(begin_time))
+            
+            # Update end time
+            end_elem = time_elem.find('end')
+            if end_elem is None:
+                end_elem = ET.SubElement(time_elem, 'end')
+            end_elem.set('value', str(end_time))
+            
+            # Write the updated configuration back to the file
+            tree.write(config_file, encoding='UTF-8', xml_declaration=True)
+            
+            print(f"DEBUG: Updated SUMO config timing - begin: {begin_time}s, end: {end_time}s")
+            
+        except ET.ParseError as e:
+            print(f"ERROR: Failed to parse SUMO config file {config_file}: {e}")
+        except Exception as e:
+            print(f"ERROR: Failed to update SUMO config timing: {e}")
