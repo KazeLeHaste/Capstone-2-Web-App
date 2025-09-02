@@ -21,9 +21,35 @@ import {
   AlertCircle,
   CheckCircle,
   HelpCircle,
-  RefreshCw
+  RefreshCw,
+  Bus,
+  Truck,
+  Bike,
+  User
 } from 'lucide-react';
 import { api } from '../utils/apiClient';
+
+// Helper function to get vehicle type icon
+const getVehicleTypeIcon = (vehicleType) => {
+  const iconProps = { size: 20, strokeWidth: 2 };
+  
+  switch (vehicleType) {
+    case 'passenger':
+      return <Car {...iconProps} />;
+    case 'bus':
+      return <Bus {...iconProps} />;
+    case 'truck':
+      return <Truck {...iconProps} />;
+    case 'motorcycle':
+      return <Bike {...iconProps} />;
+    case 'bicycle':
+      return <Bike {...iconProps} />;
+    case 'pedestrian':
+      return <User {...iconProps} />;
+    default:
+      return <Car {...iconProps} />;
+  }
+};
 
 const ConfigurationPage = ({ socket }) => {
   const navigate = useNavigate();
@@ -49,9 +75,16 @@ const ConfigurationPage = ({ socket }) => {
     // This would require backend logic to modify route files or vehicle counts
     vehicleCount: null, // Optional: number of vehicles (requires route file modification)
     
+    // Vehicle Types Configuration - Controls which vehicle types are included in simulation
+    vehicleTypes: {
+      passenger: { enabled: true, name: 'Passenger Cars' },
+      bus: { enabled: true, name: 'Buses' },
+      truck: { enabled: true, name: 'Trucks' },
+      motorcycle: { enabled: true, name: 'Motorcycles' }
+    },
+    
     // Future extensibility placeholders (commented out for now)
     // trafficDensity: 1.0, // For OSM scenarios - multiply existing vehicle counts
-    // vehicleTypes: ['passenger', 'bus', 'truck'], // Filter vehicle types in route files
   });
 
   useEffect(() => {
@@ -59,6 +92,20 @@ const ConfigurationPage = ({ socket }) => {
     const newSessionId = `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
     setSessionId(newSessionId);
   }, []);
+
+  // Configuration change handler for vehicle types
+  const handleVehicleTypeChange = (vehicleType, enabled) => {
+    setConfig(prev => ({
+      ...prev,
+      vehicleTypes: {
+        ...prev.vehicleTypes,
+        [vehicleType]: {
+          ...prev.vehicleTypes[vehicleType],
+          enabled: enabled
+        }
+      }
+    }));
+  };
 
   // Simplified configuration change handler for basic parameters only
   const handleConfigChange = (key, value) => {
@@ -92,6 +139,12 @@ const ConfigurationPage = ({ socket }) => {
           
           // Traffic Intensity Control (for SUMO calibrators and flow generation)
           sumo_traffic_intensity: config.trafficIntensity, // Maps to flow rate multiplier in calibrators
+          
+          // Vehicle Types Configuration (maps to enabled vehicles in route selection)
+          enabledVehicles: Object.keys(config.vehicleTypes).filter(
+            type => config.vehicleTypes[type].enabled
+          ), // Maps to vehicle type filtering in routes
+          vehicleTypes: config.vehicleTypes, // Keep vehicle type configuration for frontend reference
           
           // Keep original config for frontend reference
           original_config: config
@@ -144,6 +197,43 @@ const ConfigurationPage = ({ socket }) => {
     } else {
       return `${remainingSeconds}s`;
     }
+  };
+
+  // Helper function to get vehicle type information from SUMO documentation
+  const getVehicleTypeInfo = (vehicleType) => {
+    const vehicleTypeInfo = {
+      passenger: {
+        maxSpeed: '55.6 m/s (200 km/h)',
+        length: '5.0 m',
+        access: 'All roads except restricted',
+        description: 'Standard passenger cars - most common vehicle type with access to regular roads'
+      },
+      bus: {
+        maxSpeed: '27.8 m/s (100 km/h)',
+        length: '12.0 m',
+        access: 'Roads + bus lanes',
+        description: 'Urban line traffic - larger vehicles with access to dedicated bus lanes and stops'
+      },
+      truck: {
+        maxSpeed: '25.0 m/s (90 km/h)',
+        length: '7.5 m',
+        access: 'Roads (speed restricted)',
+        description: 'Commercial freight vehicles - heavier vehicles with different speed limits on some roads'
+      },
+      motorcycle: {
+        maxSpeed: '55.6 m/s (200 km/h)',
+        length: '2.5 m',
+        access: 'Most roads (no pedestrian)',
+        description: 'Two-wheeled motorized vehicles - smaller, more agile with different lane permissions'
+      }
+    };
+    
+    return vehicleTypeInfo[vehicleType] || {
+      maxSpeed: 'Variable',
+      length: 'Variable',
+      access: 'Depends on type',
+      description: 'Vehicle type information not available'
+    };
   };
 
   return (
@@ -361,6 +451,122 @@ const ConfigurationPage = ({ socket }) => {
               </div>
             </div>
 
+            {/* Vehicle Types Selection */}
+            <div className="config-section">
+              <div className="config-section-header">
+                <Car className="config-section-icon" />
+                <h2 className="config-section-title">Vehicle Types</h2>
+                <div className="config-section-help">
+                  <HelpCircle className="w-4 h-4 text-gray-400" />
+                  <span className="config-help-text">Select which vehicle types to include in the simulation</span>
+                </div>
+              </div>
+              <div className="space-y-4">
+                <div className="config-info-panel">
+                  <div className="info-panel-header">
+                    <Info className="info-panel-icon" />
+                    <div className="info-panel-content">
+                      <p className="text-sm text-gray-700">
+                        Vehicle types correspond to different route files and SUMO vClass definitions. 
+                        Each type has different characteristics like size, speed limits, and lane permissions.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Vehicle Type Checkboxes */}
+                <div className="config-vehicle-types">
+                  {Object.entries(config.vehicleTypes).map(([vehicleType, typeConfig]) => {
+                    const enabled = typeConfig.enabled;
+                    const vehicleInfo = getVehicleTypeInfo(vehicleType);
+                    
+                    return (
+                      <div key={vehicleType} className={`config-vehicle-type ${enabled ? 'enabled' : ''}`}>
+                        <div className="config-vehicle-checkbox-wrapper">
+                          <input
+                            type="checkbox"
+                            id={`vehicle-${vehicleType}`}
+                            checked={enabled}
+                            onChange={(e) => handleVehicleTypeChange(vehicleType, e.target.checked)}
+                            className="config-checkbox"
+                          />
+                        </div>
+                        
+                        <div className="config-vehicle-info">
+                          <div className={`config-vehicle-icon ${vehicleType}`}>
+                            {getVehicleTypeIcon(vehicleType)}
+                          </div>
+                          
+                          <div className="config-vehicle-content">
+                            <label htmlFor={`vehicle-${vehicleType}`} className="config-vehicle-label">
+                              {typeConfig.name}
+                              <span className="config-vehicle-type-code">{vehicleType}</span>
+                            </label>
+                            
+                            <div className="config-vehicle-specs">
+                              <div className="config-vehicle-spec">
+                                <span className="config-vehicle-spec-label">Max Speed</span>
+                                <span className="config-vehicle-spec-value">{vehicleInfo.maxSpeed}</span>
+                              </div>
+                              <div className="config-vehicle-spec">
+                                <span className="config-vehicle-spec-label">Length</span>
+                                <span className="config-vehicle-spec-value">{vehicleInfo.length}</span>
+                              </div>
+                              <div className="config-vehicle-spec">
+                                <span className="config-vehicle-spec-label">Access</span>
+                                <span className="config-vehicle-spec-value">{vehicleInfo.access}</span>
+                              </div>
+                            </div>
+                            
+                            <div className="config-vehicle-description">
+                              {vehicleInfo.description}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {/* Selected Types Summary */}
+                <div className="config-vehicle-summary">
+                  <div className="config-vehicle-summary-header">
+                    <Car className="config-vehicle-summary-icon" />
+                    <h3 className="config-vehicle-summary-title">Vehicle Selection Summary</h3>
+                  </div>
+                  
+                  <div className="config-vehicle-summary-content">
+                    <div className="config-vehicle-summary-row">
+                      <span className="config-vehicle-summary-label">Selected Types:</span>
+                      <span className="config-vehicle-summary-value">
+                        {Object.entries(config.vehicleTypes)
+                          .filter(([_, typeConfig]) => typeConfig.enabled)
+                          .map(([type, _]) => config.vehicleTypes[type].name)
+                          .join(', ') || 'None selected'}
+                      </span>
+                    </div>
+                    
+                    {Object.values(config.vehicleTypes).filter(t => t.enabled).length === 0 ? (
+                      <div className="config-vehicle-summary-warning">
+                        <AlertCircle />
+                        <span>Warning: No vehicle types selected - simulation may be empty</span>
+                      </div>
+                    ) : (
+                      <div className="config-vehicle-summary-row">
+                        <span className="config-vehicle-summary-label">Route Files:</span>
+                        <div className="config-vehicle-route-files">
+                          {Object.keys(config.vehicleTypes)
+                            .filter(t => config.vehicleTypes[t].enabled)
+                            .map(t => `osm.${t}.rou.xml`)
+                            .join(', ')}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+
             {/* Future Feature Placeholders - Commented for now */}
             {/*
             <div className="config-section">
@@ -389,10 +595,10 @@ const ConfigurationPage = ({ socket }) => {
 
             {/* Information Panel */}
             <div className="config-info-panel">
-              <div className="flex items-start space-x-3">
-                <Info className="w-5 h-5 text-blue-500 mt-1" />
-                <div>
-                  <h3 className="font-medium text-gray-900 mb-2">What happens next?</h3>
+              <div className="info-panel-header">
+                <Info className="info-panel-icon" />
+                <div className="info-panel-content">
+                  <h3 className="info-panel-title">What happens next?</h3>
                   <ul className="list-spaced">
                     <li>Your configuration will be saved to a session</li>
                     <li>You'll select a network file to apply these settings</li>
@@ -432,6 +638,31 @@ const ConfigurationPage = ({ socket }) => {
                 <span className="config-preview-label">Traffic Intensity:</span>
                 <span className="config-preview-value">{(config.trafficIntensity * 100).toFixed(0)}% ({config.trafficIntensity}x)</span>
               </div>
+              <div className="config-preview-item">
+                <span className="config-preview-label">Vehicle Types:</span>
+                <span className="config-preview-value">
+                  {Object.values(config.vehicleTypes).filter(t => t.enabled).length} selected
+                </span>
+              </div>
+            </div>
+
+            {/* Vehicle Types Detail */}
+            <div className="mt-3 pt-3 border-t border-gray-200">
+              <h4 className="text-sm font-medium text-gray-700 mb-2">Enabled Vehicle Types:</h4>
+              <div className="space-y-1">
+                {Object.entries(config.vehicleTypes)
+                  .filter(([_, typeConfig]) => typeConfig.enabled)
+                  .map(([vehicleType, typeConfig]) => (
+                    <div key={vehicleType} className="text-xs text-gray-600 flex justify-between">
+                      <span>{typeConfig.name}</span>
+                      <span className="text-gray-400">osm.{vehicleType}.rou.xml</span>
+                    </div>
+                  ))
+                }
+                {Object.values(config.vehicleTypes).filter(t => t.enabled).length === 0 && (
+                  <div className="text-xs text-red-600">⚠ No vehicle types selected</div>
+                )}
+              </div>
             </div>
 
             {/* SUMO Command Preview */}
@@ -440,8 +671,11 @@ const ConfigurationPage = ({ socket }) => {
               <div className="bg-gray-900 text-green-400 p-3 rounded text-xs font-mono">
                 --begin {config.beginTime} --end {config.endTime} --step-length {config.stepLength} --time-to-teleport {config.timeToTeleport}
               </div>
-              <div className="mt-2 text-xs text-gray-600">
-                Traffic intensity will be applied via calibrators (flow multiplier: {config.trafficIntensity}x)
+              <div className="mt-2 text-xs text-gray-600 space-y-1">
+                <div>Traffic intensity: {config.trafficIntensity}x multiplier applied via calibrators</div>
+                <div>Vehicle types: {Object.keys(config.vehicleTypes).filter(t => config.vehicleTypes[t].enabled).length} enabled 
+                  ({Object.keys(config.vehicleTypes).filter(t => config.vehicleTypes[t].enabled).join(', ') || 'none'})
+                </div>
               </div>
             </div>
           </div>

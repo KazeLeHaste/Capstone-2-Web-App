@@ -3060,43 +3060,318 @@ a:focus {
   margin-top: 0.25rem;
 }
 
+/* Vehicle Type Selection Styles */
 .config-vehicle-types {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: var(--spacing-md);
+  margin-top: var(--spacing-lg);
 }
 
 .config-vehicle-type {
   display: flex;
+  align-items: flex-start;
+  padding: var(--spacing-lg);
+  border: 2px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  background: var(--bg-primary);
+  transition: all var(--transition-normal);
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  position: relative;
+  overflow: hidden;
+}
+
+.config-vehicle-type:hover {
+  border-color: var(--border-hover);
+  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.06);
+  transform: translateY(-1px);
+}
+
+.config-vehicle-type.enabled {
+  border-color: var(--primary-color);
+  background: linear-gradient(135deg, var(--bg-primary) 0%, #f0f9ff 100%);
+  box-shadow: 0 2px 6px 0 rgba(59, 130, 246, 0.1);
+}
+
+.config-vehicle-type.enabled::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  background: linear-gradient(to bottom, var(--primary-color), var(--primary-hover));
+}
+
+.config-vehicle-checkbox-wrapper {
+  display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding: 1rem;
-  border: 1px solid var(--color-gray-200);
-  border-radius: 0.5rem;
-  background: var(--color-gray-50);
+  margin-right: var(--spacing-md);
+  margin-top: 2px;
 }
 
 .config-vehicle-info {
   display: flex;
-  align-items: center;
-  gap: 0.75rem;
+  align-items: flex-start;
+  gap: var(--spacing-md);
+  flex: 1;
+  min-width: 0;
 }
 
 .config-vehicle-icon {
-  width: 1.5rem;
-  height: 1.5rem;
-  color: var(--color-gray-600);
-}
-
-.config-vehicle-controls {
+  width: 2.5rem;
+  height: 2.5rem;
   display: flex;
   align-items: center;
-  gap: 1rem;
+  justify-content: center;
+  border-radius: var(--radius-lg);
+  flex-shrink: 0;
+  margin-top: 2px;
+  transition: all var(--transition-normal);
+}
+
+/* Vehicle Type Specific Icon Colors */
+.config-vehicle-icon.passenger {
+  background: linear-gradient(135deg, #dbeafe 0%, #93c5fd 100%);
+  color: #1e40af;
+}
+
+.config-vehicle-icon.bus {
+  background: linear-gradient(135deg, #fef3c7 0%, #fbbf24 100%);
+  color: #d97706;
+}
+
+.config-vehicle-icon.truck {
+  background: linear-gradient(135deg, #f3e8ff 0%, #c084fc 100%);
+  color: #7c3aed;
+}
+
+.config-vehicle-icon.motorcycle {
+  background: linear-gradient(135deg, #ecfdf5 0%, #6ee7b7 100%);
+  color: #059669;
+}
+
+.config-vehicle-icon.bicycle {
+  background: linear-gradient(135deg, #fef7ff 0%, #f0abfc 100%);
+  color: #c026d3;
+}
+
+.config-vehicle-icon.pedestrian {
+  background: linear-gradient(135deg, #fff7ed 0%, #fdba74 100%);
+  color: #ea580c;
+}
+
+.config-vehicle-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.config-vehicle-label {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-sm);
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 1.125rem;
+  color: var(--text-primary);
+  line-height: 1.2;
+}
+
+.config-vehicle-type-code {
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  font-size: 0.75rem;
+  background: var(--bg-tertiary);
+  color: var(--text-secondary);
+  padding: 0.125rem 0.375rem;
+  border-radius: var(--radius-sm);
+  font-weight: 500;
+  border: 1px solid var(--border-color);
+}
+
+.config-vehicle-specs {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: var(--spacing-sm) var(--spacing-md);
+  margin-bottom: var(--spacing-sm);
+  padding: var(--spacing-sm);
+  background: var(--bg-secondary);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-color);
+}
+
+.config-vehicle-spec {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+}
+
+.config-vehicle-spec-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+}
+
+.config-vehicle-spec-value {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+}
+
+.config-vehicle-description {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+  margin-top: var(--spacing-sm);
 }
 
 .config-checkbox {
+  width: 1.25rem;
+  height: 1.25rem;
+  accent-color: var(--primary-color);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.config-checkbox:hover {
+  transform: scale(1.1);
+}
+
+.config-checkbox:checked {
+  transform: scale(1.1);
+}
+
+/* Vehicle Types Summary Section */
+.config-vehicle-summary {
+  margin-top: var(--spacing-xl);
+  padding: var(--spacing-lg);
+  background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+  border: 2px solid #93c5fd;
+  border-radius: var(--radius-lg);
+  position: relative;
+  overflow: hidden;
+}
+
+.config-vehicle-summary::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: linear-gradient(to right, var(--primary-color), #3b82f6, var(--primary-color));
+}
+
+.config-vehicle-summary-header {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-md);
+}
+
+.config-vehicle-summary-icon {
+  width: 1.5rem;
+  height: 1.5rem;
+  color: var(--primary-color);
+}
+
+.config-vehicle-summary-title {
+  font-weight: 700;
+  font-size: 1.125rem;
+  color: var(--primary-color);
+  margin: 0;
+}
+
+.config-vehicle-summary-content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.config-vehicle-summary-row {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  font-size: 0.875rem;
+}
+
+.config-vehicle-summary-label {
+  font-weight: 600;
+  color: var(--text-primary);
+  min-width: 120px;
+}
+
+.config-vehicle-summary-value {
+  color: var(--text-secondary);
+  flex: 1;
+}
+
+.config-vehicle-summary-warning {
+  color: #dc2626;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  background: #fef2f2;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--radius-md);
+  border: 1px solid #fecaca;
+  margin-top: var(--spacing-sm);
+}
+
+.config-vehicle-summary-warning svg {
   width: 1rem;
   height: 1rem;
+  color: #dc2626;
+}
+
+.config-vehicle-route-files {
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  font-size: 0.8125rem;
+  background: var(--bg-primary);
+  padding: var(--spacing-sm);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .config-vehicle-specs {
+    grid-template-columns: 1fr;
+    gap: var(--spacing-sm);
+  }
+  
+  .config-vehicle-info {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .config-vehicle-icon {
+    align-self: flex-start;
+  }
+  
+  .config-vehicle-summary-content {
+    font-size: 0.8125rem;
+  }
+  
+  .config-vehicle-summary-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.25rem;
+  }
+  
+  .config-vehicle-summary-label {
+    min-width: auto;
+  }
+}
+
+.config-checkbox:focus {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
 }
 
 .config-range {
@@ -3545,24 +3820,46 @@ a:focus {
 
 .info-panel-header {
   display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  margin-bottom: 1rem;
+  align-items: flex-start;
+  gap: var(--spacing-md);
+  margin-bottom: 0;
 }
 
 .info-panel-icon {
   width: 1.25rem;
   height: 1.25rem;
-  color: var(--color-primary);
+  color: #3b82f6;
+  margin-top: 0.125rem;
+  flex-shrink: 0;
 }
 
 .info-panel-title {
   font-weight: 600;
   color: var(--color-gray-900);
+  margin-bottom: var(--spacing-sm);
+  font-size: 1rem;
 }
 
 .info-panel-content {
   color: var(--color-gray-600);
+  flex: 1;
+}
+
+.info-panel-content p {
+  margin: 0;
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+.info-panel-content ul {
+  margin: 0;
+  padding-left: 1rem;
+}
+
+.info-panel-content li {
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: var(--text-secondary);
 }
 
 /* Alert Components */

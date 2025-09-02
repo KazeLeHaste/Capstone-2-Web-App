@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vehicle Type Configuration Test</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            max-width: 800px; 
+            margin: 0 auto; 
+            padding: 20px; 
+        }
+        .test-section { 
+            border: 1px solid #ddd; 
+            padding: 20px; 
+            margin: 10px 0; 
+            border-radius: 5px; 
+        }
+        .success { 
+            background-color: #e8f5e8; 
+            border-color: #4caf50; 
+        }
+        .error { 
+            background-color: #ffebee; 
+            border-color: #f44336; 
+        }
+        .info { 
+            background-color: #e3f2fd; 
+            border-color: #2196f3; 
+        }
+        pre { 
+            background-color: #f5f5f5; 
+            padding: 10px; 
+            border-radius: 3px; 
+            overflow-x: auto; 
+        }
+        button { 
+            background-color: #2196f3; 
+            color: white; 
+            border: none; 
+            padding: 10px 20px; 
+            border-radius: 3px; 
+            cursor: pointer; 
+            margin: 5px; 
+        }
+        button:hover { 
+            background-color: #1976d2; 
+        }
+        .status { 
+            font-weight: bold; 
+        }
+    </style>
+</head>
+<body>
+    <h1>🚗 Vehicle Type Configuration - Frontend Test</h1>
+    
+    <div class="test-section info">
+        <h2>Test Instructions</h2>
+        <ol>
+            <li><strong>Configuration Page Test:</strong> 
+                <button onclick="window.open('http://localhost:3000/configuration', '_blank')">
+                    Open Configuration Page
+                </button>
+            </li>
+            <li><strong>Full Workflow Test:</strong>
+                <button onclick="window.open('http://localhost:3000/', '_blank')">
+                    Start from Home Page
+                </button>
+            </li>
+            <li><strong>Backend Status:</strong>
+                <button onclick="checkBackendStatus()">Check Backend</button>
+                <span id="backend-status"></span>
+            </li>
+        </ol>
+    </div>
+    
+    <div class="test-section">
+        <h2>🧪 Manual Testing Checklist</h2>
+        <h3>Configuration Page (http://localhost:3000/configuration)</h3>
+        <ul>
+            <li>✅ Vehicle Types section should be visible</li>
+            <li>✅ Four checkboxes: Passenger Cars, Buses, Trucks, Motorcycles</li>
+            <li>✅ All should be checked by default</li>
+            <li>✅ Each vehicle type shows SUMO vClass, max speed, length, access info</li>
+            <li>✅ Configuration Preview should show "4 selected" vehicle types</li>
+            <li>✅ Unchecking boxes should update the preview</li>
+            <li>✅ "Selected Types" summary should update correctly</li>
+            <li>✅ Route files list should update (e.g., osm.passenger.rou.xml, osm.bus.rou.xml)</li>
+            <li>✅ Warning should appear if no vehicle types selected</li>
+        </ul>
+        
+        <h3>Full Workflow Test</h3>
+        <ol>
+            <li>Start from Home → Configure Simulation</li>
+            <li>Configure parameters and <strong>uncheck some vehicle types</strong> (e.g., disable Trucks and Motorcycles)</li>
+            <li>Save & Continue to Network Selection</li>
+            <li>Select "St Dominic Realistic.Net" network</li>
+            <li>Proceed to Simulation</li>
+            <li>Verify SUMO launches with only selected vehicle types</li>
+        </ol>
+    </div>
+
+    <div class="test-section" id="api-test">
+        <h2>🔧 API Test</h2>
+        <button onclick="testVehicleTypeAPI()">Test Vehicle Type API</button>
+        <div id="api-results"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>📋 Expected Behavior</h2>
+        <h3>Frontend (Configuration Page)</h3>
+        <ul>
+            <li><strong>Vehicle Types Section:</strong> Shows 4 checkboxes with detailed information</li>
+            <li><strong>Dynamic Preview:</strong> Updates in real-time as selections change</li>
+            <li><strong>Validation:</strong> Shows warning when no types selected</li>
+            <li><strong>SUMO Integration:</strong> Displays corresponding route files and parameters</li>
+        </ul>
+        
+        <h3>Backend (SUMO Integration)</h3>
+        <ul>
+            <li><strong>Route Filtering:</strong> Only enabled vehicle types get full route files</li>
+            <li><strong>Disabled Types:</strong> Get minimal/empty route files with comments</li>
+            <li><strong>SUMO Config:</strong> Only includes routes for enabled vehicle types</li>
+            <li><strong>Session Isolation:</strong> Each configuration gets its own directory</li>
+        </ul>
+        
+        <h3>SUMO Simulation</h3>
+        <ul>
+            <li><strong>Vehicle Population:</strong> Only shows configured vehicle types in simulation</li>
+            <li><strong>Traffic Behavior:</strong> Reflects the enabled vehicle types (e.g., no trucks on roads if disabled)</li>
+            <li><strong>Performance:</strong> Better performance with fewer vehicle types</li>
+        </ul>
+    </div>
+
+    <script>
+        async function checkBackendStatus() {
+            const statusElement = document.getElementById('backend-status');
+            try {
+                const response = await fetch('http://localhost:5000/api/status');
+                if (response.ok) {
+                    const data = await response.json();
+                    statusElement.innerHTML = '<span style="color: green;">✅ Backend Running</span>';
+                } else {
+                    statusElement.innerHTML = '<span style="color: red;">❌ Backend Error</span>';
+                }
+            } catch (error) {
+                statusElement.innerHTML = '<span style="color: red;">❌ Backend Not Running</span>';
+            }
+        }
+
+        async function testVehicleTypeAPI() {
+            const resultsElement = document.getElementById('api-results');
+            resultsElement.innerHTML = '<p>Testing API...</p>';
+            
+            const testConfig = {
+                sessionId: `frontend_test_${Date.now()}`,
+                timestamp: new Date().toISOString(),
+                config: {
+                    sumo_begin: 0,
+                    sumo_end: 1800,
+                    sumo_step_length: 1.0,
+                    sumo_time_to_teleport: 300,
+                    sumo_traffic_intensity: 1.0,
+                    enabledVehicles: ["passenger", "bus"],
+                    vehicleTypes: {
+                        passenger: { enabled: true, name: "Passenger Cars" },
+                        bus: { enabled: true, name: "Buses" },
+                        truck: { enabled: false, name: "Trucks" },
+                        motorcycle: { enabled: false, name: "Motorcycles" }
+                    }
+                }
+            };
+            
+            try {
+                const response = await fetch('http://localhost:5000/api/simulation/save-config', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(testConfig)
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    resultsElement.innerHTML = `
+                        <div class="success">
+                            <h4>✅ API Test Passed</h4>
+                            <p>Configuration saved successfully!</p>
+                            <pre>${JSON.stringify(result, null, 2)}</pre>
+                            <p><strong>Enabled Vehicles:</strong> ${testConfig.config.enabledVehicles.join(', ')}</p>
+                        </div>
+                    `;
+                } else {
+                    resultsElement.innerHTML = `
+                        <div class="error">
+                            <h4>❌ API Test Failed</h4>
+                            <pre>${JSON.stringify(result, null, 2)}</pre>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                resultsElement.innerHTML = `
+                    <div class="error">
+                        <h4>❌ API Test Error</h4>
+                        <p>${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Check backend status on load
+        window.onload = checkBackendStatus;
+    </script>
+</body>
+</html>

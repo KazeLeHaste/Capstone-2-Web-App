@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- generated on 2025-09-02 21:34:38.164216 by osmWebWizard.py v1_24_0+0000-b72eb3fabc8
+<configuration>
+    <net-file value="C:\Users\kgaqu\OneDrive\Documents\4th Year\Capstone 2\v10\osm_importer\osm_scenarios\2025-09-02-21-34-32\osm.net.xml.gz"/>
+    <output-trip-file value="C:\Users\kgaqu\OneDrive\Documents\4th Year\Capstone 2\v10\osm_importer\osm_scenarios\2025-09-02-21-34-32\osm.bicycle.trips.xml"/>
+    <route-file value="C:\Users\kgaqu\OneDrive\Documents\4th Year\Capstone 2\v10\osm_importer\osm_scenarios\2025-09-02-21-34-32\osm.bicycle.rou.xml"/>
+    <prefix value="bike"/>
+    <trip-attributes value="departLane=&quot;best&quot;"/>
+    <fringe-start-attributes value="departSpeed=&quot;max&quot;"/>
+    <vehicle-class value="bicycle"/>
+    <fringe-factor value="2"/>
+    <edge-permission value="bicycle"/>
+    <via-edge-types value="highway.motorway,highway.motorway_link,highway.trunk_link,highway.primary_link,highway.secondary_link,highway.tertiary_link"/>
+    <max-distance value="8000.0"/>
+    <remove-loops value="True"/>
+    <insertion-density value="6.0"/>
+</configuration>
+-->
+
+<routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/routes_file.xsd">
+    <vType id="bike_bicycle" vClass="bicycle"/>
+    <trip id="bike0" depart="0.00" from="555020953#0" to="555020953#0" departLane="best" type="bike_bicycle"/>
+    <trip id="bike1" depart="169.71" from="555020953#0" to="555020953#0" departLane="best" type="bike_bicycle"/>
+    <trip id="bike2" depart="339.42" from="555020953#0" to="555020953#0" departLane="best" type="bike_bicycle"/>
+    <trip id="bike3" depart="509.12" from="1054315844#0" to="555020953#0" departLane="best" type="bike_bicycle" departSpeed="max"/>
+    <trip id="bike4" depart="678.83" from="1054315844#0" to="555020953#0" departLane="best" type="bike_bicycle" departSpeed="max"/>
+    <trip id="bike5" depart="848.54" from="1054315844#0" to="555020953#0" departLane="best" type="bike_bicycle" departSpeed="max"/>
+    <trip id="bike6" depart="1018.25" from="1054315844#0" to="555020953#0" departLane="best" type="bike_bicycle" departSpeed="max"/>
+    <trip id="bike7" depart="1187.96" from="555020953#0" to="555020953#0" departLane="best" type="bike_bicycle"/>
+    <trip id="bike8" depart="1357.67" from="1054315844#0" to="555020953#0" departLane="best" type="bike_bicycle" departSpeed="max"/>
+    <trip id="bike9" depart="1527.37" from="1054315844#0" to="555020953#0" departLane="best" type="bike_bicycle" departSpeed="max"/>
+    <trip id="bike10" depart="1697.08" from="555020953#0" to="555020953#0" departLane="best" type="bike_bicycle"/>
+    <trip id="bike11" depart="1866.79" from="1054315844#0" to="555020953#0" departLane="best" type="bike_bicycle" departSpeed="max"/>
+    <trip id="bike12" depart="2036.50" from="1054315844#0" to="555020953#0" departLane="best" type="bike_bicycle" departSpeed="max"/>
+    <trip id="bike13" depart="2206.21" from="555020953#0" to="555020953#0" departLane="best" type="bike_bicycle"/>
+    <trip id="bike14" depart="2375.92" from="1054315844#0" to="555020953#0" departLane="best" type="bike_bicycle" departSpeed="max"/>
+    <trip id="bike15" depart="2545.62" from="555020953#0" to="555020953#0" departLane="best" type="bike_bicycle"/>
+    <trip id="bike16" depart="2715.33" from="555020953#0" to="555020953#0" departLane="best" type="bike_bicycle"/>
+    <trip id="bike17" depart="2885.04" from="1054315844#0" to="555020953#0" departLane="best" type="bike_bicycle" departSpeed="max"/>
+    <trip id="bike18" depart="3054.75" from="1054315844#0" to="555020953#0" departLane="best" type="bike_bicycle" departSpeed="max"/>
+    <trip id="bike19" depart="3224.46" from="1054315844#0" to="555020953#0" departLane="best" type="bike_bicycle" departSpeed="max"/>
+    <trip id="bike20" depart="3394.16" from="1054315844#0" to="555020953#0" departLane="best" type="bike_bicycle" departSpeed="max"/>
+    <trip id="bike21" depart="3563.87" from="1054315844#0" to="555020953#0" departLane="best" type="bike_bicycle" departSpeed="max"/>
+</routes>
