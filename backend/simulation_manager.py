@@ -345,6 +345,9 @@ class SimulationManager:
                         # Don't rename these files - keep original names since config expects them
                         dest_file = session_dir / source_file.name
                         shutil.copy2(source_file, dest_file)
+            
+            # Generate or modify additional file for traffic light configuration
+            self._process_osm_additional_file(session_dir, network_id, config)
         
         except Exception as e:
             print(f"Error copying OSM scenario: {e}")
@@ -439,6 +442,144 @@ class SimulationManager:
             print(f"Warning: Could not process OSM config file: {e}")
             # Fallback: just copy the file
             shutil.copy2(source_config, dest_config)
+
+    def _process_osm_additional_file(self, session_dir: Path, network_id: str, config: Dict[str, Any]):
+        """
+        Generate or modify additional file for OSM scenarios to include traffic light configuration
+        
+        Args:
+            session_dir: Session directory containing OSM scenario files
+            network_id: Network identifier
+            config: Configuration parameters including traffic control settings
+        """
+        try:
+            # Look for existing additional files
+            additional_files = list(session_dir.glob("*.add.xml")) + list(session_dir.glob("*output.add.xml"))
+            
+            traffic_control_config = config.get('trafficControl')
+            if not traffic_control_config:
+                print("DEBUG: No traffic control configuration found")
+                return
+            
+            # Generate traffic light configurations
+            network_file = session_dir / f"{network_id}.net.xml"
+            if not network_file.exists():
+                print(f"DEBUG: Network file not found: {network_file}")
+                return
+            
+            tl_configs = self._generate_traffic_light_configs(network_file, traffic_control_config)
+            if not tl_configs:
+                print("DEBUG: No traffic light configurations generated")
+                return
+            
+            # Create or modify additional file
+            if additional_files:
+                # Modify existing additional file
+                additional_file = additional_files[0]
+                self._inject_traffic_lights_into_additional_file(additional_file, tl_configs)
+            else:
+                # Create new additional file
+                additional_file = session_dir / "traffic_lights.add.xml"
+                self._create_traffic_light_additional_file(additional_file, tl_configs)
+                
+                # Update SUMO config to include the new additional file
+                self._update_osm_config_with_additional_file(session_dir, network_id, "traffic_lights.add.xml")
+            
+        except Exception as e:
+            print(f"ERROR: Failed to process OSM additional file: {e}")
+
+    def _inject_traffic_lights_into_additional_file(self, additional_file: Path, tl_configs: str):
+        """
+        Inject traffic light configurations into existing additional file
+        
+        Args:
+            additional_file: Path to existing additional file
+            tl_configs: Traffic light XML configurations to inject
+        """
+        try:
+            tree = ET.parse(additional_file)
+            root = tree.getroot()
+            
+            # Create a temporary element to parse the traffic light XML
+            temp_xml = f"<temp>{tl_configs}</temp>"
+            temp_tree = ET.fromstring(temp_xml)
+            
+            # Append all traffic light elements to the root
+            for element in temp_tree:
+                root.append(element)
+            
+            # Write back to file
+            tree.write(additional_file, encoding='UTF-8', xml_declaration=True)
+            print(f"DEBUG: Injected traffic light configurations into {additional_file}")
+            
+        except ET.ParseError as e:
+            print(f"ERROR: Failed to parse additional file {additional_file}: {e}")
+        except Exception as e:
+            print(f"ERROR: Failed to inject traffic lights into additional file: {e}")
+
+    def _create_traffic_light_additional_file(self, additional_file: Path, tl_configs: str):
+        """
+        Create new additional file with traffic light configurations
+        
+        Args:
+            additional_file: Path to new additional file
+            tl_configs: Traffic light XML configurations
+        """
+        additional_content = f'''<?xml version="1.0" encoding="UTF-8"?>
+<additional xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/additional_file.xsd">
+
+    <!-- Traffic Light Configurations -->
+    {tl_configs}
+
+</additional>'''
+        
+        with open(additional_file, 'w') as f:
+            f.write(additional_content)
+        
+        print(f"DEBUG: Created traffic light additional file: {additional_file}")
+
+    def _update_osm_config_with_additional_file(self, session_dir: Path, network_id: str, additional_filename: str):
+        """
+        Update OSM SUMO configuration to include new additional file
+        
+        Args:
+            session_dir: Session directory
+            network_id: Network identifier
+            additional_filename: Name of additional file to include
+        """
+        try:
+            config_file = session_dir / f"{network_id}.sumocfg"
+            if not config_file.exists():
+                print(f"WARNING: SUMO config file not found: {config_file}")
+                return
+            
+            tree = ET.parse(config_file)
+            root = tree.getroot()
+            
+            # Find or create input section
+            input_section = root.find('.//input')
+            if input_section is None:
+                input_section = ET.SubElement(root, 'input')
+            
+            # Add additional files reference
+            additional_elem = input_section.find('additional-files')
+            if additional_elem is None:
+                additional_elem = ET.SubElement(input_section, 'additional-files')
+                additional_elem.set('value', additional_filename)
+            else:
+                # Append to existing additional files
+                current_value = additional_elem.get('value', '')
+                if current_value:
+                    additional_elem.set('value', f"{current_value},{additional_filename}")
+                else:
+                    additional_elem.set('value', additional_filename)
+            
+            # Write back to config
+            tree.write(config_file, encoding='UTF-8', xml_declaration=True)
+            print(f"DEBUG: Updated SUMO config to include {additional_filename}")
+            
+        except Exception as e:
+            print(f"ERROR: Failed to update OSM config with additional file: {e}")
     
     def _copy_and_filter_routes(self, source_dir: Path, dest_dir: Path, 
                               enabled_vehicles: List[str], config: Dict[str, Any]):
@@ -1153,7 +1294,7 @@ class SimulationManager:
     
     def _generate_additional_file(self, additional_file: Path, config: Dict[str, Any]):
         """
-        Generate additional file for road closures and other modifications
+        Generate additional file for road closures, traffic lights, and other modifications
         
         Args:
             additional_file: Path to additional file
@@ -1162,13 +1303,28 @@ class SimulationManager:
         additional_content = f'''<?xml version="1.0" encoding="UTF-8"?>
 <additional xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/additional_file.xsd">
 
-    <!-- Simple additional file for essential simulation configuration -->
-    <!-- Traffic intensity is now controlled via SUMO's --scale parameter -->
+    <!-- Additional file for simulation configuration -->
+    <!-- Traffic intensity is controlled via SUMO's --scale parameter -->
     
-    <!-- Detectors for Live Data Collection -->
+    <!-- Traffic Light Logic Configuration -->
+    <!-- Generated based on configuration settings -->
+    
+    <!-- Detectors for Live Data Collection and Adaptive Traffic Lights -->
     <!-- Basic detectors can be added here in future versions -->
     
 </additional>'''
+        
+        # Generate traffic light configurations if specified
+        traffic_control_config = config.get('trafficControl')
+        if traffic_control_config:
+            network_file = additional_file.parent / f"{additional_file.stem}.net.xml"
+            if network_file.exists():
+                tl_configs = self._generate_traffic_light_configs(network_file, traffic_control_config)
+                if tl_configs:
+                    additional_content = additional_content.replace(
+                        '<!-- Generated based on configuration settings -->',
+                        tl_configs
+                    )
         
         # Check if we have the original config with advanced features (backward compatibility)
         if 'original_config' in config:
@@ -1199,6 +1355,322 @@ class SimulationManager:
         
         with open(additional_file, 'w') as f:
             f.write(additional_content)
+
+    def _generate_traffic_light_configs(self, network_file: Path, traffic_control_config: Dict[str, Any]) -> str:
+        """
+        Generate traffic light logic configurations based on network topology
+        
+        Args:
+            network_file: Path to the network file
+            traffic_control_config: Traffic control configuration from frontend
+            
+        Returns:
+            XML string containing traffic light logic definitions
+        """
+        try:
+            # Parse network file to extract actual traffic light signal information
+            tree = ET.parse(network_file)
+            root = tree.getroot()
+            
+            # Extract traffic light information from connections
+            tl_signals = self._extract_traffic_light_signals(root)
+            
+            if not tl_signals:
+                print("DEBUG: No traffic light signals found in network")
+                return ""
+            
+            print(f"DEBUG: Found {len(tl_signals)} traffic light signals: {list(tl_signals.keys())}")
+            
+            # Generate traffic light logic based on control method
+            method = traffic_control_config.get('method', 'fixed')
+            
+            tl_xml_parts = []
+            tl_xml_parts.append("<!-- Traffic Light Logic Configurations -->")
+            
+            if method == 'fixed':
+                # Generate fixed timer traffic lights
+                tl_xml_parts.extend(self._generate_fixed_timer_tls(tl_signals, traffic_control_config))
+            elif method == 'adaptive':
+                # Generate adaptive traffic lights with detectors
+                tl_xml_parts.extend(self._generate_adaptive_tls(tl_signals, traffic_control_config))
+            
+            # Only return traffic light XML if there are new configurations to add
+            if not tl_xml_parts or len(tl_xml_parts) <= 1:  # Only the comment line
+                print("DEBUG: No additional traffic light configurations needed")
+                return ""
+            
+            return "\n    ".join(tl_xml_parts)
+            
+        except ET.ParseError as e:
+            print(f"ERROR: Failed to parse network file {network_file}: {e}")
+            return ""
+        except Exception as e:
+            print(f"ERROR: Failed to generate traffic light configs: {e}")
+            import traceback
+            print(f"Traceback: {traceback.format_exc()}")
+            return ""
+
+    def _extract_traffic_light_signals(self, root):
+        """
+        Extract traffic light signal information from network XML
+        
+        Args:
+            root: XML root element of network file
+            
+        Returns:
+            Dictionary mapping tl_id -> {'num_links': int, 'connections': list, 'existing_logic': bool}
+        """
+        tl_signals = {}
+        
+        # First, check for existing traffic light logic definitions in the network
+        existing_tl_logic = {}
+        for tl_logic in root.findall('tlLogic'):
+            tl_id = tl_logic.get('id')
+            program_id = tl_logic.get('programID', '0')
+            if tl_id:
+                existing_tl_logic[tl_id] = program_id
+        
+        print(f"DEBUG: Found existing traffic light logic: {list(existing_tl_logic.keys())}")
+        
+        # Find all connections with tl attribute
+        for connection in root.findall('connection'):
+            tl_id = connection.get('tl')
+            if tl_id:
+                link_index_str = connection.get('linkIndex')
+                if link_index_str is not None:
+                    link_index = int(link_index_str)
+                    
+                    if tl_id not in tl_signals:
+                        tl_signals[tl_id] = {
+                            'max_link_index': -1, 
+                            'connections': [], 
+                            'existing_logic': tl_id in existing_tl_logic
+                        }
+                    
+                    tl_signals[tl_id]['max_link_index'] = max(tl_signals[tl_id]['max_link_index'], link_index)
+                    tl_signals[tl_id]['connections'].append({
+                        'from': connection.get('from'),
+                        'to': connection.get('to'),
+                        'link_index': link_index,
+                        'dir': connection.get('dir', 's')  # direction: s=straight, l=left, r=right, t=turn
+                    })
+        
+        # Calculate number of links for each signal
+        for tl_id in tl_signals:
+            tl_signals[tl_id]['num_links'] = tl_signals[tl_id]['max_link_index'] + 1
+            
+        print(f"DEBUG: Extracted traffic light signals: {[(tl_id, info['num_links'], info['existing_logic']) for tl_id, info in tl_signals.items()]}")
+        
+        return tl_signals
+
+    def _generate_fixed_timer_tls(self, tl_signals: dict, traffic_control_config: Dict[str, Any]) -> list:
+        """
+        Generate fixed timer traffic light logic
+        
+        Args:
+            tl_signals: Dictionary mapping tl_id -> {'num_links': int, 'connections': list}
+            traffic_control_config: Traffic control configuration
+            
+        Returns:
+            List of XML strings for fixed timer traffic light logic
+        """
+        fixed_config = traffic_control_config.get('fixedTimer', {})
+        green_phase = fixed_config.get('greenPhase', 30)
+        yellow_phase = fixed_config.get('yellowPhase', 3)
+        red_phase = fixed_config.get('redPhase', 30)
+        all_red_phase = fixed_config.get('allRedPhase', 2)
+        
+        tl_xml_parts = []
+        
+        for tl_id, signal_info in tl_signals.items():
+            # Skip if traffic light logic already exists in the network file
+            if signal_info.get('existing_logic', False):
+                print(f"DEBUG: Skipping {tl_id} - logic already exists in network file")
+                continue
+                
+            num_links = signal_info['num_links']
+            connections = signal_info['connections']
+            
+            # Generate state strings based on actual number of links
+            # Create a simple 2-phase system: main direction green, then cross direction green
+            state_main_green = self._generate_state_string(connections, num_links, 'main_green')
+            state_main_yellow = self._generate_state_string(connections, num_links, 'main_yellow')
+            state_cross_green = self._generate_state_string(connections, num_links, 'cross_green')
+            state_cross_yellow = self._generate_state_string(connections, num_links, 'cross_yellow')
+            state_all_red = 'r' * num_links
+            
+            tl_logic = f'''<tlLogic id="{tl_id}" type="static" programID="0" offset="0">
+        <!-- Green phase for main direction -->
+        <phase duration="{green_phase}" state="{state_main_green}"/>
+        <!-- Yellow phase for main direction -->
+        <phase duration="{yellow_phase}" state="{state_main_yellow}"/>
+        <!-- All-red safety phase -->
+        <phase duration="{all_red_phase}" state="{state_all_red}"/>
+        <!-- Green phase for cross direction -->
+        <phase duration="{red_phase}" state="{state_cross_green}"/>
+        <!-- Yellow phase for cross direction -->
+        <phase duration="{yellow_phase}" state="{state_cross_yellow}"/>
+        <!-- All-red safety phase -->
+        <phase duration="{all_red_phase}" state="{state_all_red}"/>
+    </tlLogic>'''
+            
+            tl_xml_parts.append(tl_logic)
+        
+        if not tl_xml_parts:
+            print("DEBUG: No new traffic light configurations generated - all signals already have logic in network file")
+        else:
+            print(f"DEBUG: Generated {len(tl_xml_parts)} fixed timer traffic light configurations")
+        
+        return tl_xml_parts
+
+    def _generate_adaptive_tls(self, tl_signals: dict, traffic_control_config: Dict[str, Any]) -> list:
+        """
+        Generate adaptive (actuated) traffic light logic with detectors
+        
+        Args:
+            tl_signals: Dictionary mapping tl_id -> {'num_links': int, 'connections': list, 'existing_logic': bool}
+            traffic_control_config: Traffic control configuration
+            
+        Returns:
+            List of XML strings for adaptive traffic light logic and detectors
+        """
+        adaptive_config = traffic_control_config.get('adaptive', {})
+        min_green = adaptive_config.get('minGreenTime', 5)
+        max_green = adaptive_config.get('maxGreenTime', 60)
+        sensitivity = adaptive_config.get('detectorSensitivity', 1.0)
+        jam_threshold = adaptive_config.get('jamThreshold', 30)
+        
+        tl_xml_parts = []
+        detector_xml_parts = []
+        
+        for tl_id, signal_info in tl_signals.items():
+            # Skip if traffic light logic already exists in the network file
+            if signal_info.get('existing_logic', False):
+                print(f"DEBUG: Skipping {tl_id} - logic already exists in network file")
+                continue
+                
+            num_links = signal_info['num_links']
+            connections = signal_info['connections']
+            
+            # Generate state strings based on actual number of links
+            state_main_green = self._generate_state_string(connections, num_links, 'main_green')
+            state_main_yellow = self._generate_state_string(connections, num_links, 'main_yellow')
+            state_cross_green = self._generate_state_string(connections, num_links, 'cross_green')
+            state_cross_yellow = self._generate_state_string(connections, num_links, 'cross_yellow')
+            state_all_red = 'r' * num_links
+            
+            # Generate actuated traffic light logic
+            tl_logic = f'''<tlLogic id="{tl_id}" type="actuated" programID="0" offset="0">
+        <!-- Green phase for main direction (detector-controlled) -->
+        <phase duration="{min_green}" minDur="{min_green}" maxDur="{max_green}" state="{state_main_green}"/>
+        <!-- Yellow phase for main direction -->
+        <phase duration="3" state="{state_main_yellow}"/>
+        <!-- All-red safety phase -->
+        <phase duration="2" state="{state_all_red}"/>
+        <!-- Green phase for cross direction (detector-controlled) -->
+        <phase duration="{min_green}" minDur="{min_green}" maxDur="{max_green}" state="{state_cross_green}"/>
+        <!-- Yellow phase for cross direction -->
+        <phase duration="3" state="{state_cross_yellow}"/>
+        <!-- All-red safety phase -->
+        <phase duration="2" state="{state_all_red}"/>
+        <!-- Adaptive parameters -->
+        <param key="detector-gap" value="{3.0 / sensitivity}"/>
+        <param key="max-gap" value="{5.0 / sensitivity}"/>
+        <param key="jam-threshold" value="{jam_threshold}"/>
+    </tlLogic>'''
+            
+            tl_xml_parts.append(tl_logic)
+            
+            # Generate lane area detectors for incoming edges
+            unique_from_edges = set()
+            for conn in connections:
+                from_edge = conn['from']
+                if from_edge and not from_edge.startswith(':'):  # Skip internal edges
+                    unique_from_edges.add(from_edge)
+            
+            if unique_from_edges:
+                detector_xml = f'<!-- Detectors for adaptive traffic light {tl_id} -->'
+                for i, from_edge in enumerate(sorted(unique_from_edges)):
+                    # Generate detector for first lane of each incoming edge
+                    detector_xml += f'\n    <laneAreaDetector id="det_{tl_id}_{i}" lane="{from_edge}_0" pos="10" length="50" file="NUL" freq="60"/>'
+                detector_xml_parts.append(detector_xml)
+        
+        # Combine traffic light logic and detectors
+        all_parts = tl_xml_parts + detector_xml_parts
+        
+        if not tl_xml_parts:
+            print("DEBUG: No new traffic light configurations generated - all signals already have logic in network file")
+        else:
+            print(f"DEBUG: Generated {len(tl_xml_parts)} adaptive traffic light configurations with detectors")
+        
+        return all_parts
+
+    def _generate_state_string(self, connections, num_links, phase_type):
+        """
+        Generate traffic light state string based on connection directions
+        
+        Args:
+            connections: List of connection dictionaries with 'dir' and 'link_index'
+            num_links: Total number of links in the signal
+            phase_type: 'main_green', 'main_yellow', 'cross_green', 'cross_yellow'
+            
+        Returns:
+            State string for the traffic light phase
+        """
+        # Initialize all links as red
+        state = ['r'] * num_links
+        
+        # Define which movements get which signal based on direction
+        # This is a simplified model - in reality, signal timing depends on intersection geometry
+        
+        for conn in connections:
+            link_index = conn['link_index']
+            direction = conn.get('dir', 's')
+            
+            if phase_type == 'main_green':
+                # Main phase: straight and right turn movements (north-south corridor)
+                if direction in ['s', 'S']:  # Straight through
+                    state[link_index] = 'G'  # Green
+                elif direction in ['r', 'R']:  # Right turn
+                    state[link_index] = 'g'  # Green (lowercase for uncontrolled)
+                    
+            elif phase_type == 'main_yellow':
+                # Yellow phase for main direction
+                if direction in ['s', 'S']:
+                    state[link_index] = 'y'  # Yellow
+                elif direction in ['r', 'R']:
+                    state[link_index] = 'y'
+                    
+            elif phase_type == 'cross_green':
+                # Cross phase: east-west movements and left turns
+                if direction in ['s', 'S']:  # Actually cross-street straight
+                    # For cross phase, what was "straight" for other directions becomes green
+                    # This is a simplified heuristic - we'd need better geometry analysis
+                    pass  # Keep red for now, will be handled by connection analysis
+                elif direction in ['l', 'L']:  # Left turns
+                    state[link_index] = 'G'  # Green
+                elif direction in ['t']:  # U-turns
+                    state[link_index] = 'g'  # Green (typically lower priority)
+                    
+            elif phase_type == 'cross_yellow':
+                # Yellow phase for cross direction
+                if direction in ['l', 'L', 't']:
+                    state[link_index] = 'y'  # Yellow
+        
+        # Heuristic: if no movements were assigned green in cross phase, 
+        # alternate some straight movements
+        if phase_type == 'cross_green' and 'G' not in state and 'g' not in state:
+            # Give green to some straight movements that weren't in main phase
+            for conn in connections:
+                link_index = conn['link_index']
+                if conn.get('dir') == 's' and state[link_index] == 'r':
+                    # This heuristic assumes alternating directions for straight movements
+                    if link_index % 2 == 1:  # Odd indices get green in cross phase
+                        state[link_index] = 'G'
+                        if len([s for s in state if s == 'G']) >= 3:  # Limit to avoid conflicts
+                            break
+        
+        return ''.join(state)
     
     def _generate_gui_settings_file(self, gui_settings_file: Path):
         """
