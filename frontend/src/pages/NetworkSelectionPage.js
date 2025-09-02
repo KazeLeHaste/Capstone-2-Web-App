@@ -14,8 +14,6 @@ import {
   Network, 
   CheckCircle, 
   RefreshCw, 
-  Download,
-  Eye,
   MapPin,
   Users,
   ArrowLeft,
@@ -26,8 +24,7 @@ import {
   Copy,
   Settings,
   Clock,
-  Car,
-  Zap
+  Car
 } from 'lucide-react';
 import { apiClient } from '../utils/apiClient';
 
@@ -181,9 +178,9 @@ const NetworkSelectionPage = ({ socket, onLoadingChange }) => {
       <div className="network-card-header">
         <div className="network-card-info">
           <div className={`network-icon ${isSelected ? 'selected' : ''}`}>
-            {network.isOsmScenario ? <Zap /> : <Network />}
+            <Network />
           </div>
-          <div>
+          <div className="network-card-text">
             <h3 className="network-card-title">{network.name}</h3>
             <p className="network-card-id">ID: {network.id}</p>
             {network.isOsmScenario && (
@@ -254,29 +251,6 @@ const NetworkSelectionPage = ({ socket, onLoadingChange }) => {
               </span>
             </div>
           )}
-        </div>
-        
-        <div className="network-card-actions">
-          <button 
-            className="network-card-action"
-            onClick={(e) => {
-              e.stopPropagation();
-              console.log('Preview network:', network.id);
-            }}
-            title="Preview network"
-          >
-            <Eye />
-          </button>
-          <button 
-            className="network-card-action"
-            onClick={(e) => {
-              e.stopPropagation();
-              console.log('Download network:', network.id);
-            }}
-            title="Download network files"
-          >
-            <Download />
-          </button>
         </div>
       </div>
     </div>
