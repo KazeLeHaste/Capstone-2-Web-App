@@ -313,14 +313,7 @@ class SimulationManager:
                 network_dest = session_dir / f"{network_id}.net.xml"
                 shutil.copy2(network_source, network_dest)
             
-            # Copy SUMO config file
-            config_files = list(source_dir.glob("*.sumocfg"))
-            if config_files:
-                config_source = config_files[0]
-                config_dest = session_dir / f"{network_id}.sumocfg"
-                self._process_osm_config_file(config_source, config_dest, network_id, config)
-            
-            # Copy routes directory with vehicle filtering
+            # Copy routes directory with vehicle filtering FIRST
             routes_source_dir = source_dir / "routes"
             if routes_source_dir.exists():
                 routes_dest_dir = session_dir / "routes"
@@ -328,7 +321,21 @@ class SimulationManager:
                 
                 # Apply vehicle type filtering
                 enabled_vehicles = config.get('enabledVehicles', ['passenger', 'bus', 'truck', 'motorcycle'])
+                
+                # Safeguard: ensure at least one vehicle type is enabled
+                if not enabled_vehicles:
+                    print("WARNING: No vehicle types enabled, defaulting to passenger cars")
+                    enabled_vehicles = ['passenger']
+                
+                print(f"Enabled vehicle types: {enabled_vehicles}")
                 self._copy_and_filter_routes(routes_source_dir, routes_dest_dir, enabled_vehicles, config)
+            
+            # Copy SUMO config file AFTER route files are in place
+            config_files = list(source_dir.glob("*.sumocfg"))
+            if config_files:
+                config_source = config_files[0]
+                config_dest = session_dir / f"{network_id}.sumocfg"
+                self._process_osm_config_file(config_source, config_dest, network_id, config)
             
             # Copy additional files (views, edge data, etc.)
             additional_patterns = ['*.osm_view.xml', '*.view.xml', '*.add.xml', '*output_add.xml', 'edgeData*', 'stats*', 'tripinfos*']
@@ -361,24 +368,45 @@ class SimulationManager:
             # Update network file reference
             net_input = root.find('.//net-file')
             if net_input is not None:
-                net_input.set('value', f"{network_id}.net.xml")
+                # Use the actual copied network filename
+                network_files = list(dest_config.parent.glob("*.net.xml"))
+                if network_files:
+                    actual_network_filename = network_files[0].name
+                    net_input.set('value', actual_network_filename)
+                    print(f"Set network file reference to: {actual_network_filename}")
+                else:
+                    net_input.set('value', f"{network_id}.net.xml")
             
-            # Update route files based on enabled vehicles
+            # Update route files based on enabled vehicles - only include files that exist
             enabled_vehicles = config.get('enabledVehicles', ['passenger', 'bus', 'truck', 'motorcycle'])
             route_files = []
             for vehicle_type in enabled_vehicles:
                 route_file = f"routes/osm.{vehicle_type}.rou.xml"
-                if (dest_config.parent / route_file).exists():
+                route_path = dest_config.parent / route_file
+                if route_path.exists():
                     route_files.append(route_file)
+                    print(f"Including route file in config: {route_file}")
+                else:
+                    print(f"Route file not found, skipping: {route_file}")
             
             route_input = root.find('.//route-files')
-            if route_input is not None and route_files:
-                route_input.set('value', ','.join(route_files))
-                print(f"Updated route files: {route_files}")
+            if route_input is not None:
+                if route_files:
+                    route_input.set('value', ','.join(route_files))
+                    print(f"Updated route files in config: {route_files}")
+                else:
+                    print("WARNING: No route files found for enabled vehicles!")
+                    # Remove the route-files element entirely since no routes exist
+                    parent = root.find('.//input')
+                    if parent is not None and route_input is not None:
+                        parent.remove(route_input)
             
-            # Update simulation time settings
-            duration = config.get('duration', 3600)
-            step_length = config.get('stepLength', 1.0)
+            # Update simulation time settings - map from frontend config
+            begin_time = config.get('sumo_begin', config.get('beginTime', 0))
+            end_time = config.get('sumo_end', config.get('endTime', 3600))
+            step_length = config.get('sumo_step_length', config.get('stepLength', 1.0))
+            
+            print(f"Time settings: begin={begin_time}, end={end_time}, step-length={step_length}")
             
             # Find or create time section
             time_section = root.find('.//time')
@@ -390,19 +418,19 @@ class SimulationManager:
             begin_elem = time_section.find('begin')
             if begin_elem is None:
                 begin_elem = ET.SubElement(time_section, 'begin')
-            begin_elem.set('value', '0')
+            begin_elem.set('value', str(begin_time))
             
             end_elem = time_section.find('end')
             if end_elem is None:
                 end_elem = ET.SubElement(time_section, 'end')
-            end_elem.set('value', str(duration))
+            end_elem.set('value', str(end_time))
             
             step_elem = time_section.find('step-length')
             if step_elem is None:
                 step_elem = ET.SubElement(time_section, 'step-length')
             step_elem.set('value', str(step_length))
             
-            print(f"Updated OSM config: duration={duration}s, step-length={step_length}s")
+            print(f"Updated OSM config: begin={begin_time}s, end={end_time}s, step-length={step_length}s")
             
             # Save updated config
             tree.write(dest_config, encoding='utf-8', xml_declaration=True)
@@ -426,7 +454,7 @@ class SimulationManager:
         try:
             traffic_density = config.get('trafficDensity', 1.0)
             
-            # Copy and filter route files
+            # Copy and filter route files - only copy enabled vehicle types
             for route_file in source_dir.glob("*.rou.xml"):
                 # Determine vehicle type from filename
                 vehicle_type = None
@@ -443,12 +471,13 @@ class SimulationManager:
                     else:
                         # Just copy the file
                         shutil.copy2(route_file, dest_file)
-                elif vehicle_type:
-                    # Create empty/commented route file for disabled vehicles
-                    dest_file = dest_dir / route_file.name
-                    self._create_disabled_route_file(dest_file, route_file)
+                    print(f"Copied route file for enabled vehicle type: {vehicle_type}")
+                else:
+                    # Skip disabled vehicle types - don't create empty files
+                    if vehicle_type:
+                        print(f"Skipped route file for disabled vehicle type: {vehicle_type}")
             
-            # Copy trip files as well
+            # Copy trip files as well - only for enabled vehicles
             for trip_file in source_dir.glob("*.trips.xml"):
                 vehicle_type = None
                 for vtype in ['passenger', 'bus', 'truck', 'motorcycle']:
@@ -459,6 +488,7 @@ class SimulationManager:
                 if vehicle_type and vehicle_type in enabled_vehicles:
                     dest_file = dest_dir / trip_file.name
                     shutil.copy2(trip_file, dest_file)
+                    print(f"Copied trip file for enabled vehicle type: {vehicle_type}")
         
         except Exception as e:
             print(f"Error filtering routes: {e}")
