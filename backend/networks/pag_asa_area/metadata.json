@@ -1,0 +1,29 @@
+{
+  "name": "pag_asa_area",
+  "type": "osm_imported",
+  "is_osm_scenario": true,
+  "import_date": "2025-09-03T01:01:14.732318",
+  "original_scenario": "Pag-asa Area",
+  "vehicle_types": [
+    "passenger",
+    "bus",
+    "truck",
+    "motorcycle"
+  ],
+  "network_info": {
+    "edges": 22,
+    "junctions": 15,
+    "lanes": 96,
+    "boundary": "0.00,0.00,1183.56,1449.89",
+    "file_size": 14424
+  },
+  "stats": {
+    "total_files": 16,
+    "route_files": 0,
+    "trip_files": 0,
+    "total_size": 89528
+  },
+  "description": "Imported OSM scenario: Pag-asa Area",
+  "supports_realistic_traffic": true,
+  "configuration_overlay_supported": true
+}

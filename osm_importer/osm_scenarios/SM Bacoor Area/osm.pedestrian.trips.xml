@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- generated on 2025-09-03 00:52:09.417073 by osmWebWizard.py v1_24_0+0000-b72eb3fabc8
+<configuration>
+    <net-file value="C:\Users\kgaqu\OneDrive\Documents\4th Year\Capstone 2\v10\osm_importer\osm_scenarios\2025-09-03-00-52-05\osm.net.xml.gz"/>
+    <output-trip-file value="C:\Users\kgaqu\OneDrive\Documents\4th Year\Capstone 2\v10\osm_importer\osm_scenarios\2025-09-03-00-52-05\osm.pedestrian.trips.xml"/>
+    <route-file value="C:\Users\kgaqu\OneDrive\Documents\4th Year\Capstone 2\v10\osm_importer\osm_scenarios\2025-09-03-00-52-05\osm.pedestrian.rou.xml"/>
+    <pedestrians value="True"/>
+    <prefix value="ped"/>
+    <vehicle-class value="pedestrian"/>
+    <fringe-factor value="1"/>
+    <seed value="46"/>
+    <max-distance value="2000.0"/>
+    <insertion-density value="10.0"/>
+</configuration>
+-->
+
+<routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/routes_file.xsd">
+    <vType id="ped_pedestrian" vClass="pedestrian"/>
+    <person id="ped0" depart="0.00" type="ped_pedestrian">
+        <walk from="1252226318#0" to="587063887#0"/>
+    </person>
+    <person id="ped1" depart="69.70" type="ped_pedestrian">
+        <walk from="-1296098178" to="-1296098178"/>
+    </person>
+    <person id="ped2" depart="139.40" type="ped_pedestrian">
+        <walk from="-587063887#6" to="587063887#0"/>
+    </person>
+    <person id="ped3" depart="209.10" type="ped_pedestrian">
+        <walk from="587063904" to="587063904"/>
+    </person>
+    <person id="ped4" depart="278.80" type="ped_pedestrian">
+        <walk from="1252226318#0" to="587063887#0"/>
+    </person>
+    <person id="ped5" depart="348.50" type="ped_pedestrian">
+        <walk from="-587063887#6" to="587063887#0"/>
+    </person>
+    <person id="ped6" depart="418.20" type="ped_pedestrian">
+        <walk from="1296098178" to="-1296098178"/>
+    </person>
+    <person id="ped7" depart="487.90" type="ped_pedestrian">
+        <walk from="1252226318#0" to="-587063887#6"/>
+    </person>
+    <person id="ped8" depart="557.61" type="ped_pedestrian">
+        <walk from="587063887#0" to="1252226318#0"/>
+    </person>
+    <person id="ped9" depart="627.31" type="ped_pedestrian">
+        <walk from="-587063887#6" to="1252226318#0"/>
+    </person>
+    <person id="ped10" depart="697.01" type="ped_pedestrian">
+        <walk from="1296098178" to="-1296098178"/>
+    </person>
+    <person id="ped11" depart="766.71" type="ped_pedestrian">
+        <walk from="587063887#0" to="-587063887#6"/>
+    </person>
+    <person id="ped12" depart="836.41" type="ped_pedestrian">
+        <walk from="1252226316" to="587063887#0"/>
+    </person>
+    <person id="ped13" depart="906.11" type="ped_pedestrian">
+        <walk from="-1296098178" to="-1296098178"/>
+    </person>
+    <person id="ped14" depart="975.81" type="ped_pedestrian">
+        <walk from="-587063887#6" to="1252226318#0"/>
+    </person>
+    <person id="ped15" depart="1045.51" type="ped_pedestrian">
+        <walk from="-333292211#2" to="587063904"/>
+    </person>
+    <person id="ped16" depart="1115.21" type="ped_pedestrian">
+        <walk from="587063904" to="587063904"/>
+    </person>
+    <person id="ped17" depart="1184.91" type="ped_pedestrian">
+        <walk from="587063887#0" to="-587063887#6"/>
+    </person>
+    <person id="ped18" depart="1254.61" type="ped_pedestrian">
+        <walk from="-1296098178" to="1296098178"/>
+    </person>
+    <person id="ped19" depart="1324.31" type="ped_pedestrian">
+        <walk from="1296098178" to="1296098178"/>
+    </person>
+    <person id="ped20" depart="1394.01" type="ped_pedestrian">
+        <walk from="1296098178" to="-1296098178"/>
+    </person>
+    <person id="ped21" depart="1463.71" type="ped_pedestrian">
+        <walk from="-1296098178" to="1296098178"/>
+    </person>
+    <person id="ped22" depart="1533.42" type="ped_pedestrian">
+        <walk from="-587063887#6" to="-587063887#6"/>
+    </person>
+    <person id="ped23" depart="1603.12" type="ped_pedestrian">
+        <walk from="1252226318#0" to="587063887#0"/>
+    </person>
+    <person id="ped24" depart="1672.82" type="ped_pedestrian">
+        <walk from="1252226316" to="1252226316"/>
+    </person>
+    <person id="ped25" depart="1742.52" type="ped_pedestrian">
+        <walk from="587063887#0" to="587063887#0"/>
+    </person>
+    <person id="ped26" depart="1812.22" type="ped_pedestrian">
+        <walk from="-587063887#6" to="1252226316"/>
+    </person>
+    <person id="ped27" depart="1881.92" type="ped_pedestrian">
+        <walk from="1252226318#0" to="587063887#0"/>
+    </person>
+    <person id="ped28" depart="1951.62" type="ped_pedestrian">
+        <walk from="-587063887#6" to="1252226316"/>
+    </person>
+    <person id="ped29" depart="2021.32" type="ped_pedestrian">
+        <walk from="-587063887#6" to="587063887#0"/>
+    </person>
+    <person id="ped30" depart="2091.02" type="ped_pedestrian">
+        <walk from="1252226318#0" to="-587063887#6"/>
+    </person>
+    <person id="ped31" depart="2160.72" type="ped_pedestrian">
+        <walk from="1252226318#0" to="587063887#0"/>
+    </person>
+    <person id="ped32" depart="2230.42" type="ped_pedestrian">
+        <walk from="-587063887#6" to="1252226318#0"/>
+    </person>
+    <person id="ped33" depart="2300.12" type="ped_pedestrian">
+        <walk from="587063887#0" to="587063887#0"/>
+    </person>
+    <person id="ped34" depart="2369.82" type="ped_pedestrian">
+        <walk from="1252226316" to="-587063887#6"/>
+    </person>
+    <person id="ped35" depart="2439.52" type="ped_pedestrian">
+        <walk from="-587063887#6" to="1252226318#0"/>
+    </person>
+    <person id="ped36" depart="2509.23" type="ped_pedestrian">
+        <walk from="587063904" to="-333292211#2"/>
+    </person>
+    <person id="ped37" depart="2578.93" type="ped_pedestrian">
+        <walk from="1296098178" to="-1296098178"/>
+    </person>
+    <person id="ped38" depart="2648.63" type="ped_pedestrian">
+        <walk from="587063887#0" to="1252226318#0"/>
+    </person>
+    <person id="ped39" depart="2718.33" type="ped_pedestrian">
+        <walk from="587063904" to="-333292211#2"/>
+    </person>
+    <person id="ped40" depart="2788.03" type="ped_pedestrian">
+        <walk from="-587063887#6" to="1252226318#0"/>
+    </person>
+    <person id="ped41" depart="2857.73" type="ped_pedestrian">
+        <walk from="587063887#0" to="587063887#0"/>
+    </person>
+    <person id="ped42" depart="2927.43" type="ped_pedestrian">
+        <walk from="-587063887#6" to="587063887#0"/>
+    </person>
+    <person id="ped43" depart="2997.13" type="ped_pedestrian">
+        <walk from="1252226316" to="1252226318#0"/>
+    </person>
+    <person id="ped44" depart="3066.83" type="ped_pedestrian">
+        <walk from="1252226316" to="1252226318#0"/>
+    </person>
+    <person id="ped45" depart="3136.53" type="ped_pedestrian">
+        <walk from="1252226316" to="1252226318#0"/>
+    </person>
+    <person id="ped46" depart="3206.23" type="ped_pedestrian">
+        <walk from="587063904" to="-333292211#2"/>
+    </person>
+    <person id="ped47" depart="3275.93" type="ped_pedestrian">
+        <walk from="587063904" to="-333292211#2"/>
+    </person>
+    <person id="ped48" depart="3345.63" type="ped_pedestrian">
+        <walk from="-587063887#6" to="587063887#0"/>
+    </person>
+    <person id="ped49" depart="3415.33" type="ped_pedestrian">
+        <walk from="-587063887#6" to="1252226316"/>
+    </person>
+    <person id="ped50" depart="3485.04" type="ped_pedestrian">
+        <walk from="1252226316" to="-587063887#6"/>
+    </person>
+    <person id="ped51" depart="3554.74" type="ped_pedestrian">
+        <walk from="587063887#0" to="587063887#0"/>
+    </person>
+</routes>
