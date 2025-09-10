@@ -319,7 +319,7 @@ const MapVisualization = ({ simulationData, isRunning, config, isFullscreen = fa
   return (
     <div className="relative w-full h-full">
       {/* Controls */}
-      <div className="absolute top-4 right-4 z-10 bg-white rounded-lg shadow-lg p-3 space-y-2">
+      <div className="absolute top-4 right-4 z-10 bg-primary rounded-lg shadow-lg p-3 space-y-2">
         <div className="flex items-center space-x-2">
           <label className="text-sm font-medium text-gray-700">View:</label>
           <select
@@ -353,8 +353,7 @@ const MapVisualization = ({ simulationData, isRunning, config, isFullscreen = fa
       {/* Canvas */}
       <canvas
         ref={canvasRef}
-        className="w-full h-full border border-gray-200 rounded-lg"
-        style={{ minHeight: '400px' }}
+        className="w-full h-full border border-gray-200 rounded-lg map-container"
       />
       
       {/* No data overlay */}

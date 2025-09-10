@@ -66,7 +66,7 @@ const SimulationStats = ({ stats = {}, isRunning = false }) => {
   ];
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-6">
+    <div className="bg-primary rounded-lg shadow-md p-6">
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-lg font-semibold text-gray-800">
           Simulation Statistics
@@ -118,8 +118,8 @@ const SimulationStats = ({ stats = {}, isRunning = false }) => {
             <span className="text-sm text-gray-600">Simulation Progress</span>
             <span className="text-sm text-gray-500">Real-time updates</span>
           </div>
-          <div className="w-full bg-gray-200 rounded-full h-2">
-            <div className="bg-blue-500 h-2 rounded-full animate-pulse" style={{ width: '100%' }}></div>
+          <div className="progress-bar">
+            <div className="progress-bar-fill" style={{ width: '100%' }}></div>
           </div>
         </div>
       )}

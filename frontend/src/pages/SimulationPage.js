@@ -487,13 +487,13 @@ const SimulationPage = ({ socket }) => {
 
   const getStatusColor = () => {
     switch (simulationState) {
-      case 'running': return 'text-green-600';
-      case 'paused': return 'text-yellow-600';
-      case 'stopped': return 'text-gray-600';
-      case 'finished': return 'text-blue-600';
-      case 'error': return 'text-red-600';
-      case 'launching': return 'text-blue-600';
-      default: return 'text-gray-600';
+      case 'running': return 'text-primary';
+      case 'paused': return 'text-muted';
+      case 'stopped': return 'text-muted';
+      case 'finished': return 'text-primary';
+      case 'error': return 'text-danger';
+      case 'launching': return 'text-primary';
+      default: return 'text-muted';
     }
   };
 
@@ -515,11 +515,11 @@ const SimulationPage = ({ socket }) => {
       <div className="simulation-page">
         <div className="simulation-container">
           <div className="text-center py-12">
-            <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
-            <h2 className="text-xl font-semibold text-gray-900 mb-2">
+            <AlertCircle className="w-12 h-12 text-danger mx-auto mb-4" />
+            <h2 className="text-xl font-semibold text-primary mb-2">
               Session Data Required
             </h2>
-            <p className="text-gray-600 mb-6">
+            <p className="text-secondary mb-6">
               Please complete the configuration and network selection process.
             </p>
             <Link
@@ -545,10 +545,10 @@ const SimulationPage = ({ socket }) => {
 
   const getConnectionStatusClass = () => {
     switch (connectionStatus) {
-      case 'connected': return 'text-green-600';
-      case 'disconnected': return 'text-red-600';
-      case 'no_socket': return 'text-yellow-600';
-      default: return 'text-gray-600';
+      case 'connected': return 'text-primary';
+      case 'disconnected': return 'text-danger';
+      case 'no_socket': return 'text-muted';
+      default: return 'text-muted';
     }
   };
 
@@ -561,9 +561,9 @@ const SimulationPage = ({ socket }) => {
             <h1 className="simulation-title">
               Simulation Launch
             </h1>
-            <p className="text-gray-600">
+            <p className="text-secondary">
               Network: <strong>{sessionData.networkName}</strong> | 
-              Session: <code className="bg-gray-100 px-1 rounded text-xs">{sessionData.sessionId}</code>
+              Session: <code className="code-block">{sessionData.sessionId}</code>
             </p>
           </div>
           
@@ -702,8 +702,8 @@ const SimulationPage = ({ socket }) => {
                       <ZoomOut className="w-4 h-4" />
                     </button>
                     
-                    <div className="px-4 py-2 bg-white border border-blue-200 rounded-md min-w-[100px] text-center">
-                      <span className="text-sm font-medium text-blue-900">
+                    <div className="px-4 py-2 bg-primary border border-primary rounded-md min-w-[100px] text-center">
+                      <span className="text-sm font-medium text-primary">
                         {currentZoom.toFixed(1)}%
                       </span>
                     </div>
@@ -738,10 +738,10 @@ const SimulationPage = ({ socket }) => {
 
             {/* Live Statistics */}
             {simulationState === 'running' && (
-              <div className="bg-white rounded-lg p-6 shadow-sm">
+              <div className="bg-primary rounded-lg p-6 shadow-sm">
                 <div className="flex items-center justify-between mb-4">
-                  <h2 className="text-lg font-semibold text-gray-900">Live Statistics</h2>
-                  <div className="text-sm text-gray-500">
+                  <h2 className="text-lg font-semibold text-primary">Live Statistics</h2>
+                  <div className="text-sm text-secondary">
                     Updates every second
                   </div>
                 </div>
@@ -861,7 +861,7 @@ const SimulationPage = ({ socket }) => {
                 <div>
                   <span className="font-medium">Session ID:</span>
                   <br />
-                  <code className="text-xs bg-gray-100 px-1 rounded">{sessionData.sessionId}</code>
+                  <code className="code-block">{sessionData.sessionId}</code>
                 </div>
                 <div>
                   <span className="font-medium">Created:</span> {new Date(sessionData.timestamp).toLocaleTimeString()}
@@ -910,9 +910,9 @@ const SimulationPage = ({ socket }) => {
             </Link>
           </div>
           
-          <div className="text-sm text-gray-500">
+          <div className="text-sm text-muted">
             {simulationState === 'running' ? (
-              <span className="text-green-600 font-medium">Simulation is running in SUMO GUI</span>
+              <span className="text-primary font-medium">Simulation is running in SUMO GUI</span>
             ) : simulationState === 'ready' ? (
               <span>Click "Launch SUMO" to start the simulation</span>
             ) : (

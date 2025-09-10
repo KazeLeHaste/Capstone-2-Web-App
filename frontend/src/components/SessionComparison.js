@@ -86,10 +86,10 @@ const SessionComparison = ({ selectedSessions, onClose }) => {
   if (loading) {
     return (
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-        <div className="bg-white rounded-lg p-8 w-full max-w-4xl max-h-[90vh] overflow-hidden">
+        <div className="bg-primary rounded-lg p-8 w-full max-w-4xl max-h-[90vh] overflow-hidden">
           <div className="text-center">
             <RotateCcw className="animate-spin mx-auto h-8 w-8 text-blue-500" />
-            <p className="mt-4 text-gray-600">Comparing sessions...</p>
+            <p className="mt-4 text-secondary">Comparing sessions...</p>
           </div>
         </div>
       </div>

@@ -261,11 +261,11 @@ const NetworkSelectionPage = ({ socket, onLoadingChange }) => {
       <div className="network-page">
         <div className="network-container">
           <div className="text-center py-12">
-            <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
-            <h2 className="text-xl font-semibold text-gray-900 mb-2">
+            <AlertCircle className="w-12 h-12 text-error mx-auto mb-4" />
+            <h2 className="text-xl font-semibold text-primary mb-2">
               Configuration Required
             </h2>
-            <p className="text-gray-600 mb-6">
+            <p className="text-secondary mb-6">
               Please complete the simulation configuration before selecting a network.
             </p>
             <Link
@@ -285,21 +285,21 @@ const NetworkSelectionPage = ({ socket, onLoadingChange }) => {
       <div className="network-container">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+          <h1 className="text-3xl font-bold text-primary mb-2">
             Select Network
           </h1>
-          <p className="text-gray-600">
+          <p className="text-secondary">
             Choose a predefined network to apply your configuration. The selected network will be copied to your session folder.
           </p>
           
           {sessionConfig && (
-            <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+            <div className="mt-4 p-4 info-block rounded-lg">
               <div className="flex items-center space-x-2 mb-2">
-                <Settings className="w-5 h-5 text-blue-600" />
-                <span className="font-medium text-blue-900">Active Configuration</span>
+                <Settings className="w-5 h-5 text-info" />
+                <span className="font-medium text-info-dark">Active Configuration</span>
               </div>
-              <div className="text-sm text-blue-800">
-                Session: <code className="bg-blue-100 px-1 rounded">{sessionId}</code> | 
+              <div className="text-sm text-info-dark">
+                Session: <code className="code-block px-1 rounded">{sessionId}</code> | 
                 {/* Handle both simplified and legacy configuration structures */}
                 {sessionConfig.config.original_config ? (
                   // Simplified configuration structure
@@ -361,8 +361,8 @@ const NetworkSelectionPage = ({ socket, onLoadingChange }) => {
         {loading && (
           <div className="flex items-center justify-center py-12">
             <div className="text-center">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-              <p className="text-gray-600">Loading available networks...</p>
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-accent mx-auto mb-4"></div>
+              <p className="text-secondary">Loading available networks...</p>
             </div>
           </div>
         )}
@@ -393,13 +393,13 @@ const NetworkSelectionPage = ({ socket, onLoadingChange }) => {
                 
                 {/* Selection Actions */}
                 {selectedNetwork && (
-                  <div className="mt-8 p-6 bg-green-50 border border-green-200 rounded-lg">
+                  <div className="mt-8 p-6 success-block rounded-lg">
                     <div className="flex items-center justify-between">
                       <div>
-                        <h3 className="text-lg font-semibold text-green-900 mb-1">
+                        <h3 className="text-lg font-semibold text-success-dark mb-1">
                           Selected: {selectedNetwork.name}
                         </h3>
-                        <p className="text-green-700">
+                        <p className="text-success-dark">
                           This network will be copied to your session folder and your configuration will be applied.
                         </p>
                       </div>
@@ -479,7 +479,7 @@ const NetworkSelectionPage = ({ socket, onLoadingChange }) => {
         </div>
         
         {/* Navigation */}
-        <div className="flex justify-between items-center mt-8 pt-6 border-t border-gray-200">
+        <div className="flex justify-between items-center mt-8 pt-6 border-t border-default">
           <Link 
             to="/configuration" 
             className="btn btn-secondary flex items-center space-x-2"
@@ -490,11 +490,11 @@ const NetworkSelectionPage = ({ socket, onLoadingChange }) => {
           
           <div className="flex items-center space-x-4">
             {selectedNetwork ? (
-              <span className="text-green-600 text-sm font-medium">
+              <span className="text-success text-sm font-medium">
                 Network selected: {selectedNetwork.name}
               </span>
             ) : (
-              <span className="text-gray-500 text-sm">
+              <span className="text-secondary text-sm">
                 Select a network to continue
               </span>
             )}
