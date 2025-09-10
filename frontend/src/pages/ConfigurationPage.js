@@ -285,8 +285,8 @@ const ConfigurationPage = ({ socket }) => {
           </p>
           
           {sessionId && (
-            <div className="text-sm text-gray-600 mt-2">
-              Session ID: <code className="bg-gray-100 px-2 py-1 rounded">{sessionId}</code>
+            <div className="text-sm text-secondary mt-2">
+              Session ID: <code className="code-block px-2 py-1 rounded">{sessionId}</code>
             </div>
           )}
         </div>
@@ -316,7 +316,7 @@ const ConfigurationPage = ({ socket }) => {
                 <Clock className="config-section-icon" />
                 <h2 className="config-section-title">Simulation Duration</h2>
                 <div className="config-section-help">
-                  <HelpCircle className="w-4 h-4 text-gray-400" />
+                  <HelpCircle className="w-4 h-4 text-muted" />
                   <span className="config-help-text">Set the time period for your simulation</span>
                 </div>
               </div>
@@ -353,7 +353,7 @@ const ConfigurationPage = ({ socket }) => {
                     onChange={(e) => handleConfigChange('endTime', parseInt(e.target.value))}
                     className="config-range w-full"
                   />
-                  <div className="flex justify-between text-xs text-gray-500 mt-1">
+                  <div className="flex justify-between text-xs text-muted mt-1">
                     <span>5 min</span>
                     <span>2 hours</span>
                   </div>
@@ -383,7 +383,7 @@ const ConfigurationPage = ({ socket }) => {
                 <Zap className="config-section-icon" />
                 <h2 className="config-section-title">Time Step</h2>
                 <div className="config-section-help">
-                  <HelpCircle className="w-4 h-4 text-gray-400" />
+                  <HelpCircle className="w-4 h-4 text-muted" />
                   <span className="config-help-text">Simulation accuracy vs. performance</span>
                 </div>
               </div>
@@ -413,7 +413,7 @@ const ConfigurationPage = ({ socket }) => {
                 <Car className="config-section-icon" />
                 <h2 className="config-section-title">Simulation Behavior</h2>
                 <div className="config-section-help">
-                  <HelpCircle className="w-4 h-4 text-gray-400" />
+                  <HelpCircle className="w-4 h-4 text-muted" />
                   <span className="config-help-text">How the simulation handles stuck vehicles</span>
                 </div>
               </div>
@@ -446,7 +446,7 @@ const ConfigurationPage = ({ socket }) => {
                 <RefreshCw className="config-section-icon" />
                 <h2 className="config-section-title">Traffic Intensity</h2>
                 <div className="config-section-help">
-                  <HelpCircle className="w-4 h-4 text-gray-400" />
+                  <HelpCircle className="w-4 h-4 text-muted" />
                   <span className="config-help-text">Control the density of traffic in the simulation</span>
                 </div>
               </div>
@@ -469,12 +469,12 @@ const ConfigurationPage = ({ socket }) => {
                   <span className="config-help-text">
                     Multiplies the base traffic volume. Range: 0.1x to 5.0x normal traffic.
                   </span>
-                  <div className="mt-2 p-3 bg-blue-50 rounded-lg">
-                    <div className="flex items-center text-sm text-blue-700">
+                  <div className="mt-2 p-3 info-block rounded-lg">
+                    <div className="flex items-center text-sm text-info-dark">
                       <Info className="w-4 h-4 mr-2" />
                       <div>
                         <div><strong>Current Setting:</strong> {(config.trafficIntensity * 100).toFixed(0)}% of normal traffic</div>
-                        <div className="text-blue-600">
+                        <div className="text-info">
                           {config.trafficIntensity < 0.8 ? "Light traffic conditions" :
                            config.trafficIntensity <= 1.2 ? "Normal traffic conditions" :
                            config.trafficIntensity <= 2.0 ? "Heavy traffic conditions" :
@@ -493,7 +493,7 @@ const ConfigurationPage = ({ socket }) => {
                 <Car className="config-section-icon" />
                 <h2 className="config-section-title">Vehicle Types</h2>
                 <div className="config-section-help">
-                  <HelpCircle className="w-4 h-4 text-gray-400" />
+                  <HelpCircle className="w-4 h-4 text-muted" />
                   <span className="config-help-text">Select which vehicle types to include in the simulation</span>
                 </div>
               </div>
@@ -502,7 +502,7 @@ const ConfigurationPage = ({ socket }) => {
                   <div className="info-panel-header">
                     <Info className="info-panel-icon" />
                     <div className="info-panel-content">
-                      <p className="text-sm text-gray-700">
+                      <p className="text-sm text-secondary">
                         Vehicle types correspond to different route files and SUMO vClass definitions. 
                         Each type has different characteristics like size, speed limits, and lane permissions.
                       </p>
@@ -982,37 +982,37 @@ const ConfigurationPage = ({ socket }) => {
             </div>
 
             {/* Vehicle Types Detail */}
-            <div className="mt-3 pt-3 border-t border-gray-200">
-              <h4 className="text-sm font-medium text-gray-700 mb-2">Enabled Vehicle Types:</h4>
+            <div className="mt-3 pt-3 border-t border-default">
+              <h4 className="text-sm font-medium text-secondary mb-2">Enabled Vehicle Types:</h4>
               <div className="space-y-1">
                 {Object.entries(config.vehicleTypes)
                   .filter(([_, typeConfig]) => typeConfig.enabled)
                   .map(([vehicleType, typeConfig]) => (
-                    <div key={vehicleType} className="text-xs text-gray-600 flex justify-between">
+                    <div key={vehicleType} className="text-xs text-secondary flex justify-between">
                       <span>{typeConfig.name}</span>
-                      <span className="text-gray-400">osm.{vehicleType}.rou.xml</span>
+                      <span className="text-muted">osm.{vehicleType}.rou.xml</span>
                     </div>
                   ))
                 }
                 {Object.values(config.vehicleTypes).filter(t => t.enabled).length === 0 && (
-                  <div className="text-xs text-red-600">⚠ No vehicle types selected</div>
+                  <div className="text-xs text-error">⚠ No vehicle types selected</div>
                 )}
               </div>
             </div>
 
             {/* Traffic Control Detail */}
-            <div className="mt-3 pt-3 border-t border-gray-200">
-              <h4 className="text-sm font-medium text-gray-700 mb-2">Traffic Control Configuration:</h4>
+            <div className="mt-3 pt-3 border-t border-default">
+              <h4 className="text-sm font-medium text-secondary mb-2">Traffic Control Configuration:</h4>
               <div className="space-y-1">
-                <div className="text-xs text-gray-600 flex justify-between">
+                <div className="text-xs text-secondary flex justify-between">
                   <span>Method:</span>
-                  <span className="text-gray-800">
+                  <span className="text-primary">
                     {config.trafficControl.method === 'fixed' ? 'Fixed Timer (Static)' : 'Adaptive (Actuated)'}
                   </span>
                 </div>
-                <div className="text-xs text-gray-600 flex justify-between">
+                <div className="text-xs text-secondary flex justify-between">
                   <span>Application:</span>
-                  <span className="text-gray-800">
+                  <span className="text-primary">
                     {config.trafficControl.globalMode ? 'All intersections' : 'Per-intersection control'}
                   </span>
                 </div>

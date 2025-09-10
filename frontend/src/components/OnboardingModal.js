@@ -201,7 +201,7 @@ const OnboardingModal = ({ onComplete, onClose }) => {
   
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-xl max-w-2xl w-full max-h-screen overflow-y-auto">
+      <div className="bg-primary rounded-xl max-w-2xl w-full max-h-screen overflow-y-auto">
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b">
           <div className="flex items-center space-x-3">
@@ -222,9 +222,9 @@ const OnboardingModal = ({ onComplete, onClose }) => {
         
         {/* Progress bar */}
         <div className="px-6 pt-4">
-          <div className="w-full bg-gray-200 rounded-full h-2">
+          <div className="progress-bar">
             <div 
-              className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+              className="progress-bar-fill"
               style={{ width: `${((currentStep + 1) / onboardingSteps.length) * 100}%` }}
             ></div>
           </div>

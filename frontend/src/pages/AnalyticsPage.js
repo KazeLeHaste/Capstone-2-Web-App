@@ -360,7 +360,7 @@ const AnalyticsPage = ({ socket, simulationData, simulationStatus }) => {
         {!selectedSession && !loading && (
           <div className="card">
             <div className="card-body text-center py-xl">
-              <Eye className="mx-auto mb-md" style={{width: '3rem', height: '3rem', color: 'var(--text-muted)'}} />
+              <Eye className="icon-large icon-muted icon-center mb-md" />
               <h3 className="mb-sm">Select a Session to Analyze</h3>
               <p className="text-muted mb-md">
                 Choose a simulation session from the dropdown above to view detailed analytics.
@@ -378,7 +378,7 @@ const AnalyticsPage = ({ socket, simulationData, simulationStatus }) => {
         {loading && (
           <div className="card">
             <div className="card-body text-center py-xl">
-              <RefreshCw className="mx-auto mb-md animate-spin" style={{width: '2rem', height: '2rem', color: 'var(--primary-color)'}} />
+              <RefreshCw className="icon-medium icon-primary icon-center animate-spin mb-md" />
               <p>Loading analytics data...</p>
             </div>
           </div>

@@ -25,6 +25,9 @@ import OnboardingModal from './components/OnboardingModal';
 import LoadingOverlay from './components/LoadingOverlay';
 import ErrorBoundary from './components/ErrorBoundary';
 
+// Import contexts
+import { ThemeProvider } from './contexts/ThemeContext';
+
 // Import utilities
 import { apiClient } from './utils/apiClient';
 
@@ -114,17 +117,18 @@ function App() {
   };
   
   return (
-    <ErrorBoundary>
-      <Router>
-        <div className="App">
-          {/* Navigation */}
-          <Navigation 
-            isConnected={isConnected}
-            backendStatus={backendStatus}
-            simulationStatus={simulationStatus}
-          />
-          
-          {/* Main content */}
+    <ThemeProvider>
+      <ErrorBoundary>
+        <Router>
+          <div className="App">
+            {/* Navigation */}
+            <Navigation 
+              isConnected={isConnected}
+              backendStatus={backendStatus}
+              simulationStatus={simulationStatus}
+            />
+            
+            {/* Main content */}
           <main className="main-content">
             <Routes>
               <Route 
@@ -196,6 +200,7 @@ function App() {
         </div>
       </Router>
     </ErrorBoundary>
+    </ThemeProvider>
   );
 }
 

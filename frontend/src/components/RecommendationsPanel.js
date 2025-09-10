@@ -31,12 +31,12 @@ const RecommendationsPanel = ({ recommendations = [], loading = false }) => {
     return (
       <div className="space-y-4">
         {[...Array(3)].map((_, i) => (
-          <div key={i} className="bg-white rounded-lg border p-6 animate-pulse">
+          <div key={i} className="bg-primary rounded-lg border p-6 animate-pulse">
             <div className="flex items-center space-x-3">
-              <div className="w-8 h-8 bg-gray-200 rounded"></div>
+              <div className="w-8 h-8 bg-tertiary rounded"></div>
               <div className="flex-1">
-                <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
-                <div className="h-3 bg-gray-200 rounded w-1/2"></div>
+                <div className="h-4 bg-tertiary rounded w-3/4 mb-2"></div>
+                <div className="h-3 bg-tertiary rounded w-1/2"></div>
               </div>
             </div>
           </div>
@@ -73,26 +73,26 @@ const RecommendationsPanel = ({ recommendations = [], loading = false }) => {
     high: {
       icon: AlertTriangle,
       color: 'red',
-      bgColor: 'bg-red-50',
-      borderColor: 'border-red-200',
-      textColor: 'text-red-800',
-      iconColor: 'text-red-600'
+      bgColor: 'bg-error',
+      borderColor: 'border-error',
+      textColor: 'text-error',
+      iconColor: 'text-error'
     },
     medium: {
       icon: AlertCircle,
       color: 'yellow',
-      bgColor: 'bg-yellow-50',
-      borderColor: 'border-yellow-200',
-      textColor: 'text-yellow-800',
-      iconColor: 'text-yellow-600'
+      bgColor: 'bg-warning',
+      borderColor: 'border-warning',
+      textColor: 'text-warning',
+      iconColor: 'text-warning'
     },
     low: {
       icon: Info,
       color: 'blue',
-      bgColor: 'bg-blue-50',
-      borderColor: 'border-blue-200',
-      textColor: 'text-blue-800',
-      iconColor: 'text-blue-600'
+      bgColor: 'bg-info',
+      borderColor: 'border-info',
+      textColor: 'text-info',
+      iconColor: 'text-info'
     }
   };
 
@@ -172,11 +172,12 @@ const RecommendationsPanel = ({ recommendations = [], loading = false }) => {
         
         <div className="flex items-center space-x-3">
           <div className="flex items-center space-x-2">
-            <Filter className="w-4 h-4 text-gray-400" />
+            <Filter className="w-4 h-4 text-theme-muted" />
             <select
               value={selectedCategory}
               onChange={(e) => setSelectedCategory(e.target.value)}
-              className="text-sm border rounded px-3 py-1"
+              className="form-control text-sm"
+              style={{ minWidth: '150px' }}
             >
               {categories.map(category => (
                 <option key={category} value={category}>
@@ -190,7 +191,8 @@ const RecommendationsPanel = ({ recommendations = [], loading = false }) => {
           <select
             value={selectedPriority}
             onChange={(e) => setSelectedPriority(e.target.value)}
-            className="text-sm border rounded px-3 py-1"
+            className="form-control text-sm"
+            style={{ minWidth: '120px' }}
           >
             {priorities.map(priority => (
               <option key={priority} value={priority}>
@@ -328,12 +330,12 @@ const RecommendationsPanel = ({ recommendations = [], loading = false }) => {
 
       {/* Summary Footer */}
       {filteredRecommendations.length > 0 && (
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+        <div className="bg-info border border-info rounded-lg p-4">
           <div className="flex items-start">
-            <Info className="w-5 h-5 text-blue-600 mr-3 mt-0.5" />
+            <Info className="w-5 h-5 text-info mr-3 mt-0.5" />
             <div className="text-sm">
-              <p className="text-blue-800 font-medium">Implementation Priority</p>
-              <p className="text-blue-700 mt-1">
+              <p className="text-info font-medium">Implementation Priority</p>
+              <p className="text-info mt-1">
                 Address high-priority recommendations first, focusing on safety and congestion issues. 
                 Medium and low priority items can be implemented as part of long-term improvement plans.
               </p>

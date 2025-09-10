@@ -28,6 +28,28 @@
   --border-color: #e2e8f0;
   --border-hover: #cbd5e0;
   
+  /* Status colors and backgrounds */
+  --success-bg: #f0fff4;
+  --success-border: #9ae6b4;
+  --success-text: #22543d;
+  --success-text-dark: #2f855a;
+  --success-hover: #2f855a;
+  
+  --info-bg: #ebf8ff;
+  --info-border: #90cdf4;
+  --info-text: #2c5aa0;
+  --info-text-dark: #2a69ac;
+  
+  /* Warning state colors */
+  --bg-warning: #fffbeb;
+  --text-warning: #92400e;
+  --border-warning: #fed7aa;
+  
+  /* Info state colors */
+  --bg-info: #eff6ff;
+  --text-info: #1e40af;
+  --border-info: #dbeafe;
+  
   --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
   --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
   --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
@@ -51,6 +73,11 @@
   --color-gray-300: #d1d5db;
   --color-gray-900: #111827;
   
+  /* Action icon colors */
+  --color-purple-600: #805ad5;
+  --color-purple-700: #6b46c1;
+  --color-orange-700: #c05621;
+  
   /* ISO 9241-110 compliant spacing */
   --spacing-xs: 0.25rem;   /* 4px */
   --spacing-sm: 0.5rem;    /* 8px */
@@ -67,6 +94,177 @@
   --bp-tablet-l: 1024px;   /* Tablet landscape / Small desktop */
   --bp-desktop: 1280px;    /* Desktop */
   --bp-desktop-l: 1536px;  /* Large desktop */
+  
+  /* Page background gradients */
+  --page-gradient-start: #ebf8ff;
+  --page-gradient-end: #e0e7ff;
+  
+  /* Configuration page specific gradients */
+  --config-selected-bg-start: #f0f9ff;
+  --config-selected-bg-end: #e0f2fe;
+  --config-vehicle-summary-start: #eff6ff;
+  --config-vehicle-summary-end: #dbeafe;
+  --config-container-bg: #f8fafc;
+  
+  /* Vehicle type icon gradients */
+  --vehicle-passenger-bg-start: #dbeafe;
+  --vehicle-passenger-bg-end: #93c5fd;
+  --vehicle-passenger-color: #1e40af;
+  --vehicle-bus-bg-start: #fef3c7;
+  --vehicle-bus-bg-end: #fbbf24;
+  --vehicle-bus-color: #d97706;
+  --vehicle-truck-bg-start: #f3e8ff;
+  --vehicle-truck-bg-end: #c084fc;
+  --vehicle-truck-color: #7c3aed;
+  --vehicle-motorcycle-bg-start: #ecfdf5;
+  --vehicle-motorcycle-bg-end: #6ee7b7;
+  --vehicle-motorcycle-color: #059669;
+  --vehicle-bicycle-bg-start: #fef7ff;
+  --vehicle-bicycle-bg-end: #f0abfc;
+  --vehicle-bicycle-color: #c026d3;
+  --vehicle-pedestrian-bg-start: #fff7ed;
+  --vehicle-pedestrian-bg-end: #fdba74;
+  --vehicle-pedestrian-color: #ea580c;
+  
+  /* Summary section border */
+  --config-summary-border: #93c5fd;
+}
+
+/* Dark mode color scheme with higher specificity */
+html.dark {
+  --primary-color: #60a5fa !important;
+  --primary-hover: #3b82f6 !important;
+  --secondary-color: #374151 !important;
+  --success-color: #10b981 !important;
+  --danger-color: #f87171 !important;
+  --warning-color: #fbbf24 !important;
+  --info-color: #60a5fa !important;
+  
+  --text-primary: #f9fafb !important;
+  --text-secondary: #e5e7eb !important;
+  --text-muted: #9ca3af !important;
+  --text-light: #6b7280 !important;
+  
+  --bg-primary: #111827 !important;
+  --bg-secondary: #1f2937 !important;
+  --bg-tertiary: #374151 !important;
+  
+  --border-color: #374151 !important;
+  --border-hover: #4b5563 !important;
+  
+  /* Dark mode status colors */
+  --success-bg: #064e3b !important;
+  --success-border: #059669 !important;
+  --success-text: #6ee7b7 !important;
+  --success-text-dark: #34d399 !important;
+  --success-hover: #059669 !important;
+  
+  --info-bg: #1e3a8a !important;
+  --info-border: #3b82f6 !important;
+  --info-text: #93c5fd !important;
+  --info-text-dark: #60a5fa !important;
+  
+  --error-bg: #7f1d1d !important;
+  --error-text: #f87171 !important;
+  
+  /* Warning and info alert colors for dark mode */
+  --bg-warning: #451a03 !important;
+  --text-warning: #fbbf24 !important;
+  --border-warning: #d97706 !important;
+  
+  --bg-info: #1e3a8a !important;
+  --text-info: #93c5fd !important;
+  --border-info: #3b82f6 !important;
+  
+  --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.3), 0 1px 2px 0 rgba(0, 0, 0, 0.2) !important;
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2) !important;
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.2) !important;
+  
+  /* Dark mode compatible colors */
+  --color-primary: #60a5fa !important;
+  --color-primary-50: #1e293b !important;
+  --color-primary-600: #2563eb !important;
+  --color-primary-700: #1d4ed8 !important;
+  --color-primary-light: #1e40af !important;
+  --color-gray-50: #1f2937 !important;
+  --color-gray-300: #4b5563 !important;
+  --color-gray-900: #f9fafb !important;
+  
+  /* Dark mode action icon colors */
+  --color-purple-600: #a855f7 !important;
+  --color-purple-700: #9333ea !important;
+  --color-orange-700: #ea580c !important;
+  
+  /* Dark mode page gradients */
+  --page-gradient-start: #1e293b !important;
+  --page-gradient-end: #0f172a !important;
+  
+  /* Dark mode configuration page gradients */
+  --config-selected-bg-start: #1e3a8a !important;
+  --config-selected-bg-end: #1e40af !important;
+  --config-vehicle-summary-start: #1f2937 !important;
+  --config-vehicle-summary-end: #374151 !important;
+  --config-container-bg: #1f2937 !important;
+  
+  /* Dark mode vehicle type icon gradients */
+  --vehicle-passenger-bg-start: #1e3a8a !important;
+  --vehicle-passenger-bg-end: #2563eb !important;
+  --vehicle-passenger-color: #93c5fd !important;
+  --vehicle-bus-bg-start: #d97706 !important;
+  --vehicle-bus-bg-end: #b45309 !important;
+  --vehicle-bus-color: #fbbf24 !important;
+  --vehicle-truck-bg-start: #7c3aed !important;
+  --vehicle-truck-bg-end: #6d28d9 !important;
+  --vehicle-truck-color: #c084fc !important;
+  --vehicle-motorcycle-bg-start: #059669 !important;
+  --vehicle-motorcycle-bg-end: #047857 !important;
+  --vehicle-motorcycle-color: #6ee7b7 !important;
+  --vehicle-bicycle-bg-start: #c026d3 !important;
+  --vehicle-bicycle-bg-end: #a21caf !important;
+  --vehicle-bicycle-color: #f0abfc !important;
+  --vehicle-pedestrian-bg-start: #ea580c !important;
+  --vehicle-pedestrian-bg-end: #c2410c !important;
+  --vehicle-pedestrian-color: #fdba74 !important;
+  
+  /* Summary section border */
+  --config-summary-border: #374151 !important;
+  
+  /* Dark mode summary section border */
+  --config-summary-border: #374151 !important;
+}
+
+/* Debug - Temporary obvious style to test dark mode toggle */
+html.dark,
+html.dark body,
+html.dark .App,
+html.dark .main-content {
+  background-color: #1f2937 !important;
+  color: #f9fafb !important;
+}
+
+html.dark * {
+  color: #f9fafb !important;
+}
+
+html.dark .card,
+html.dark .bg-white,
+html.dark .bg-primary {
+  background-color: #111827 !important;
+  border-color: #374151 !important;
+}
+
+html.dark .card {
+  background-color: var(--bg-primary) !important;
+  border-color: var(--border-color) !important;
+  color: var(--text-primary) !important;
+}
+
+html.dark .bg-white {
+  background-color: var(--bg-primary) !important;
+}
+
+html.dark .bg-primary {
+  background-color: var(--bg-primary) !important;
 }
 
 /* Reset and base styles */
@@ -398,10 +596,11 @@ a:focus {
 }
 
 .btn-success:hover:not(:disabled) {
-  background-color: #2f855a;
-  border-color: #2f855a;
+  background-color: var(--success-color);
+  border-color: var(--success-color);
   transform: translateY(-1px);
   box-shadow: var(--shadow-md);
+  filter: brightness(0.9);
 }
 
 .btn-danger {
@@ -411,10 +610,11 @@ a:focus {
 }
 
 .btn-danger:hover:not(:disabled) {
-  background-color: #c53030;
-  border-color: #c53030;
+  background-color: var(--danger-color);
+  border-color: var(--danger-color);
   transform: translateY(-1px);
   box-shadow: var(--shadow-md);
+  filter: brightness(0.9);
 }
 
 .btn-outline {
@@ -956,12 +1156,12 @@ a:focus {
 .bg-white { background-color: var(--bg-primary); }
 .bg-gray-50 { background-color: var(--bg-secondary); }
 .bg-gray-100 { background-color: var(--bg-tertiary); }
-.bg-blue-50 { background-color: #eff6ff; }
+.bg-blue-50 { background-color: var(--color-primary-50); }
 .bg-blue-500 { background-color: var(--primary-color); }
 .bg-blue-600 { background-color: var(--primary-color); }
-.bg-green-50 { background-color: #f0fdf4; }
+.bg-green-50 { background-color: var(--color-primary-50); }
 .bg-green-500 { background-color: var(--success-color); }
-.bg-red-50 { background-color: #fef2f2; }
+.bg-red-50 { background-color: var(--color-primary-50); }
 .bg-red-500 { background-color: var(--danger-color); }
 
 .border { border: 1px solid var(--border-color); }
@@ -973,8 +1173,9 @@ a:focus {
 .border-l-4 { border-left: 4px solid var(--border-color); }
 .border-r { border-right: 1px solid var(--border-color); }
 
+.border-default { border-color: var(--border-color); }
 .border-transparent { border-color: transparent; }
-.border-blue-200 { border-color: #bee3f8; }
+.border-blue-200 { border-color: var(--color-primary-light); }
 .border-blue-600 { border-color: var(--primary-color); }
 .border-gray-200 { border-color: var(--color-gray-300); }
 
@@ -1096,9 +1297,9 @@ a:focus {
   }
   
   .btn {
-    border: 1px solid black;
-    background: white !important;
-    color: black !important;
+    border: 1px solid var(--text-primary);
+    background: var(--bg-primary) !important;
+    color: var(--text-primary) !important;
   }
   
   .card {
@@ -1161,11 +1362,11 @@ a:focus {
 /* Dark mode support (optional) */
 @media (prefers-color-scheme: dark) {
   .dark\\:bg-gray-900 {
-    background-color: #1a202c;
+    background-color: var(--bg-primary);
   }
   
   .dark\\:text-white {
-    color: white;
+    color: var(--text-primary);
   }
   
   .dark\\:border-gray-700 {
@@ -1208,24 +1409,24 @@ a:focus {
 
 /* Background utilities */
 .bg-white {
-  background-color: white;
+  background-color: var(--bg-primary);
 }
 
 .bg-gray-50 {
-  background-color: #f7fafc;
+  background-color: var(--bg-secondary);
 }
 
 .bg-blue-50 {
-  background-color: #ebf8ff;
+  background-color: var(--color-primary-50);
 }
 
 /* Border utilities */
 .border {
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--border-color);
 }
 
 .border-b {
-  border-bottom: 1px solid #e2e8f0;
+  border-bottom: 1px solid var(--border-color);
 }
 
 .rounded {
@@ -1245,23 +1446,25 @@ a:focus {
   align-items: center;
   gap: 0.5rem;
   padding: 0.5rem 1rem;
-  background: white;
+  background: var(--bg-primary);
   border-radius: 0.5rem;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-md);
   font-size: 0.875rem;
   font-weight: 500;
   z-index: 1000;
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
 }
 
 .connection-status .status-indicator {
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background-color: #e53e3e;
+  background-color: var(--error-color);
 }
 
 .connection-status.connected .status-indicator {
-  background-color: #38a169;
+  background-color: var(--success-color);
 }
 
 .connection-status.connected {
@@ -1313,9 +1516,11 @@ a:focus {
 .form-textarea {
   width: 100%;
   padding: 0.75rem;
-  border: 1px solid #d1d5db;
+  border: 1px solid var(--border-color);
   border-radius: 0.375rem;
   font-size: 1rem;
+  background: var(--bg-primary);
+  color: var(--text-primary);
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
@@ -1323,15 +1528,15 @@ a:focus {
 .form-select:focus,
 .form-textarea:focus {
   outline: none;
-  border-color: #3182ce;
+  border-color: var(--primary-color);
   box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.1);
 }
 
 .form-input:disabled,
 .form-select:disabled,
 .form-textarea:disabled {
-  background-color: #f9fafb;
-  color: #6b7280;
+  background-color: var(--bg-tertiary);
+  color: var(--text-muted);
   cursor: not-allowed;
 }
 
@@ -1343,27 +1548,27 @@ a:focus {
 }
 
 .alert-info {
-  background-color: #ebf8ff;
-  color: #2c5aa0;
-  border: 1px solid #bee3f8;
+  background-color: var(--color-primary-50);
+  color: var(--primary-color);
+  border: 1px solid var(--primary-color);
 }
 
 .alert-success {
-  background-color: #f0fff4;
-  color: #2f855a;
-  border: 1px solid #c6f6d5;
+  background-color: var(--color-primary-50);
+  color: var(--success-color);
+  border: 1px solid var(--success-color);
 }
 
 .alert-warning {
-  background-color: #fffbeb;
-  color: #c05621;
-  border: 1px solid #fed7aa;
+  background-color: var(--color-primary-50);
+  color: var(--warning-color);
+  border: 1px solid var(--warning-color);
 }
 
 .alert-error {
-  background-color: #fed7d7;
-  color: #c53030;
-  border: 1px solid #feb2b2;
+  background-color: var(--color-primary-50);
+  color: var(--danger-color);
+  border: 1px solid var(--danger-color);
 }
 
 /* Responsive design */
@@ -1663,9 +1868,9 @@ a:focus {
 }
 
 .btn-secondary-contrast {
-  background-color: white;
-  color: var(--color-primary-600);
-  border: 2px solid var(--color-primary-600);
+  background-color: var(--bg-primary);
+  color: var(--primary-color);
+  border: 2px solid var(--primary-color);
 }
 
 .btn-secondary-contrast:hover {
@@ -1714,7 +1919,7 @@ a:focus {
 .hero-section {
   position: relative;
   padding: 4rem 0;
-  background: linear-gradient(135deg, #ebf8ff 0%, #e0e7ff 100%);
+  background: linear-gradient(135deg, var(--page-gradient-start) 0%, var(--page-gradient-end) 100%);
 }
 
 @media (min-width: 640px) {
@@ -1841,43 +2046,43 @@ a:focus {
 }
 
 .status-badge-green {
-  background-color: #f0fff4;
-  color: #2f855a;
-  border-color: #c6f6d5;
+  background-color: var(--color-primary-50);
+  color: var(--success-color);
+  border-color: var(--success-color);
 }
 
 .status-badge-green .status-badge-dot {
-  background-color: #38a169;
+  background-color: var(--success-color);
 }
 
 .status-badge-red {
-  background-color: #fed7d7;
-  color: #c53030;
-  border-color: #feb2b2;
+  background-color: var(--color-primary-50);
+  color: var(--danger-color);
+  border-color: var(--danger-color);
 }
 
 .status-badge-red .status-badge-dot {
-  background-color: #e53e3e;
+  background-color: var(--danger-color);
 }
 
 .status-badge-yellow {
-  background-color: #fffbeb;
-  color: #c05621;
-  border-color: #fed7aa;
+  background-color: var(--color-primary-50);
+  color: var(--warning-color);
+  border-color: var(--warning-color);
 }
 
 .status-badge-yellow .status-badge-dot {
-  background-color: #d69e2e;
+  background-color: var(--warning-color);
 }
 
 .status-badge-gray {
-  background-color: #f7fafc;
-  color: #4a5568;
-  border-color: #e2e8f0;
+  background-color: var(--bg-secondary);
+  color: var(--text-secondary);
+  border-color: var(--border-color);
 }
 
 .status-badge-gray .status-badge-dot {
-  background-color: #718096;
+  background-color: var(--text-muted);
 }
 
 /* Hero Buttons */
@@ -1924,7 +2129,7 @@ a:focus {
   align-items: center;
   justify-content: center;
   padding: 1rem 2rem;
-  background-color: white;
+  background-color: var(--bg-primary);
   color: var(--primary-color);
   border: 2px solid var(--primary-color);
   border-radius: var(--radius-lg);
@@ -1937,7 +2142,7 @@ a:focus {
 }
 
 .btn-secondary:hover {
-  background-color: #ebf8ff;
+  background-color: var(--bg-secondary);
   box-shadow: var(--shadow-lg);
   transform: translateY(-1px);
 }
@@ -1960,8 +2165,8 @@ a:focus {
 }
 
 .btn-success:hover {
-  background-color: #2f855a;
-  border-color: #2f855a;
+  background-color: var(--success-hover);
+  border-color: var(--success-hover);
   box-shadow: var(--shadow-lg);
   transform: translateY(-1px);
 }
@@ -1996,11 +2201,11 @@ a:focus {
 }
 
 .section-white {
-  background-color: white;
+  background-color: var(--bg-primary);
 }
 
 .section-gray {
-  background-color: #f7fafc;
+  background-color: var(--bg-tertiary);
 }
 
 .section-container {
@@ -2088,7 +2293,7 @@ a:focus {
   padding: 1.5rem;
   border: 1px solid var(--border-color);
   border-radius: var(--radius-xl);
-  background-color: white;
+  background-color: var(--bg-primary);
   height: 100%;
   transition: all var(--transition-slow);
 }
@@ -2123,27 +2328,27 @@ a:focus {
 }
 
 .feature-icon-blue {
-  background-color: #ebf8ff;
+  background-color: var(--info-bg);
 }
 
 .feature-icon-green {
-  background-color: #f0fff4;
+  background-color: var(--success-bg);
 }
 
 .feature-icon-purple {
-  background-color: #faf5ff;
+  background-color: var(--info-bg);
 }
 
 .feature-icon-orange {
-  background-color: #fffbeb;
+  background-color: var(--info-bg);
 }
 
 .feature-icon-red {
-  background-color: #fed7d7;
+  background-color: var(--error-bg);
 }
 
 .feature-icon-indigo {
-  background-color: #e0e7ff;
+  background-color: var(--info-bg);
 }
 
 .icon-blue {
@@ -2218,7 +2423,7 @@ a:focus {
 .benefit-icon {
   width: 3.5rem;
   height: 3.5rem;
-  background-color: #f0fff4;
+  background-color: var(--success-bg);
   border-radius: var(--radius-lg);
   display: flex;
   align-items: center;
@@ -2287,7 +2492,7 @@ a:focus {
 .step-number {
   width: 5rem;
   height: 5rem;
-  background-color: #ebf8ff;
+  background-color: var(--info-bg);
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -2364,7 +2569,7 @@ a:focus {
   padding: 1.5rem;
   border-radius: var(--radius-xl);
   border: 1px solid var(--border-color);
-  background-color: white;
+  background-color: var(--bg-primary);
   text-decoration: none;
   transition: all var(--transition-normal);
   display: block;
@@ -2401,25 +2606,25 @@ a:focus {
 }
 
 .action-icon-green:hover {
-  background-color: #2f855a;
+  background-color: var(--success-hover);
 }
 
 .action-icon-purple {
-  background-color: #805ad5;
-  color: white;
+  background-color: var(--color-purple-600);
+  color: var(--text-light);
 }
 
 .action-icon-purple:hover {
-  background-color: #6b46c1;
+  background-color: var(--color-purple-700);
 }
 
 .action-icon-orange {
-  background-color: #dd6b20;
-  color: white;
+  background-color: var(--warning-color);
+  color: var(--text-light);
 }
 
 .action-icon-orange:hover {
-  background-color: #c05621;
+  background-color: var(--color-orange-700);
 }
 
 .action-title {
@@ -2445,10 +2650,47 @@ a:focus {
   text-align: center;
 }
 
+/* Theme-aware utility classes */
+.bg-error {
+  background-color: var(--error-bg);
+}
+
+.bg-warning {
+  background-color: var(--info-bg);
+}
+
+.bg-info {
+  background-color: var(--info-bg);
+}
+
+.border-error {
+  border-color: var(--error-text);
+}
+
+.border-warning {
+  border-color: var(--warning-color);
+}
+
+.border-info {
+  border-color: var(--info-border);
+}
+
+.text-error {
+  color: var(--error-text);
+}
+
+.text-warning {
+  color: var(--warning-color);
+}
+
+.text-info {
+  color: var(--info-text);
+}
+
 /* Page Layout */
 .page-layout {
   min-height: 100vh;
-  background: linear-gradient(135deg, #ebf8ff 0%, #e0e7ff 100%);
+  background: linear-gradient(135deg, var(--page-gradient-start) 0%, var(--page-gradient-end) 100%);
 }
 
 /* Icon sizing classes */
@@ -2498,7 +2740,7 @@ a:focus {
 /* === NETWORK SELECTION PAGE STYLES === */
 .network-page {
   min-height: 100vh;
-  background-color: #f9fafb;
+  background-color: var(--bg-secondary);
   padding: 2rem 0;
 }
 
@@ -2537,7 +2779,7 @@ a:focus {
 }
 
 .upload-section {
-  background-color: white;
+  background-color: var(--bg-primary);
   border-radius: var(--radius-lg);
   padding: 1.5rem;
   margin-bottom: 2rem;
@@ -2589,7 +2831,7 @@ a:focus {
 }
 
 .network-card {
-  background-color: white;
+  background-color: var(--bg-primary);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-lg);
   padding: 1.5rem;
@@ -2604,7 +2846,7 @@ a:focus {
 
 .network-card.selected {
   border-color: var(--primary-color);
-  background-color: #ebf8ff;
+  background-color: var(--info-bg);
 }
 
 .network-card-header {
@@ -2623,7 +2865,7 @@ a:focus {
 .network-icon {
   width: 2.5rem;
   height: 2.5rem;
-  background-color: #f3f4f6;
+  background-color: var(--bg-tertiary);
   border-radius: var(--radius-lg);
   display: flex;
   align-items: center;
@@ -2633,7 +2875,7 @@ a:focus {
 }
 
 .network-icon.selected {
-  background-color: #dbeafe;
+  background-color: var(--info-bg);
 }
 
 .network-icon svg {
@@ -2702,7 +2944,7 @@ a:focus {
 /* OSM Scenario specific styles */
 .network-card.osm-scenario {
   border-left: 4px solid #10b981;
-  background: linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%);
+  background: linear-gradient(135deg, var(--bg-primary) 0%, var(--success-bg) 100%);
 }
 
 .network-card.osm-scenario:hover {
@@ -2714,8 +2956,8 @@ a:focus {
   display: inline-flex;
   align-items: center;
   gap: 0.25rem;
-  background-color: #10b981;
-  color: white;
+  background-color: var(--success-color);
+  color: var(--text-light);
   font-size: 0.75rem;
   font-weight: 500;
   padding: 0.25rem 0.5rem;
@@ -2724,8 +2966,8 @@ a:focus {
 }
 
 .osm-features {
-  background-color: #f0fdf4;
-  border: 1px solid #bbf7d0;
+  background-color: var(--success-bg);
+  border: 1px solid var(--success-border);
   border-radius: var(--radius-md);
   padding: 0.75rem;
   margin-bottom: 1rem;
@@ -2748,8 +2990,8 @@ a:focus {
   display: inline-flex;
   align-items: center;
   gap: 0.25rem;
-  background-color: #ecfdf5;
-  color: #065f46;
+  background-color: var(--success-bg);
+  color: var(--success-text);
   font-size: 0.75rem;
   font-weight: 500;
   padding: 0.25rem 0.5rem;
@@ -2770,18 +3012,18 @@ a:focus {
 }
 
 .route-source-badge.osm {
-  background-color: #10b981;
-  color: white;
+  background-color: var(--success-color);
+  color: var(--text-light);
 }
 
 .route-source-badge.generated {
-  background-color: #6b7280;
-  color: white;
+  background-color: var(--text-muted);
+  color: var(--text-light);
 }
 
 .selected-network {
-  background-color: #ebf8ff;
-  border: 1px solid #bee3f8;
+  background-color: var(--bg-info);
+  border: 1px solid var(--info-border);
   border-radius: var(--radius-lg);
   padding: 1.5rem;
   margin-bottom: 2rem;
@@ -2796,7 +3038,7 @@ a:focus {
 .selected-network-icon {
   width: 3rem;
   height: 3rem;
-  background-color: #bee3f8;
+  background-color: var(--info-border);
   border-radius: var(--radius-lg);
   display: flex;
   align-items: center;
@@ -2864,7 +3106,7 @@ a:focus {
 }
 
 .network-help {
-  background-color: white;
+  background-color: var(--bg-primary);
   border-radius: var(--radius-lg);
   padding: 1.5rem;
 }
@@ -3012,12 +3254,12 @@ a:focus {
 .config-title {
   font-size: 1.875rem;
   font-weight: bold;
-  color: var(--color-gray-900);
+  color: var(--text-primary);
   margin-bottom: 0.5rem;
 }
 
 .config-subtitle {
-  color: var(--color-gray-600);
+  color: var(--text-secondary);
   margin-bottom: 1.5rem;
 }
 
@@ -3041,7 +3283,7 @@ a:focus {
 }
 
 .config-section {
-  background: white;
+  background: var(--bg-primary);
   border-radius: 0.5rem;
   padding: 1.5rem;
   box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
@@ -3063,7 +3305,7 @@ a:focus {
 .config-section-title {
   font-size: 1.125rem;
   font-weight: 600;
-  color: var(--color-gray-900);
+  color: var(--text-primary);
 }
 
 .config-form-group {
@@ -3073,49 +3315,51 @@ a:focus {
 .config-label {
   display: block;
   font-weight: 500;
-  color: var(--color-gray-700);
+  color: var(--text-secondary);
   margin-bottom: 0.5rem;
 }
 
 .config-input {
   width: 100%;
   padding: 0.5rem 0.75rem;
-  border: 1px solid var(--color-gray-300);
+  border: 1px solid var(--border-color);
   border-radius: 0.375rem;
-  background: white;
+  background: var(--bg-primary);
+  color: var(--text-primary);
   font-size: 0.875rem;
   transition: all 0.2s ease;
 }
 
 .config-input:focus {
   outline: none;
-  border-color: var(--color-primary);
+  border-color: var(--primary-color);
   ring: 2px;
-  ring-color: var(--color-primary);
+  ring-color: var(--primary-color);
   ring-opacity: 0.2;
 }
 
 .config-select {
   width: 100%;
   padding: 0.5rem 0.75rem;
-  border: 1px solid var(--color-gray-300);
+  border: 1px solid var(--border-color);
   border-radius: 0.375rem;
-  background: white;
+  background: var(--bg-primary);
+  color: var(--text-primary);
   font-size: 0.875rem;
   transition: all 0.2s ease;
 }
 
 .config-select:focus {
   outline: none;
-  border-color: var(--color-primary);
+  border-color: var(--primary-color);
   ring: 2px;
-  ring-color: var(--color-primary);
+  ring-color: var(--primary-color);
   ring-opacity: 0.2;
 }
 
 .config-help-text {
   font-size: 0.75rem;
-  color: var(--color-gray-500);
+  color: var(--text-muted);
   margin-top: 0.25rem;
 }
 
@@ -3148,7 +3392,7 @@ a:focus {
 
 .config-vehicle-type.enabled {
   border-color: var(--primary-color);
-  background: linear-gradient(135deg, var(--bg-primary) 0%, #f0f9ff 100%);
+  background: linear-gradient(135deg, var(--bg-primary) 0%, var(--config-selected-bg-start) 100%);
   box-shadow: 0 2px 6px 0 rgba(59, 130, 246, 0.1);
 }
 
@@ -3191,33 +3435,33 @@ a:focus {
 
 /* Vehicle Type Specific Icon Colors */
 .config-vehicle-icon.passenger {
-  background: linear-gradient(135deg, #dbeafe 0%, #93c5fd 100%);
-  color: #1e40af;
+  background: linear-gradient(135deg, var(--vehicle-passenger-bg-start) 0%, var(--vehicle-passenger-bg-end) 100%);
+  color: var(--vehicle-passenger-color);
 }
 
 .config-vehicle-icon.bus {
-  background: linear-gradient(135deg, #fef3c7 0%, #fbbf24 100%);
-  color: #d97706;
+  background: linear-gradient(135deg, var(--vehicle-bus-bg-start) 0%, var(--vehicle-bus-bg-end) 100%);
+  color: var(--vehicle-bus-color);
 }
 
 .config-vehicle-icon.truck {
-  background: linear-gradient(135deg, #f3e8ff 0%, #c084fc 100%);
-  color: #7c3aed;
+  background: linear-gradient(135deg, var(--vehicle-truck-bg-start) 0%, var(--vehicle-truck-bg-end) 100%);
+  color: var(--vehicle-truck-color);
 }
 
 .config-vehicle-icon.motorcycle {
-  background: linear-gradient(135deg, #ecfdf5 0%, #6ee7b7 100%);
-  color: #059669;
+  background: linear-gradient(135deg, var(--vehicle-motorcycle-bg-start) 0%, var(--vehicle-motorcycle-bg-end) 100%);
+  color: var(--vehicle-motorcycle-color);
 }
 
 .config-vehicle-icon.bicycle {
-  background: linear-gradient(135deg, #fef7ff 0%, #f0abfc 100%);
-  color: #c026d3;
+  background: linear-gradient(135deg, var(--vehicle-bicycle-bg-start) 0%, var(--vehicle-bicycle-bg-end) 100%);
+  color: var(--vehicle-bicycle-color);
 }
 
 .config-vehicle-icon.pedestrian {
-  background: linear-gradient(135deg, #fff7ed 0%, #fdba74 100%);
-  color: #ea580c;
+  background: linear-gradient(135deg, var(--vehicle-pedestrian-bg-start) 0%, var(--vehicle-pedestrian-bg-end) 100%);
+  color: var(--vehicle-pedestrian-color);
 }
 
 .config-vehicle-content {
@@ -3307,8 +3551,8 @@ a:focus {
 .config-vehicle-summary {
   margin-top: var(--spacing-xl);
   padding: var(--spacing-lg);
-  background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
-  border: 2px solid #93c5fd;
+  background: linear-gradient(135deg, var(--config-vehicle-summary-start) 0%, var(--config-vehicle-summary-end) 100%);
+  border: 2px solid var(--config-summary-border);
   border-radius: var(--radius-lg);
   position: relative;
   overflow: hidden;
@@ -3321,7 +3565,7 @@ a:focus {
   left: 0;
   width: 100%;
   height: 4px;
-  background: linear-gradient(to right, var(--primary-color), #3b82f6, var(--primary-color));
+  background: linear-gradient(to right, var(--primary-color), var(--primary-hover), var(--primary-color));
 }
 
 .config-vehicle-summary-header {
@@ -3369,22 +3613,22 @@ a:focus {
 }
 
 .config-vehicle-summary-warning {
-  color: #dc2626;
+  color: var(--error-text);
   font-weight: 600;
   display: flex;
   align-items: center;
   gap: var(--spacing-sm);
-  background: #fef2f2;
+  background: var(--bg-tertiary);
   padding: var(--spacing-sm) var(--spacing-md);
   border-radius: var(--radius-md);
-  border: 1px solid #fecaca;
+  border: 1px solid var(--border-color);
   margin-top: var(--spacing-sm);
 }
 
 .config-vehicle-summary-warning svg {
   width: 1rem;
   height: 1rem;
-  color: #dc2626;
+  color: var(--error-text);
 }
 
 .config-vehicle-route-files {
@@ -3450,22 +3694,22 @@ a:focus {
   align-items: flex-start;
   gap: 0.75rem;
   padding: 1rem;
-  border: 2px solid var(--color-gray-200);
+  border: 2px solid var(--border-color);
   border-radius: 0.5rem;
   cursor: pointer;
   transition: all 0.2s ease;
-  background: white;
+  background: var(--bg-primary);
   position: relative;
 }
 
 .config-radio-option:hover {
-  border-color: var(--color-primary);
+  border-color: var(--border-hover);
   box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.05);
 }
 
 .config-radio-option:has(.config-radio:checked) {
-  border-color: var(--color-primary);
-  background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+  border-color: var(--primary-color);
+  background: linear-gradient(135deg, var(--config-selected-bg-start) 0%, var(--config-selected-bg-end) 100%);
   box-shadow: 0 2px 8px 0 rgba(59, 130, 246, 0.1);
 }
 
@@ -3476,14 +3720,14 @@ a:focus {
   left: 0;
   width: 4px;
   height: 100%;
-  background: var(--color-primary);
+  background: var(--primary-color);
   border-radius: 0.25rem 0 0 0.25rem;
 }
 
 .config-radio {
   width: 1.25rem;
   height: 1.25rem;
-  accent-color: var(--color-primary);
+  accent-color: var(--primary-color);
   margin-top: 0.125rem;
   cursor: pointer;
   flex-shrink: 0;
@@ -3499,20 +3743,20 @@ a:focus {
 .config-radio-title {
   font-weight: 600;
   font-size: 1rem;
-  color: var(--color-gray-900);
+  color: var(--text-primary);
   line-height: 1.4;
 }
 
 .config-radio-description {
   font-size: 0.875rem;
-  color: var(--color-gray-600);
+  color: var(--text-secondary);
   line-height: 1.4;
 }
 
 .config-checkbox-container {
   padding: 1rem;
-  background: #f8fafc;
-  border: 1px solid var(--color-gray-200);
+  background: var(--config-container-bg);
+  border: 1px solid var(--border-color);
   border-radius: 0.5rem;
   margin-top: 0.5rem;
 }
@@ -3527,15 +3771,15 @@ a:focus {
 .config-checkbox-text {
   flex: 1;
   font-size: 0.875rem;
-  color: var(--color-gray-700);
+  color: var(--text-secondary);
   line-height: 1.5;
 }
 
 .config-subsection {
-  background: #f8fafc;
+  background: var(--config-container-bg);
   padding: 1.5rem;
   border-radius: 0.5rem;
-  border: 1px solid var(--color-gray-200);
+  border: 1px solid var(--border-color);
   margin-top: 1rem;
 }
 
@@ -3573,8 +3817,8 @@ a:focus {
 }
 
 .config-preview-box {
-  background: white;
-  border: 1px solid var(--color-gray-200);
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
   border-radius: 0.5rem;
   padding: 1rem;
   margin-top: 1rem;
@@ -3592,16 +3836,16 @@ a:focus {
 .config-cycle-preview {
   font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
   font-size: 0.875rem;
-  color: var(--color-gray-900);
-  background: #f1f5f9;
+  color: var(--text-primary);
+  background: var(--bg-tertiary);
   padding: 0.75rem;
   border-radius: 0.375rem;
-  border: 1px solid var(--color-gray-300);
+  border: 1px solid var(--border-color);
 }
 
 .config-info-box {
-  background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
-  border: 1px solid #93c5fd;
+  background: linear-gradient(135deg, var(--config-vehicle-summary-start) 0%, var(--config-vehicle-summary-end) 100%);
+  border: 1px solid var(--config-summary-border);
   border-radius: 0.5rem;
   padding: 1rem;
   margin-top: 1rem;
@@ -3662,11 +3906,11 @@ a:focus {
 
 .config-scenario-card {
   padding: 1rem;
-  border: 2px solid var(--color-gray-200);
+  border: 2px solid var(--border-color);
   border-radius: 0.5rem;
   cursor: pointer;
   transition: all 0.2s ease;
-  background: white;
+  background: var(--bg-primary);
 }
 
 .config-scenario-card:hover {
@@ -3739,7 +3983,7 @@ a:focus {
   justify-content: space-between;
   margin-bottom: 1.5rem;
   padding: 1rem;
-  background: white;
+  background: var(--bg-primary);
   border-radius: 0.5rem;
   box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
 }
@@ -3807,7 +4051,7 @@ a:focus {
 
 .simulation-map-container {
   position: relative;
-  background: white;
+  background: var(--bg-primary);
   border-radius: 0.5rem;
   box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
   overflow: hidden;
@@ -3834,19 +4078,19 @@ a:focus {
 
 .simulation-map-control {
   padding: 0.25rem;
-  border: 1px solid var(--color-gray-300);
+  border: 1px solid var(--border-color);
   border-radius: 0.25rem;
-  background: white;
+  background: var(--bg-primary);
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
 .simulation-map-control:hover {
-  background: var(--color-gray-50);
+  background: var(--bg-secondary);
 }
 
 .simulation-controls {
-  background: white;
+  background: var(--bg-primary);
   border-radius: 0.5rem;
   padding: 1rem;
   box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
@@ -3876,9 +4120,10 @@ a:focus {
   align-items: center;
   gap: 0.5rem;
   padding: 0.5rem 1rem;
-  border: 1px solid var(--color-gray-300);
+  border: 1px solid var(--border-color);
   border-radius: 0.375rem;
-  background: white;
+  background: var(--bg-primary);
+  color: var(--text-primary);
   font-size: 0.875rem;
   font-weight: 500;
   cursor: pointer;
@@ -3888,7 +4133,7 @@ a:focus {
 }
 
 .simulation-control-btn:hover {
-  background: var(--color-gray-50);
+  background: var(--bg-secondary);
 }
 
 .simulation-control-btn:disabled {
@@ -3999,7 +4244,7 @@ a:focus {
 }
 
 .simulation-stat-card {
-  background: white;
+  background: var(--bg-primary);
   border-radius: 0.5rem;
   padding: 1rem;
   text-align: center;
@@ -4055,7 +4300,7 @@ a:focus {
   justify-content: space-between;
   align-items: center;
   padding: 1rem;
-  background: white;
+  background: var(--bg-primary);
   border-radius: 0.5rem;
   box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
 }
@@ -4087,7 +4332,7 @@ a:focus {
 }
 
 .info-panel {
-  background: white;
+  background: var(--bg-primary);
   border-radius: 0.5rem;
   padding: 1.5rem;
   box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
@@ -4281,14 +4526,14 @@ code {
 }
 
 .config-info-panel {
-  background: #e6f3ff;
-  border: 1px solid #b3d9ff;
+  background: var(--info-bg);
+  border: 1px solid var(--info-border);
   border-radius: 0.5rem;
   padding: 1rem;
 }
 
 .config-preview-panel {
-  background: white;
+  background: var(--bg-primary);
   border-radius: 0.5rem;
   padding: 1.5rem;
   box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
@@ -4557,15 +4802,15 @@ code {
 }
 
 .alert-warning {
-  background-color: #fffbeb;
-  color: #92400e;
-  border-color: #fed7aa;
+  background-color: var(--bg-warning);
+  color: var(--text-warning);
+  border-color: var(--border-warning);
 }
 
 .alert-info {
-  background-color: #eff6ff;
-  color: #1e40af;
-  border-color: #dbeafe;
+  background-color: var(--bg-info);
+  color: var(--text-info);
+  border-color: var(--border-info);
 }
 
 /* ==========================================================================
@@ -4651,6 +4896,37 @@ code {
 .form-control:disabled {
   background-color: var(--bg-tertiary);
   opacity: 0.6;
+}
+
+/* Ensure option elements inherit theme colors */
+.form-control option {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+/* Specific styling for select elements */
+select.form-control {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  cursor: pointer;
+}
+
+select.form-control option {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  padding: var(--spacing-sm);
+}
+
+/* Global select and option styling to ensure consistency across all selects */
+select {
+  background-color: var(--bg-primary) !important;
+  color: var(--text-primary) !important;
+  border-color: var(--border-color) !important;
+}
+
+select option {
+  background-color: var(--bg-primary) !important;
+  color: var(--text-primary) !important;
 }
 
 .form-help {
@@ -5122,7 +5398,7 @@ code {
 
 .network-card.selected {
   border-color: var(--primary-color);
-  background-color: #eff6ff;
+  background-color: var(--info-bg);
 }
 
 .network-card-header {
@@ -5446,12 +5722,12 @@ code {
 
 .analytics-recommendation-tile.high-priority {
   border-left: 4px solid var(--danger-color);
-  background: linear-gradient(135deg, var(--bg-primary) 0%, #fff5f5 100%);
+  background: linear-gradient(135deg, var(--bg-primary) 0%, var(--error-bg) 100%);
 }
 
 .analytics-recommendation-tile.medium-priority {
   border-left: 4px solid var(--warning-color);
-  background: linear-gradient(135deg, var(--bg-primary) 0%, #fffbeb 100%);
+  background: linear-gradient(135deg, var(--bg-primary) 0%, var(--info-bg) 100%);
 }
 
 .analytics-recommendation-tile.low-priority {
@@ -5753,11 +6029,20 @@ code {
 .analytics-actions .form-control {
   min-width: 200px;
   flex: 1;
+  background-color: var(--bg-primary) !important;
+  color: var(--text-primary) !important;
+  border-color: var(--border-color) !important;
   
   @media (max-width: 768px) {
     width: 100%;
     margin-bottom: var(--spacing-sm);
   }
+}
+
+/* Ensure dropdown options in analytics have correct theme */
+.analytics-actions .form-control option {
+  background-color: var(--bg-primary) !important;
+  color: var(--text-primary) !important;
 }
 
 /* Improved button hover states for better readability */
@@ -5835,9 +6120,9 @@ code {
 .analytics-page .btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
-  background-color: #f8f9fa;
-  border-color: #dee2e6;
-  color: #6c757d;
+  background-color: var(--bg-tertiary);
+  border-color: var(--border-color);
+  color: var(--text-muted);
 }
 
 .analytics-page .btn:disabled:hover {
@@ -5934,12 +6219,12 @@ code {
 }
 
 .analytics-tile {
-  background: white;
+  background: var(--bg-primary);
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   padding: 20px;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
-  border: 1px solid var(--color-gray-300);
+  border: 1px solid var(--border-color);
 }
 
 .analytics-tile:hover {
@@ -6008,7 +6293,7 @@ code {
 }
 
 .recommendation-card {
-  background: #fefefe;
+  background: var(--bg-primary);
   border: 1px solid var(--color-gray-300);
   border-radius: 6px;
   padding: 16px;
@@ -6030,7 +6315,7 @@ code {
 }
 
 .recommendation-type.warning {
-  background: #fed7d7;
+  background: var(--error-bg);
   color: var(--danger-color);
 }
 
@@ -6058,10 +6343,10 @@ code {
 }
 
 .chart-container {
-  background: white;
+  background: var(--bg-primary);
   border-radius: 8px;
   padding: 20px;
-  border: 1px solid var(--color-gray-300);
+  border: 1px solid var(--border-color);
   min-height: 300px;
 }
 
@@ -6075,13 +6360,14 @@ code {
 
 /* Navigation Styles */
 .nav-main {
-  background-color: white;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  background-color: var(--bg-primary);
+  box-shadow: var(--shadow-md);
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   z-index: 50;
+  transition: background-color var(--transition-normal);
 }
 
 .nav-container {
@@ -6133,22 +6419,24 @@ code {
   text-decoration: none;
   padding: 0.25rem;
   border-radius: 0.375rem;
+  transition: all var(--transition-normal);
 }
 
 .nav-brand-link:focus {
-  outline: 2px solid #3b82f6;
+  outline: 2px solid var(--primary-color);
   outline-offset: 2px;
 }
 
 .nav-brand-icon {
   width: 2rem;
   height: 2rem;
-  background-color: #2563eb;
+  background-color: var(--primary-color);
   border-radius: 0.5rem;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  transition: background-color var(--transition-normal);
 }
 
 @media (min-width: 1024px) {
@@ -6161,8 +6449,9 @@ code {
 .nav-brand-text {
   font-size: 1.125rem;
   font-weight: 700;
-  color: #111827;
+  color: var(--text-primary);
   display: none;
+  transition: color var(--transition-normal);
 }
 
 @media (min-width: 640px) {
@@ -6250,11 +6539,12 @@ code {
 
 .nav-dropdown-content {
   margin-top: 0.5rem;
-  background-color: white;
-  border: 1px solid #e5e7eb;
+  background-color: var(--bg-primary);
+  border: 1px solid var(--border-color);
   border-radius: 0.75rem;
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  box-shadow: var(--shadow-lg);
   overflow: hidden;
+  transition: all var(--transition-normal);
 }
 
 /* Desktop spacing - more generous */
@@ -6278,7 +6568,7 @@ code {
   border-radius: 0.75rem;
   font-size: 1rem;
   font-weight: 500;
-  transition: all 0.2s ease;
+  transition: all var(--transition-normal);
   min-height: 48px;
   text-decoration: none;
 }
@@ -6294,20 +6584,67 @@ code {
 }
 
 .nav-dropdown-link-active {
-  color: #2563eb;
-  background-color: #eff6ff;
-  border-left: 4px solid #2563eb;
+  color: var(--primary-color);
+  background-color: var(--color-primary-50);
+  border-left: 4px solid var(--primary-color);
   font-weight: 600;
 }
 
 .nav-dropdown-link-inactive {
-  color: #374151;
+  color: var(--text-primary);
 }
 
 .nav-dropdown-link-inactive:hover {
-  color: #2563eb;
-  background-color: #f9fafb;
+  color: var(--primary-color);
+  background-color: var(--bg-secondary);
   transform: translateX(4px);
+}
+
+/* Dark mode toggle styles */
+.nav-dropdown-divider {
+  height: 1px;
+  background-color: var(--border-color);
+  margin: 0.5rem 0;
+  transition: background-color var(--transition-normal);
+}
+
+.nav-dropdown-toggle {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 1.25rem;
+  border-radius: 0.75rem;
+  font-size: 1rem;
+  font-weight: 500;
+  transition: all var(--transition-normal);
+  min-height: 48px;
+  width: 100%;
+  border: none;
+  background: none;
+  cursor: pointer;
+  color: var(--text-primary);
+  text-align: left;
+}
+
+/* Desktop toggle styling */
+@media (min-width: 768px) {
+  .nav-dropdown-toggle {
+    padding: 1.25rem 1.5rem;
+    font-size: 1.125rem;
+    min-height: 56px;
+    gap: 1.25rem;
+  }
+}
+
+.nav-dropdown-toggle:hover {
+  color: var(--primary-color);
+  background-color: var(--bg-secondary);
+  transform: translateX(4px);
+}
+
+.nav-dropdown-toggle:focus {
+  outline: 2px solid var(--primary-color);
+  outline-offset: 2px;
 }
 
 /* Desktop status section - only show on mobile */
@@ -6386,7 +6723,15 @@ code {
   gap: 0.5rem;
   padding: 0.25rem 0.75rem;
   border-radius: 9999px;
-  background-color: #f9fafb;
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
+  transition: all var(--transition-normal);
+}
+
+.nav-status-item:hover {
+  background-color: var(--color-primary-50);
+  color: var(--primary-color);
+  transform: scale(1.05);
 }
 
 .nav-status-text {
@@ -6420,12 +6765,56 @@ code {
   display: none;
 }
 
-/* Additional utility classes for navigation */
-.bg-white { background-color: white; }
-.bg-blue-600 { background-color: #2563eb; }
-.bg-blue-50 { background-color: #eff6ff; }
-.bg-gray-50 { background-color: #f9fafb; }
-.bg-gray-100 { background-color: #f3f4f6; }
+/* Theme-aware utility classes - Use these instead of hardcoded colors */
+.bg-primary { background-color: var(--bg-primary); }
+.bg-secondary { background-color: var(--bg-secondary); }
+.bg-tertiary { background-color: var(--bg-tertiary); }
+.text-primary { color: var(--text-primary); }
+.text-secondary { color: var(--text-secondary); }
+.text-muted { color: var(--text-muted); }
+.border-primary { border-color: var(--border-color); }
+
+/* Additional theme-aware utilities */
+.text-gray-900 { color: var(--text-primary); }
+.text-gray-800 { color: var(--text-primary); }
+.text-gray-700 { color: var(--text-primary); }
+.text-gray-600 { color: var(--text-secondary); }
+.text-gray-500 { color: var(--text-muted); }
+.text-gray-400 { color: var(--text-muted); }
+
+.bg-gray-900 { background-color: var(--bg-tertiary); }
+.bg-gray-100 { background-color: var(--bg-tertiary); }
+.bg-gray-50 { background-color: var(--bg-secondary); }
+
+.border-gray-200 { border-color: var(--border-color); }
+.border-gray-300 { border-color: var(--border-color); }
+
+/* Code block styling */
+.code-block {
+  background-color: var(--bg-tertiary);
+  color: var(--text-primary);
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  font-size: 0.75rem;
+  font-family: 'Courier New', monospace;
+}
+
+/* Terminal/console styling */
+.terminal-block {
+  background-color: var(--bg-tertiary);
+  color: var(--success-color);
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  font-size: 0.75rem;
+  font-family: 'Courier New', monospace;
+}
+
+/* Legacy utility classes - Updated to use CSS variables */
+.bg-white { background-color: var(--bg-primary); }
+.bg-blue-600 { background-color: var(--primary-color); }
+.bg-blue-50 { background-color: var(--color-primary-50); }
+.bg-gray-50 { background-color: var(--bg-secondary); }
+.bg-gray-100 { background-color: var(--bg-tertiary); }
 
 .text-blue-600 { color: #2563eb; }
 .text-gray-700 { color: #374151; }
@@ -6452,8 +6841,8 @@ code {
 
 .hover\\:text-blue-600:hover { color: #2563eb; }
 .hover\\:text-gray-900:hover { color: #111827; }
-.hover\\:bg-gray-50:hover { background-color: #f9fafb; }
-.hover\\:bg-gray-100:hover { background-color: #f3f4f6; }
+.hover\\:bg-gray-50:hover { background-color: var(--bg-secondary); }
+.hover\\:bg-gray-100:hover { background-color: var(--bg-tertiary); }
 .hover\\:border-gray-200:hover { border-color: #e5e7eb; }
 
 .focus\\:outline-none:focus { outline: 2px solid transparent; outline-offset: 2px; }
@@ -6678,3 +7067,109 @@ code {
 .text-sm { font-size: 0.875rem; }
 .text-base { font-size: 1rem; }
 .text-lg { font-size: 1.125rem; }
+
+/* Icon utility classes */
+.icon-large {
+  width: 3rem;
+  height: 3rem;
+}
+
+.icon-medium {
+  width: 2rem;
+  height: 2rem;
+}
+
+.icon-small {
+  width: 1rem;
+  height: 1rem;
+}
+
+.icon-muted {
+  color: var(--text-muted);
+}
+
+.icon-primary {
+  color: var(--primary-color);
+}
+
+.icon-center {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Animation utilities */
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Progress bar utilities */
+.progress-bar {
+  height: 0.5rem;
+  border-radius: 9999px;
+  overflow: hidden;
+  background-color: var(--bg-tertiary);
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background-color: var(--primary-color);
+  border-radius: inherit;
+  transition: width var(--transition-normal);
+  animation: pulse 2s ease-in-out infinite alternate;
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.5;
+  }
+}
+
+/* Map container utility */
+.map-container {
+  min-height: 400px;
+}
+
+/* Success blocks */
+.success-block {
+  background-color: var(--success-bg) !important;
+  border: 1px solid var(--success-border) !important;
+}
+
+/* Info blocks */
+.info-block {
+  background-color: var(--info-bg) !important;
+  border: 1px solid var(--info-border) !important;
+}
+
+/* Text colors for status messages */
+.text-success {
+  color: var(--success-text) !important;
+}
+
+.text-success-dark {
+  color: var(--success-text-dark) !important;
+}
+
+.text-info {
+  color: var(--info-text) !important;
+}
+
+.text-info-dark {
+  color: var(--info-text-dark) !important;
+}
+
+.text-error {
+  color: var(--error-text) !important;
+}

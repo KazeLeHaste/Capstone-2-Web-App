@@ -21,13 +21,17 @@ import {
   X,
   Wifi,
   WifiOff,
-  Circle
+  Circle,
+  Moon,
+  Sun
 } from 'lucide-react';
+import { useTheme } from '../contexts/ThemeContext';
 
 const Navigation = ({ isConnected, backendStatus, simulationStatus }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const location = useLocation();
   const mobileMenuRef = useRef(null);
+  const { isDarkMode, toggleTheme } = useTheme();
   
   // Close mobile menu when clicking outside
   useEffect(() => {
@@ -181,6 +185,21 @@ const Navigation = ({ isConnected, backendStatus, simulationStatus }) => {
                   </Link>
                 );
               })}
+              
+              {/* Dark Mode Toggle */}
+              <div className="nav-dropdown-divider"></div>
+              <button
+                onClick={toggleTheme}
+                className="nav-dropdown-toggle"
+                aria-label={isDarkMode ? 'Switch to light mode' : 'Switch to dark mode'}
+              >
+                {isDarkMode ? (
+                  <Sun className="w-5 h-5 flex-shrink-0" />
+                ) : (
+                  <Moon className="w-5 h-5 flex-shrink-0" />
+                )}
+                <span>{isDarkMode ? 'Light Mode' : 'Dark Mode'}</span>
+              </button>
               
               {/* Mobile status section - Only show on smaller screens */}
               <div className="nav-dropdown-status">
