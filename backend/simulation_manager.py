@@ -33,13 +33,14 @@ except ImportError:
     TRACI_AVAILABLE = False
 
 class SimulationManager:
-    def __init__(self, base_networks_dir: str = "networks", websocket_handler=None):
+    def __init__(self, base_networks_dir: str = "networks", websocket_handler=None, db_service=None):
         """
         Initialize the simulation manager
         
         Args:
             base_networks_dir: Directory containing original network files
             websocket_handler: WebSocket handler for live data broadcasting
+            db_service: Database service for persistent storage
         """
         # Get the backend directory path (where this script is located)
         backend_dir = Path(__file__).parent
@@ -49,6 +50,7 @@ class SimulationManager:
         self.sessions_dir = backend_dir / "sessions"
         self.active_processes = {}
         self.websocket_handler = websocket_handler
+        self.db_service = db_service
         
         # Start periodic process monitoring
         self._start_process_monitor()
@@ -59,7 +61,7 @@ class SimulationManager:
         
     def save_session_config(self, session_id: str, config_data: Dict[str, Any]) -> Dict[str, Any]:
         """
-        Save session configuration to persistent storage
+        Save session configuration to persistent storage (database and file backup)
         
         Args:
             session_id: Unique session identifier
@@ -69,9 +71,24 @@ class SimulationManager:
             Result dictionary with success status
         """
         try:
+            # Create session directory for file-based operations
             session_config_dir = self.sessions_dir / session_id
             session_config_dir.mkdir(exist_ok=True)
             
+            # Save to database if available
+            if self.db_service:
+                # Create session in database
+                self.db_service.create_session(
+                    session_id=session_id,
+                    session_path=str(session_config_dir)
+                )
+                
+                # Save configuration to database
+                success = self.db_service.save_configuration(session_id, config_data)
+                if not success:
+                    print(f"Warning: Failed to save configuration to database for session {session_id}")
+            
+            # Also save to file as backup (maintain backward compatibility)
             config_file = session_config_dir / "config.json"
             with open(config_file, 'w') as f:
                 json.dump(config_data, f, indent=2)
@@ -79,7 +96,8 @@ class SimulationManager:
             return {
                 "success": True,
                 "message": "Configuration saved successfully",
-                "config_path": str(config_file)
+                "config_path": str(config_file),
+                "session_id": session_id
             }
             
         except Exception as e:
@@ -279,6 +297,27 @@ class SimulationManager:
             metadata_file = session_dir / "session_metadata.json"
             with open(metadata_file, 'w') as f:
                 json.dump(session_metadata, f, indent=2)
+            
+            # Update database with session and network information
+            if self.db_service:
+                # Update session with network information
+                self.db_service.update_session_status(
+                    session_id, 
+                    'network_configured',
+                    network_id=network_id,
+                    network_name=network_id,  # Can be improved to get actual network name
+                    session_path=str(session_dir)
+                )
+                
+                # Save/update network metadata
+                network_data = {
+                    'id': network_id,
+                    'name': network_id,  # Can be improved
+                    'path': str(network_dest),
+                    'is_osm_scenario': is_osm_scenario
+                }
+                self.db_service.save_network(network_data)
+                self.db_service.update_network_last_used(network_id)
             
             return {
                 "success": True,
@@ -2658,6 +2697,13 @@ class SimulationManager:
                         if step_count % 5 == 0:  # Print every 5 steps
                             print(f"Step {step_count}: sim_time={sim_time}s, vehicles={total_vehicles}, avg_speed={avg_speed:.1f}m/s")
                         
+                        # Save to database every 10 steps to avoid overwhelming the database
+                        if self.db_service and step_count % 10 == 0:
+                            try:
+                                self.db_service.save_live_data(session_id, live_data)
+                            except Exception as db_error:
+                                print(f"Warning: Failed to save live data to database: {db_error}")
+                        
                         # Broadcast data via WebSocket
                         if self.websocket_handler:
                             self.websocket_handler.broadcast_simulation_data(live_data)
@@ -2740,7 +2786,7 @@ class SimulationManager:
                     current_time = datetime.now().isoformat()
                     
                     if session_stats:
-                        # Save session statistics to a JSON file
+                        # Save session statistics to a JSON file (backward compatibility)
                         stats_file = Path(session_path) / "session_statistics.json"
                         with open(stats_file, 'w') as f:
                             json.dump({
@@ -2752,7 +2798,30 @@ class SimulationManager:
                             }, f, indent=2)
                         print(f"Session statistics saved to {stats_file}")
                         
-                        # Also save session metadata for the analytics API
+                        # Save analytics to database if available
+                        if self.db_service:
+                            try:
+                                # Convert session_stats to KPI format
+                                kpis_data = {
+                                    'total_vehicles_loaded': session_stats.get('totalVehicles', 0),
+                                    'total_vehicles_completed': session_stats.get('totalVehicles', 0),
+                                    'avg_travel_time': session_stats.get('averageTravelTime', 0),
+                                    'avg_waiting_time': session_stats.get('averageWaitingTime', 0),
+                                    'avg_speed': session_stats.get('averageSpeed', 0) / 3.6 if session_stats.get('averageSpeed', 0) > 0 else 0,  # Convert km/h to m/s
+                                    'throughput': session_stats.get('throughput', 0),
+                                    'simulation_duration': session_stats.get('simulationTime', 0),
+                                    'notes': f"Completed: {reason}"
+                                }
+                                
+                                success = self.db_service.save_kpis(session_id, kpis_data)
+                                if success:
+                                    print(f"Session analytics saved to database for session {session_id}")
+                                else:
+                                    print(f"Warning: Failed to save analytics to database for session {session_id}")
+                            except Exception as db_error:
+                                print(f"Error saving analytics to database: {db_error}")
+                        
+                        # Also save session metadata for the analytics API (backward compatibility)
                         metadata_file = Path(session_path) / "session_metadata.json"
                         
                         # Try to load existing config to get network info

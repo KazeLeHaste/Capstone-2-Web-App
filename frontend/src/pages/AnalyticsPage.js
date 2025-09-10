@@ -11,7 +11,6 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import axios from 'axios';
 import { 
-  BarChart3, 
   TrendingUp, 
   Activity,
   Download,
@@ -44,7 +43,7 @@ const AnalyticsPage = ({ socket, simulationData, simulationStatus }) => {
   const [selectedSession, setSelectedSession] = useState(sessionIdFromUrl || '');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [activeTab, setActiveTab] = useState('overview');
+  const [activeTab, setActiveTab] = useState('kpis');
   const [showComparison, setShowComparison] = useState(false);
   const [selectedSessionsForComparison, setSelectedSessionsForComparison] = useState([]);
 
@@ -163,7 +162,6 @@ const AnalyticsPage = ({ socket, simulationData, simulationStatus }) => {
   const canStartComparison = selectedSessionsForComparison.length >= 2;
 
   const tabs = [
-    { id: 'overview', name: 'Overview', icon: BarChart3 },
     { id: 'kpis', name: 'KPIs', icon: TrendingUp },
     { id: 'charts', name: 'Charts', icon: LineChart },
     { id: 'recommendations', name: 'Recommendations', icon: AlertCircle },
@@ -413,41 +411,6 @@ const AnalyticsPage = ({ socket, simulationData, simulationStatus }) => {
             {/* Tab Content */}
             <div className="card">
               <div className="card-body">
-                {activeTab === 'overview' && (
-                  <div className="space-y-lg">
-                    <KPIDashboard kpis={analyticsData.kpis} loading={false} />
-                    
-                    {analyticsData.recommendations && analyticsData.recommendations.length > 0 && (
-                      <div className="card">
-                        <div className="card-header">
-                          <h3 className="card-title">Top Recommendations</h3>
-                        </div>
-                        <div className="card-body">
-                          <div className="space-y-md">
-                            {analyticsData.recommendations
-                              .filter(r => r.priority === 'high')
-                              .slice(0, 3)
-                              .map((rec, index) => (
-                                <div key={index} className="alert alert-warning">
-                                  <AlertTriangle />
-                                  <div>
-                                    <p className="font-medium">{rec.category.toUpperCase()}</p>
-                                    <p className="text-sm">{rec.message}</p>
-                                  </div>
-                                </div>
-                              ))}
-                            {analyticsData.recommendations.filter(r => r.priority === 'high').length === 0 && (
-                              <div className="alert alert-success text-center">
-                                <p>No high-priority recommendations. Performance looks good!</p>
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                )}
-
                 {activeTab === 'kpis' && (
                   <KPIDashboard kpis={analyticsData.kpis} loading={false} />
                 )}

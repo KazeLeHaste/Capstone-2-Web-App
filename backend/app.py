@@ -21,6 +21,8 @@ from sumo_controller import SumoController
 from websocket_handler import WebSocketHandler
 from simulation_manager import SimulationManager
 from analytics_engine import TrafficAnalyticsEngine
+from database.service import DatabaseService
+from enhanced_session_manager import EnhancedSessionManager
 
 # Initialize Flask app
 app = Flask(__name__)
@@ -32,11 +34,24 @@ CORS(app, origins=["http://localhost:3000", "http://127.0.0.1:3000"], supports_c
 # Initialize SocketIO for real-time communication
 socketio = SocketIO(app, cors_allowed_origins=["http://localhost:3000", "http://127.0.0.1:3000"], async_mode='threading')
 
+# Initialize database service
+db_service = DatabaseService()
+
+# Initialize networks in database from filesystem  
+db_service.initialize_networks_from_filesystem(str(Path(__file__).parent / "networks"))
+
 # Initialize SUMO controller and WebSocket handler
 sumo_controller = SumoController()
 websocket_handler = WebSocketHandler(socketio, sumo_controller)
-sim_manager = SimulationManager(websocket_handler=websocket_handler)
-analytics_engine = TrafficAnalyticsEngine()
+sim_manager = SimulationManager(websocket_handler=websocket_handler, db_service=db_service)
+analytics_engine = TrafficAnalyticsEngine(db_service=db_service)
+
+# Initialize enhanced session manager for multi-session support
+enhanced_session_manager = EnhancedSessionManager(
+    base_networks_dir="networks",
+    db_service=db_service,
+    websocket_handler=websocket_handler
+)
 
 # Add request logging
 @app.before_request
@@ -874,7 +889,7 @@ def get_session_analytics(session_id):
             }), 404
         
         # Analyze session
-        analytics_data = analytics_engine.analyze_session(str(session_path))
+        analytics_data = analytics_engine.analyze_session(str(session_path), session_id)
         
         if 'error' in analytics_data:
             return jsonify({
@@ -1082,7 +1097,7 @@ def export_session_analytics(session_id):
             }), 404
         
         # Get full analytics
-        analytics_data = analytics_engine.analyze_session(str(session_path))
+        analytics_data = analytics_engine.analyze_session(str(session_path), session_id)
         
         if 'error' in analytics_data:
             return jsonify({
@@ -1115,6 +1130,397 @@ def export_session_analytics(session_id):
 
 # ============================================================================
 # END ANALYTICS ENDPOINTS
+# ============================================================================
+
+# ============================================================================
+# DATABASE-POWERED ENDPOINTS
+# ============================================================================
+
+@app.route('/api/sessions', methods=['GET'])
+def get_sessions():
+    """
+    Get list of recent sessions from database
+    """
+    try:
+        limit = request.args.get('limit', 10, type=int)
+        sessions = db_service.get_recent_sessions(limit)
+        
+        return jsonify({
+            'success': True,
+            'sessions': [session.to_dict() for session in sessions]
+        })
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': f'Error retrieving sessions: {str(e)}'
+        }), 500
+
+@app.route('/api/sessions/<session_id>', methods=['GET'])
+def get_session_details(session_id):
+    """
+    Get detailed session information including configuration
+    """
+    try:
+        session = db_service.get_session_by_id(session_id)
+        if not session:
+            return jsonify({
+                'success': False,
+                'message': 'Session not found'
+            }), 404
+        
+        config = db_service.get_configuration(session_id)
+        
+        result = {
+            'success': True,
+            'session': session.to_dict(),
+            'configuration': config.to_dict() if config else None
+        }
+        
+        return jsonify(result)
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': f'Error retrieving session details: {str(e)}'
+        }), 500
+
+@app.route('/api/sessions/<session_id>/analytics', methods=['GET'])
+def get_session_analytics_db(session_id):
+    """
+    Get session analytics from database
+    """
+    try:
+        analytics_data = db_service.get_session_analytics(session_id)
+        
+        if not analytics_data:
+            return jsonify({
+                'success': False,
+                'message': 'Session not found or no analytics available'
+            }), 404
+        
+        return jsonify({
+            'success': True,
+            **analytics_data
+        })
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': f'Error retrieving analytics: {str(e)}'
+        }), 500
+
+@app.route('/api/sessions/<session_id>/live-data', methods=['GET'])
+def get_session_live_data(session_id):
+    """
+    Get live data history for session
+    """
+    try:
+        limit = request.args.get('limit', 100, type=int)
+        live_data = db_service.get_live_data(session_id, limit)
+        
+        data_list = []
+        for data in live_data:
+            data_dict = {
+                'simulation_time': data.simulation_time,
+                'active_vehicles': data.active_vehicles,
+                'avg_speed': data.avg_speed,
+                'throughput': data.throughput,
+                'timestamp': data.timestamp.isoformat(),
+                **data.get_raw_data()
+            }
+            data_list.append(data_dict)
+        
+        return jsonify({
+            'success': True,
+            'live_data': data_list
+        })
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': f'Error retrieving live data: {str(e)}'
+        }), 500
+
+@app.route('/api/sessions/<session_id>', methods=['DELETE'])
+def delete_session(session_id):
+    """
+    Delete session and all related data
+    """
+    try:
+        success = db_service.delete_session(session_id)
+        
+        if success:
+            # Also try to delete session files if they exist
+            try:
+                session_dir = sim_manager.sessions_dir / session_id
+                if session_dir.exists():
+                    import shutil
+                    shutil.rmtree(session_dir)
+            except Exception as file_error:
+                print(f"Warning: Failed to delete session files: {file_error}")
+            
+            return jsonify({
+                'success': True,
+                'message': 'Session deleted successfully'
+            })
+        else:
+            return jsonify({
+                'success': False,
+                'message': 'Session not found or could not be deleted'
+            }), 404
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': f'Error deleting session: {str(e)}'
+        }), 500
+
+@app.route('/api/networks/database', methods=['GET'])
+def get_networks_from_database():
+    """
+    Get networks from database
+    """
+    try:
+        networks = db_service.get_networks()
+        
+        return jsonify({
+            'success': True,
+            'networks': [network.to_dict() for network in networks]
+        })
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': f'Error retrieving networks: {str(e)}'
+        }), 500
+
+@app.route('/api/database/stats', methods=['GET'])
+def get_database_stats():
+    """
+    Get database statistics
+    """
+    try:
+        stats = db_service.get_database_stats()
+        return jsonify({
+            'success': True,
+            'stats': stats
+        })
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': f'Error retrieving database stats: {str(e)}'
+        }), 500
+
+@app.route('/api/database/cleanup', methods=['POST'])
+def cleanup_old_data():
+    """
+    Clean up old session data
+    """
+    try:
+        days_old = request.json.get('days', 30) if request.is_json else 30
+        deleted_count = db_service.cleanup_old_data(days_old)
+        
+        return jsonify({
+            'success': True,
+            'message': f'Cleaned up {deleted_count} old sessions',
+            'deleted_sessions': deleted_count
+        })
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': f'Error cleaning up data: {str(e)}'
+        }), 500
+
+# ============================================================================
+# ============================================================================
+# ENHANCED MULTI-SESSION ENDPOINTS (V2)
+# ============================================================================
+
+@app.route('/api/v2/sessions', methods=['POST'])
+def create_session_v2():
+    """Create a new simulation session with enhanced management"""
+    try:
+        data = request.get_json()
+        network_id = data.get('networkId')
+        config = data.get('config', {})
+        enable_gui = data.get('enableGui', True)
+        
+        if not network_id:
+            return jsonify({
+                'success': False,
+                'message': 'Network ID is required'
+            }), 400
+        
+        # Create session using enhanced manager
+        result = enhanced_session_manager.create_session(
+            network_id=network_id,
+            config=config,
+            enable_gui=enable_gui
+        )
+        
+        return jsonify(result)
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': f'Error creating session: {str(e)}'
+        }), 500
+
+@app.route('/api/v2/sessions/<session_id>/launch', methods=['POST'])
+def launch_session_v2(session_id: str):
+    """Launch simulation for specific session"""
+    try:
+        result = enhanced_session_manager.launch_simulation(session_id)
+        return jsonify(result)
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': f'Error launching session: {str(e)}'
+        }), 500
+
+@app.route('/api/v2/sessions/<session_id>/stop', methods=['POST'])
+def stop_session_v2(session_id: str):
+    """Stop simulation for specific session"""
+    try:
+        result = enhanced_session_manager.stop_simulation(session_id)
+        return jsonify(result)
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': f'Error stopping session: {str(e)}'
+        }), 500
+
+@app.route('/api/v2/sessions/<session_id>', methods=['DELETE'])
+def cleanup_session_v2(session_id: str):
+    """Clean up session resources"""
+    try:
+        success = enhanced_session_manager.cleanup_session(session_id)
+        return jsonify({
+            'success': success,
+            'message': f'Session {session_id} cleaned up' if success else 'Cleanup failed'
+        })
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': f'Error cleaning up session: {str(e)}'
+        }), 500
+
+@app.route('/api/v2/sessions', methods=['GET'])
+def get_active_sessions_v2():
+    """Get all active sessions"""
+    try:
+        sessions = enhanced_session_manager.get_active_sessions()
+        
+        # Enhance with database information
+        if db_service:
+            for session in sessions:
+                db_session = db_service.get_session_by_id(session['session_id'])
+                if db_session:
+                    session.update(db_session.to_dict())
+        
+        return jsonify({
+            'success': True,
+            'sessions': sessions,
+            'total': len(sessions)
+        })
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': f'Error retrieving sessions: {str(e)}'
+        }), 500
+
+@app.route('/api/v2/sessions/<session_id>/status', methods=['GET'])
+def get_session_status_v2(session_id: str):
+    """Get detailed status of specific session"""
+    try:
+        # Get from enhanced manager
+        active_sessions = enhanced_session_manager.get_active_sessions()
+        session_info = next((s for s in active_sessions if s['session_id'] == session_id), None)
+        
+        if not session_info:
+            # Check database for completed sessions
+            if db_service:
+                db_session = db_service.get_session_by_id(session_id)
+                if db_session:
+                    return jsonify({
+                        'success': True,
+                        'session': db_session.to_dict()
+                    })
+            
+            return jsonify({
+                'success': False,
+                'message': f'Session {session_id} not found'
+            }), 404
+        
+        # Enhance with database information
+        if db_service:
+            db_session = db_service.get_session_by_id(session_id)
+            if db_session:
+                session_info.update(db_session.to_dict())
+        
+        return jsonify({
+            'success': True,
+            'session': session_info
+        })
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': f'Error retrieving session status: {str(e)}'
+        }), 500
+
+@app.route('/api/v2/sessions/<session_id>/live-data', methods=['GET'])
+def get_session_live_data_v2(session_id: str):
+    """Get live data for specific session"""
+    try:
+        if not db_service:
+            return jsonify({
+                'success': False,
+                'message': 'Database service not available'
+            }), 500
+        
+        # Get latest live data from database
+        live_data = db_service.get_latest_live_data(session_id, limit=100)
+        
+        return jsonify({
+            'success': True,
+            'session_id': session_id,
+            'data': [data.to_dict() for data in live_data]
+        })
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': f'Error retrieving live data: {str(e)}'
+        }), 500
+
+@app.route('/api/v2/resource-usage', methods=['GET'])
+def get_resource_usage_v2():
+    """Get current resource usage (ports, sessions, etc.)"""
+    try:
+        active_sessions = enhanced_session_manager.get_active_sessions()
+        allocated_ports = enhanced_session_manager.port_allocator.get_allocated_ports()
+        
+        return jsonify({
+            'success': True,
+            'resource_usage': {
+                'active_sessions': len(active_sessions),
+                'allocated_ports': allocated_ports,
+                'max_sessions': enhanced_session_manager.port_allocator.max_ports,
+                'available_ports': enhanced_session_manager.port_allocator.max_ports - len(allocated_ports)
+            }
+        })
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': f'Error retrieving resource usage: {str(e)}'
+        }), 500
+
+# END ENHANCED MULTI-SESSION ENDPOINTS
+# ============================================================================
+
+# ============================================================================
+# END DATABASE-POWERED ENDPOINTS
 # ============================================================================
 
 # ============================================================================

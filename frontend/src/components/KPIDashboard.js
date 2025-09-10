@@ -248,31 +248,38 @@ const KPIDashboard = ({ kpis, loading = false }) => {
       {/* Main KPIs */}
       <div>
         <h3 className="text-lg font-semibold text-gray-900 mb-4">Key Performance Indicators</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="analytics-kpi-grid">
           {kpiConfigs.map((kpi) => {
             const Icon = kpi.icon;
-            const colorClass = colorClasses[kpi.color] || colorClasses.gray;
-            const iconColorClass = iconColorClasses[kpi.color] || iconColorClasses.gray;
-            const textColorClass = textColorClasses[kpi.color] || textColorClasses.gray;
+            const isPositiveTrend = kpi.thresholds ? 
+              (kpi.inverse ? kpi.value < kpi.thresholds.warning : kpi.value >= kpi.thresholds.warning) 
+              : true;
 
             return (
-              <div key={kpi.id} className={`bg-white rounded-lg border p-6 ${colorClass}`}>
-                <div className="flex items-center justify-between mb-2">
-                  <Icon className={`w-6 h-6 ${iconColorClass}`} />
-                  {kpi.thresholds && kpi.value !== null && !isNaN(kpi.value) && 
-                    getTrendIndicator(kpi.value, kpi.thresholds.warning, kpi.inverse)
-                  }
+              <div key={kpi.id} className="analytics-kpi-tile">
+                <div className="analytics-kpi-header">
+                  <div className="analytics-kpi-icon">
+                    <Icon className="w-6 h-6" />
+                  </div>
+                  {kpi.thresholds && kpi.value !== null && !isNaN(kpi.value) && (
+                    <div className={`analytics-kpi-trend ${isPositiveTrend ? 'positive' : 'negative'}`}>
+                      {isPositiveTrend ? 
+                        <TrendingUp className="w-4 h-4" /> : 
+                        <TrendingDown className="w-4 h-4" />
+                      }
+                    </div>
+                  )}
                 </div>
                 
-                <div className={`text-2xl font-bold ${textColorClass} mb-1`}>
+                <div className="analytics-kpi-value">
                   {formatValue(kpi.value, kpi.unit, kpi.decimals)}
                 </div>
                 
-                <div className="text-sm font-medium text-gray-900 mb-1">
+                <div className="analytics-kpi-title">
                   {kpi.title}
                 </div>
                 
-                <div className="text-xs text-gray-600">
+                <div className="analytics-kpi-description">
                   {kpi.description}
                 </div>
                 
@@ -294,19 +301,23 @@ const KPIDashboard = ({ kpis, loading = false }) => {
             <AlertTriangle className="w-5 h-5 mr-2 text-red-500" />
             Safety Metrics
           </h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="analytics-kpi-grid">
             {safetyMetrics.map((metric) => {
               const Icon = metric.icon;
               return (
-                <div key={metric.id} className="bg-white rounded-lg border border-red-200 p-6">
-                  <Icon className="w-6 h-6 text-red-600 mb-2" />
-                  <div className="text-2xl font-bold text-red-900 mb-1">
+                <div key={metric.id} className="analytics-kpi-tile safety-metric">
+                  <div className="analytics-kpi-header">
+                    <div className="analytics-kpi-icon safety-icon">
+                      <Icon className="w-6 h-6" />
+                    </div>
+                  </div>
+                  <div className="analytics-kpi-value safety-value">
                     {formatValue(metric.value, metric.unit, metric.decimals)}
                   </div>
-                  <div className="text-sm font-medium text-gray-900 mb-1">
+                  <div className="analytics-kpi-title">
                     {metric.title}
                   </div>
-                  <div className="text-xs text-gray-600">
+                  <div className="analytics-kpi-description">
                     {metric.description}
                   </div>
                 </div>
@@ -323,19 +334,23 @@ const KPIDashboard = ({ kpis, loading = false }) => {
             <CheckCircle className="w-5 h-5 mr-2 text-green-500" />
             Environmental Impact
           </h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="analytics-kpi-grid">
             {environmentalMetrics.map((metric) => {
               const Icon = metric.icon;
               return (
-                <div key={metric.id} className="bg-white rounded-lg border border-green-200 p-6">
-                  <Icon className="w-6 h-6 text-green-600 mb-2" />
-                  <div className="text-2xl font-bold text-green-900 mb-1">
+                <div key={metric.id} className="analytics-kpi-tile environmental-metric">
+                  <div className="analytics-kpi-header">
+                    <div className="analytics-kpi-icon environmental-icon">
+                      <Icon className="w-6 h-6" />
+                    </div>
+                  </div>
+                  <div className="analytics-kpi-value environmental-value">
                     {formatValue(metric.value, metric.unit, metric.decimals)}
                   </div>
-                  <div className="text-sm font-medium text-gray-900 mb-1">
+                  <div className="analytics-kpi-title">
                     {metric.title}
                   </div>
-                  <div className="text-xs text-gray-600">
+                  <div className="analytics-kpi-description">
                     {metric.description}
                   </div>
                 </div>

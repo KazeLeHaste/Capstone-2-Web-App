@@ -88,8 +88,9 @@ class RecommendationRule:
 class TrafficAnalyticsEngine:
     """Main analytics engine for processing SUMO outputs"""
     
-    def __init__(self):
+    def __init__(self, db_service=None):
         """Initialize the analytics engine"""
+        self.db_service = db_service
         self.recommendation_rules = self._initialize_recommendation_rules()
     
     def _initialize_recommendation_rules(self) -> List[RecommendationRule]:
@@ -163,18 +164,23 @@ class TrafficAnalyticsEngine:
             )
         ]
     
-    def analyze_session(self, session_path: str) -> Dict[str, Any]:
+    def analyze_session(self, session_path: str, session_id: str = None) -> Dict[str, Any]:
         """
         Analyze a complete simulation session
         
         Args:
             session_path: Path to session directory containing SUMO output files
+            session_id: Session ID (for database storage)
             
         Returns:
             Dictionary containing complete analytics results
         """
         try:
             session_path = Path(session_path)
+            
+            # Extract session_id from path if not provided
+            if not session_id:
+                session_id = session_path.name
             
             # Locate output files
             tripinfo_file = self._find_file(session_path, "*.tripinfos.xml")
@@ -194,8 +200,45 @@ class TrafficAnalyticsEngine:
             route_analysis = self._analyze_routes(trip_data)
             temporal_patterns = self._analyze_temporal_patterns(time_series)
             
+            # Save to database if available
+            if self.db_service and session_id:
+                try:
+                    # Save KPIs
+                    kpis_dict = asdict(kpis)
+                    self.db_service.save_kpis(session_id, kpis_dict)
+                    
+                    # Save time series data
+                    time_series_dicts = [asdict(ts) for ts in time_series]
+                    # Convert time_step to time for database compatibility
+                    for ts_dict in time_series_dicts:
+                        ts_dict['time_step'] = ts_dict.pop('time', 0)
+                    self.db_service.save_time_series(session_id, time_series_dicts)
+                    
+                    # Save trip data
+                    self.db_service.save_trips(session_id, trip_data)
+                    
+                    # Save recommendations
+                    rec_dicts = []
+                    for rec in recommendations:
+                        rec_dict = {
+                            'rule_id': rec.get('rule_id', ''),
+                            'priority': rec.get('priority', 'medium'),
+                            'category': rec.get('category', 'general'),
+                            'message': rec.get('message', ''),
+                            'kpi_name': rec.get('kpi', ''),
+                            'actual_value': rec.get('actual_value', 0),
+                            'threshold_value': rec.get('threshold', 0)
+                        }
+                        rec_dicts.append(rec_dict)
+                    self.db_service.save_recommendations(session_id, rec_dicts)
+                    
+                    print(f"Analytics data saved to database for session {session_id}")
+                except Exception as db_error:
+                    print(f"Warning: Failed to save analytics to database: {db_error}")
+            
             return {
                 "session_path": str(session_path),
+                "session_id": session_id,
                 "analysis_timestamp": datetime.now().isoformat(),
                 "kpis": asdict(kpis),
                 "time_series": [asdict(ts) for ts in time_series],
@@ -210,6 +253,7 @@ class TrafficAnalyticsEngine:
             return {
                 "error": str(e),
                 "session_path": str(session_path),
+                "session_id": session_id,
                 "analysis_timestamp": datetime.now().isoformat()
             }
     

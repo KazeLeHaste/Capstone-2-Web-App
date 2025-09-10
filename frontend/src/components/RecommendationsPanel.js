@@ -229,8 +229,8 @@ const RecommendationsPanel = ({ recommendations = [], loading = false }) => {
         </div>
       )}
 
-      {/* Recommendations List */}
-      <div className="space-y-4">
+      {/* Recommendations Grid */}
+      <div className="analytics-recommendations-grid">
         {filteredRecommendations.map((recommendation, index) => {
           const config = priorityConfig[recommendation.priority] || priorityConfig.low;
           const categoryConf = categoryConfig[recommendation.category] || { icon: Info, color: 'gray', label: recommendation.category };
@@ -239,97 +239,77 @@ const RecommendationsPanel = ({ recommendations = [], loading = false }) => {
           const isExpanded = expandedRecommendation === recommendation.id;
 
           return (
-            <div key={recommendation.id || index} className={`bg-white border rounded-lg ${config.borderColor}`}>
-              {/* Main Recommendation */}
-              <div className="p-6">
-                <div className="flex items-start justify-between">
-                  <div className="flex items-start space-x-4 flex-1">
-                    <Icon className={`w-6 h-6 mt-1 ${config.iconColor}`} />
-                    
-                    <div className="flex-1">
-                      <div className="flex items-center space-x-3 mb-2">
-                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${config.bgColor} ${config.textColor}`}>
-                          {recommendation.priority.charAt(0).toUpperCase() + recommendation.priority.slice(1)}
-                        </span>
-                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
-                          <CategoryIcon className="w-3 h-3 mr-1" />
-                          {categoryConf.label}
-                        </span>
+            <div 
+              key={recommendation.id || index} 
+              className={`analytics-recommendation-tile ${recommendation.priority}-priority`}
+            >
+              {/* Recommendation Header */}
+              <div className="analytics-recommendation-header">
+                <div className="analytics-recommendation-priority">
+                  <div className={`analytics-recommendation-icon ${config.bgColor}`}>
+                    <Icon className={`w-5 h-5 ${config.iconColor}`} />
+                  </div>
+                  <span className={`analytics-recommendation-badge ${config.bgColor} ${config.textColor}`}>
+                    {recommendation.priority} priority
+                  </span>
+                </div>
+                <CategoryIcon className="analytics-recommendation-category-icon" />
+              </div>
+
+              {/* Recommendation Content */}
+              <div className="analytics-recommendation-content">
+                <div className="analytics-recommendation-main">
+                  <p className="analytics-recommendation-title">
+                    {recommendation.category.charAt(0).toUpperCase() + recommendation.category.slice(1)}
+                  </p>
+                  <p className="analytics-recommendation-message">
+                    {recommendation.message}
+                  </p>
+                </div>
+
+                {recommendation.kpi && (
+                  <div className="analytics-recommendation-details">
+                    <div className="analytics-recommendation-kpi-grid">
+                      <div>
+                        <span className="analytics-recommendation-label">KPI:</span>
+                        <p className="analytics-recommendation-value">{recommendation.kpi}</p>
                       </div>
-                      
-                      <p className={`text-base ${config.textColor} font-medium mb-2`}>
-                        {recommendation.message}
-                      </p>
-                      
-                      {recommendation.kpi && recommendation.actual_value && (
-                        <div className="text-sm text-gray-600">
-                          <span className="font-medium">Current value:</span> {recommendation.actual_value.toFixed(2)} 
-                          {recommendation.threshold && (
-                            <span className="ml-2">
-                              <span className="font-medium">Threshold:</span> {recommendation.threshold}
-                            </span>
-                          )}
+                      {recommendation.actual_value && (
+                        <div>
+                          <span className="analytics-recommendation-label">Value:</span>
+                          <p className="analytics-recommendation-value">{recommendation.actual_value.toFixed(2)}</p>
                         </div>
                       )}
                     </div>
                   </div>
-                  
-                  <button
-                    onClick={() => setExpandedRecommendation(isExpanded ? null : recommendation.id)}
-                    className="ml-4 p-2 text-gray-400 hover:text-gray-600 transition-colors"
-                  >
-                    <ChevronRight className={`w-5 h-5 transform transition-transform ${isExpanded ? 'rotate-90' : ''}`} />
-                  </button>
-                </div>
+                )}
+
+                {/* Action Button */}
+                <button
+                  onClick={() => setExpandedRecommendation(isExpanded ? null : recommendation.id)}
+                  className="analytics-recommendation-toggle"
+                >
+                  {isExpanded ? 'Less details' : 'More details'}
+                  <ChevronRight className={`analytics-recommendation-chevron ${isExpanded ? 'expanded' : ''}`} />
+                </button>
               </div>
 
               {/* Expanded Details */}
               {isExpanded && (
-                <div className="border-t bg-gray-50 px-6 py-4">
-                  <div className="space-y-4">
-                    <div>
-                      <h4 className="font-medium text-gray-900 mb-2 flex items-center">
-                        <Target className="w-4 h-4 mr-2" />
-                        Suggested Actions
-                      </h4>
-                      <ul className="space-y-2">
-                        {getDetailedRecommendations(recommendation).map((action, i) => (
-                          <li key={i} className="flex items-start">
-                            <CheckCircle className="w-4 h-4 text-green-500 mr-2 mt-0.5 flex-shrink-0" />
-                            <span className="text-sm text-gray-700">{action}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                    
-                    {recommendation.kpi && (
-                      <div>
-                        <h4 className="font-medium text-gray-900 mb-2 flex items-center">
-                          <Settings className="w-4 h-4 mr-2" />
-                          Technical Details
-                        </h4>
-                        <div className="bg-white rounded border p-3 text-sm">
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                              <span className="font-medium">Affected KPI:</span> {recommendation.kpi}
-                            </div>
-                            <div>
-                              <span className="font-medium">Category:</span> {recommendation.category}
-                            </div>
-                            {recommendation.actual_value && (
-                              <div>
-                                <span className="font-medium">Measured Value:</span> {recommendation.actual_value.toFixed(2)}
-                              </div>
-                            )}
-                            {recommendation.threshold && (
-                              <div>
-                                <span className="font-medium">Target Threshold:</span> {recommendation.threshold}
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    )}
+                <div className="analytics-recommendation-expanded">
+                  <div className="analytics-recommendation-actions">
+                    <h4 className="analytics-recommendation-actions-title">
+                      <Target className="w-4 h-4 mr-2" />
+                      Suggested Actions
+                    </h4>
+                    <ul className="analytics-recommendation-actions-list">
+                      {getDetailedRecommendations(recommendation).map((detail, idx) => (
+                        <li key={idx} className="analytics-recommendation-action-item">
+                          <span className="analytics-recommendation-bullet">•</span>
+                          {detail}
+                        </li>
+                      ))}
+                    </ul>
                   </div>
                 </div>
               )}
