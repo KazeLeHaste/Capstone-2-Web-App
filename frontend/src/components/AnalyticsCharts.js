@@ -341,7 +341,7 @@ const AnalyticsCharts = ({ analyticsData, loading = false }) => {
       </div>
 
       {/* Chart Display */}
-      <div className="bg-white rounded-lg border p-6">
+      <div className="analytics-chart-tile">
         <div className="mb-6">
           <h3 className="text-lg font-semibold text-gray-900 flex items-center">
             {React.createElement(chartConfigs[selectedChart].icon, { className: "w-5 h-5 mr-2" })}
@@ -359,7 +359,7 @@ const AnalyticsCharts = ({ analyticsData, loading = false }) => {
 
       {/* Chart Statistics */}
       {timeSeriesData.length > 0 && (
-        <div className="bg-white rounded-lg border p-6">
+        <div className="analytics-chart-tile">
           <h4 className="text-md font-medium text-gray-900 mb-4">Chart Summary</h4>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
             <div>
