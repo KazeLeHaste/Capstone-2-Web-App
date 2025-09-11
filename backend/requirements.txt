@@ -1,10 +1,19 @@
+# Core Flask framework and extensions
 Flask==2.3.3
 Flask-CORS==4.0.0
 Flask-SocketIO==5.3.6
+
+# Real-time WebSocket communication
 python-socketio==5.8.0
+
+# SUMO traffic simulator integration
 traci==1.19.0
 sumolib==1.19.0
-requests==2.31.0
-python-dotenv==1.0.0
+
+# Database ORM and migrations
 SQLAlchemy>=2.0.23
 alembic==1.12.0
+
+# HTTP client and environment management
+requests==2.31.0
+python-dotenv==1.0.0
