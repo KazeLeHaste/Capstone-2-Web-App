@@ -15,7 +15,6 @@ import {
   Home, 
   Network, 
   Settings, 
-  Play, 
   BarChart3, 
   Menu, 
   X,
@@ -51,9 +50,7 @@ const Navigation = ({ isConnected, backendStatus, simulationStatus }) => {
   
   const navigationItems = [
     { path: '/', label: 'Home', icon: Home },
-    { path: '/configuration', label: 'Configuration', icon: Settings },
-    { path: '/network-selection', label: 'Network', icon: Network },
-    { path: '/simulation', label: 'Simulation', icon: Play },
+    { path: '/configuration', label: 'Start Simulating', icon: Settings },
     { path: '/analytics', label: 'Analytics', icon: BarChart3 }
   ];
   
