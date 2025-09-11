@@ -128,18 +128,6 @@ const Navigation = ({ isConnected, backendStatus, simulationStatus }) => {
                   </>
                 )}
               </div>
-              
-              {/* Simulation status */}
-              <div className="nav-status-item" aria-live="polite">
-                <Circle 
-                  className={`w-3 h-3 ${getStatusColor(simulationStatus)} ${simulationStatus === 'running' ? 'animate-pulse' : ''}`}
-                  fill="currentColor"
-                  aria-hidden="true"
-                />
-                <span className={`nav-status-text-xl ${getStatusColor(simulationStatus)}`}>
-                  {getStatusText(simulationStatus)}
-                </span>
-              </div>
             </div>
             
             {/* Navigation menu button - Always visible */}
@@ -215,19 +203,6 @@ const Navigation = ({ isConnected, backendStatus, simulationStatus }) => {
                           <span className="nav-dropdown-status-text text-red-600">Disconnected</span>
                         </>
                       )}
-                    </div>
-                  </div>
-                  
-                  <div className="nav-dropdown-status-item">
-                    <span className="nav-dropdown-status-label">Simulation</span>
-                    <div className="nav-dropdown-status-value">
-                      <Circle 
-                        className={`w-3 h-3 ${getStatusColor(simulationStatus)} ${simulationStatus === 'running' ? 'animate-pulse' : ''}`}
-                        fill="currentColor"
-                      />
-                      <span className={`nav-dropdown-status-text ${getStatusColor(simulationStatus)}`}>
-                        {getStatusText(simulationStatus)}
-                      </span>
                     </div>
                   </div>
                 </div>

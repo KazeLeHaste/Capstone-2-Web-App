@@ -28,39 +28,41 @@ const OnboardingModal = ({ onComplete, onClose }) => {
     {
       title: "Welcome to Traffic Simulator",
       content: (
-        <div className="text-center">
-          <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <Network className="w-8 h-8 text-blue-600" />
+        <div className="onboarding-welcome-content">
+          <div className="onboarding-icon-blue onboarding-icon-large">
+            <Network className="onboarding-icon-svg-large" />
           </div>
-          <p className="text-gray-600 mb-4">
-            Welcome to the Traffic Simulator web application! This tool allows you to create, 
-            configure, and analyze traffic simulations using SUMO (Simulation of Urban MObility).
+          <p className="onboarding-text-primary onboarding-text-mb">
+            Welcome to the Traffic Simulator web application! This tool integrates with SUMO 
+            (Simulation of Urban MObility) to provide a complete traffic simulation experience 
+            with real-time monitoring and comprehensive analytics.
           </p>
-          <p className="text-gray-600">
-            Let's take a quick tour to get you started with traffic simulation.
+          <p className="onboarding-text-primary">
+            Let's walk through the simulation workflow to get you started with traffic analysis.
           </p>
         </div>
       )
     },
     {
-      title: "Home Page",
+      title: "Configuration Setup",
       content: (
-        <div>
-          <div className="flex items-center mb-4">
-            <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mr-3">
-              <Home className="w-5 h-5 text-blue-600" />
+        <div className="onboarding-step-content">
+          <div className="onboarding-step-header">
+            <div className="onboarding-icon-blue onboarding-icon-small">
+              <Settings className="onboarding-icon-svg-small" />
             </div>
-            <h3 className="text-lg font-semibold">Project Introduction</h3>
+            <h3 className="onboarding-step-title">Start Simulating - Configuration First</h3>
           </div>
-          <p className="text-gray-600 mb-4">
-            The home page provides an overview of the traffic simulation project, 
-            explaining the integration between SUMO and this web application.
+          <p className="onboarding-text-primary onboarding-text-mb">
+            Begin your simulation by configuring essential SUMO parameters. This configuration-first 
+            approach ensures your settings are applied correctly to your chosen network.
           </p>
-          <ul className="text-gray-600 space-y-2">
-            <li>• Learn about traffic simulation benefits</li>
-            <li>• Understand the SUMO integration</li>
-            <li>• Access quick start guides</li>
-            <li>• Check system requirements</li>
+          <ul className="onboarding-list">
+            <li>Set simulation duration (begin/end time)</li>
+            <li>Configure time step and teleport settings</li>
+            <li>Choose vehicle types (passenger, bus, truck, motorcycle)</li>
+            <li>Set traffic control (fixed timing or adaptive signals)</li>
+            <li>Adjust traffic intensity and volume</li>
           </ul>
         </div>
       )
@@ -68,87 +70,70 @@ const OnboardingModal = ({ onComplete, onClose }) => {
     {
       title: "Network Selection",
       content: (
-        <div>
-          <div className="flex items-center mb-4">
-            <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center mr-3">
-              <Network className="w-5 h-5 text-green-600" />
+        <div className="onboarding-step-content">
+          <div className="onboarding-step-header">
+            <div className="onboarding-icon-green onboarding-icon-small">
+              <Network className="onboarding-icon-svg-small" />
             </div>
-            <h3 className="text-lg font-semibold">Choose Your Network</h3>
+            <h3 className="onboarding-step-title">Choose Your Traffic Network</h3>
           </div>
-          <p className="text-gray-600 mb-4">
-            Select from predefined traffic networks or upload your own SUMO network files.
+          <p className="onboarding-text-primary onboarding-text-mb">
+            Select from available Filipino traffic networks. Your configuration will be applied 
+            to the selected network automatically.
           </p>
-          <ul className="text-gray-600 space-y-2">
-            <li>• Browse available network templates</li>
-            <li>• View network previews and details</li>
-            <li>• Upload custom network files</li>
-            <li>• Validate network compatibility</li>
+          <ul className="onboarding-list">
+            <li>Browse predefined networks (Jollibee Molino, SM Bacoor, etc.)</li>
+            <li>View network details and metadata</li>
+            <li>Networks are copied to your session folder</li>
+            <li>Configuration parameters are applied automatically</li>
           </ul>
         </div>
       )
     },
     {
-      title: "Configuration",
+      title: "Live Simulation",
       content: (
-        <div>
-          <div className="flex items-center mb-4">
-            <div className="w-10 h-10 bg-yellow-100 rounded-lg flex items-center justify-center mr-3">
-              <Settings className="w-5 h-5 text-yellow-600" />
+        <div className="onboarding-step-content">
+          <div className="onboarding-step-header">
+            <div className="onboarding-icon-purple onboarding-icon-small">
+              <Play className="onboarding-icon-svg-small" />
             </div>
-            <h3 className="text-lg font-semibold">Simulation Setup</h3>
+            <h3 className="onboarding-step-title">Run & Monitor Simulation</h3>
           </div>
-          <p className="text-gray-600 mb-4">
-            Configure simulation parameters to customize your traffic scenario.
+          <p className="onboarding-text-primary onboarding-text-mb">
+            Launch SUMO with your configured parameters and monitor the simulation in real-time 
+            through the web interface.
           </p>
-          <ul className="text-gray-600 space-y-2">
-            <li>• Set simulation duration and time step</li>
-            <li>• Configure vehicle types and flows</li>
-            <li>• Adjust traffic generation parameters</li>
-            <li>• Define measurement areas</li>
+          <ul className="onboarding-list">
+            <li>Start/pause/stop simulation controls</li>
+            <li>Real-time vehicle statistics and metrics</li>
+            <li>Live SUMO GUI integration with zoom controls</li>
+            <li>WebSocket connection for instant data updates</li>
+            <li>Session management and auto-save functionality</li>
           </ul>
         </div>
       )
     },
     {
-      title: "Simulation Control",
+      title: "Analytics & Insights",
       content: (
-        <div>
-          <div className="flex items-center mb-4">
-            <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center mr-3">
-              <Play className="w-5 h-5 text-purple-600" />
+        <div className="onboarding-step-content">
+          <div className="onboarding-step-header">
+            <div className="onboarding-icon-red onboarding-icon-small">
+              <BarChart3 className="onboarding-icon-svg-small" />
             </div>
-            <h3 className="text-lg font-semibold">Run Your Simulation</h3>
+            <h3 className="onboarding-step-title">Comprehensive Analytics</h3>
           </div>
-          <p className="text-gray-600 mb-4">
-            Launch and monitor your traffic simulation in real-time with live visualization.
+          <p className="onboarding-text-primary onboarding-text-mb">
+            Analyze simulation results with detailed dashboards, charts, and comparison tools 
+            for traffic optimization insights.
           </p>
-          <ul className="text-gray-600 space-y-2">
-            <li>• Start/stop simulation control</li>
-            <li>• Real-time 2D map visualization</li>
-            <li>• Live vehicle position tracking</li>
-            <li>• Interactive simulation monitoring</li>
-          </ul>
-        </div>
-      )
-    },
-    {
-      title: "Analytics & Results",
-      content: (
-        <div>
-          <div className="flex items-center mb-4">
-            <div className="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center mr-3">
-              <BarChart3 className="w-5 h-5 text-red-600" />
-            </div>
-            <h3 className="text-lg font-semibold">Analyze Results</h3>
-          </div>
-          <p className="text-gray-600 mb-4">
-            Review simulation results with comprehensive analytics and visualizations.
-          </p>
-          <ul className="text-gray-600 space-y-2">
-            <li>• Traffic flow statistics</li>
-            <li>• Vehicle density metrics</li>
-            <li>• Performance charts and graphs</li>
-            <li>• Export data for further analysis</li>
+          <ul className="onboarding-list">
+            <li>KPI dashboard with key traffic metrics</li>
+            <li>Interactive charts and visualizations</li>
+            <li>Session comparison and trend analysis</li>
+            <li>Traffic recommendations and optimization suggestions</li>
+            <li>PDF report export functionality</li>
           </ul>
         </div>
       )
@@ -156,22 +141,23 @@ const OnboardingModal = ({ onComplete, onClose }) => {
     {
       title: "Getting Started",
       content: (
-        <div className="text-center">
-          <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <CheckCircle className="w-8 h-8 text-green-600" />
+        <div className="onboarding-welcome-content">
+          <div className="onboarding-icon-green onboarding-icon-large">
+            <CheckCircle className="onboarding-icon-svg-large" />
           </div>
-          <h3 className="text-lg font-semibold mb-4">You're Ready to Start!</h3>
-          <p className="text-gray-600 mb-4">
-            You now know the basics of using the Traffic Simulator. Here are some tips to get started:
+          <h3 className="onboarding-final-title">Ready to Simulate Traffic!</h3>
+          <p className="onboarding-text-primary onboarding-text-mb">
+            You're now ready to start creating traffic simulations. Follow the configuration-first 
+            workflow for best results.
           </p>
-          <div className="bg-blue-50 p-4 rounded-lg text-left">
-            <h4 className="font-medium text-blue-900 mb-2">Quick Start Tips:</h4>
-            <ul className="text-blue-800 text-sm space-y-1">
-              <li>• Start with a sample network to familiarize yourself</li>
-              <li>• Use default configuration settings for your first simulation</li>
-              <li>• Monitor the real-time visualization during simulation</li>
-              <li>• Check the analytics page for detailed results</li>
-              <li>• Make sure SUMO is installed on your system</li>
+          <div className="onboarding-tips-box">
+            <h4 className="onboarding-tips-title">Quick Start Tips:</h4>
+            <ul className="onboarding-tips-list">
+              <li>Always start with "Start Simulating" to configure parameters first</li>
+              <li>Use default settings for your first simulation</li>
+              <li>Monitor the real-time statistics during simulation</li>
+              <li>Check Analytics after completion for detailed insights</li>
+              <li>Ensure SUMO is installed and WebSocket connection is active</li>
             </ul>
           </div>
         </div>
@@ -200,73 +186,75 @@ const OnboardingModal = ({ onComplete, onClose }) => {
   const currentStepData = onboardingSteps[currentStep];
   
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div className="bg-primary rounded-xl max-w-2xl w-full max-h-screen overflow-y-auto">
-        {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b">
-          <div className="flex items-center space-x-3">
-            <h2 className="text-xl font-bold text-gray-900">
-              {currentStepData.title}
-            </h2>
-            <span className="text-sm text-gray-500">
-              Step {currentStep + 1} of {onboardingSteps.length}
-            </span>
-          </div>
-          <button
-            onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 transition-colors"
-          >
-            <X className="w-6 h-6" />
-          </button>
-        </div>
-        
-        {/* Progress bar */}
-        <div className="px-6 pt-4">
-          <div className="progress-bar">
-            <div 
-              className="progress-bar-fill"
-              style={{ width: `${((currentStep + 1) / onboardingSteps.length) * 100}%` }}
-            ></div>
-          </div>
-        </div>
-        
-        {/* Content */}
-        <div className="p-6">
-          {currentStepData.content}
-        </div>
-        
-        {/* Footer */}
-        <div className="flex items-center justify-between p-6 border-t bg-gray-50">
-          <div className="flex space-x-2">
+    <div className="onboarding-modal-backdrop">
+      <div className="onboarding-modal-container">
+        <div className="onboarding-modal-content">
+          {/* Header */}
+          <div className="onboarding-modal-header">
+            <div className="onboarding-header-content">
+              <h2 className="onboarding-modal-title">
+                {currentStepData.title}
+              </h2>
+              <span className="onboarding-step-counter">
+                Step {currentStep + 1} of {onboardingSteps.length}
+              </span>
+            </div>
             <button
-              onClick={handleSkip}
-              className="text-gray-600 hover:text-gray-800 transition-colors"
+              onClick={onClose}
+              className="onboarding-close-btn"
             >
-              Skip Tour
+              <X className="onboarding-close-icon" />
             </button>
           </div>
           
-          <div className="flex space-x-3">
-            <button
-              onClick={handlePrevious}
-              disabled={currentStep === 0}
-              className="flex items-center space-x-1 px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-            >
-              <ChevronLeft className="w-4 h-4" />
-              <span>Previous</span>
-            </button>
+          {/* Progress bar */}
+          <div className="onboarding-progress-container">
+            <div className="progress-bar">
+              <div 
+                className="progress-bar-fill onboarding-progress-fill"
+                data-progress={((currentStep + 1) / onboardingSteps.length) * 100}
+              ></div>
+            </div>
+          </div>
+          
+          {/* Content */}
+          <div className="onboarding-content">
+            {currentStepData.content}
+          </div>
+          
+          {/* Footer */}
+          <div className="onboarding-modal-footer">
+            <div className="onboarding-footer-left">
+              <button
+                onClick={handleSkip}
+                className="onboarding-skip-btn"
+              >
+                Skip Tour
+              </button>
+            </div>
             
-            <button
-              onClick={handleNext}
-              className="flex items-center space-x-1 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-            >
-              <span>
-                {currentStep === onboardingSteps.length - 1 ? 'Get Started' : 'Next'}
-              </span>
-              {currentStep !== onboardingSteps.length - 1 && (
-                <ChevronRight className="w-4 h-4" />
-              )}
-            </button>
+            <div className="onboarding-footer-right">
+              <button
+                onClick={handlePrevious}
+                disabled={currentStep === 0}
+                className="onboarding-btn-secondary"
+              >
+                <ChevronLeft className="onboarding-btn-icon" />
+                <span>Previous</span>
+              </button>
+              
+              <button
+                onClick={handleNext}
+                className="onboarding-btn-primary"
+              >
+                <span>
+                  {currentStep === onboardingSteps.length - 1 ? 'Get Started' : 'Next'}
+                </span>
+                {currentStep !== onboardingSteps.length - 1 && (
+                  <ChevronRight className="onboarding-btn-icon" />
+                )}
+              </button>
+            </div>
           </div>
         </div>
       </div>
