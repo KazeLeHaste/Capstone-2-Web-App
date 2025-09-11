@@ -7173,3 +7173,428 @@ select option {
 .text-error {
   color: var(--error-text) !important;
 }
+
+/* ===========================
+   Onboarding Modal Styles
+   =========================== */
+
+/* Modal backdrop and positioning - PERFECT CENTERING */
+.onboarding-modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  z-index: 50;
+}
+
+/* Modal container - PERFECT CENTERING */
+.onboarding-modal-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
+
+.onboarding-modal-content {
+  background-color: var(--bg-primary);
+  border-radius: 0.75rem;
+  box-shadow: var(--shadow-lg);
+  max-width: 42rem; /* 672px */
+  width: 100%;
+  max-height: 90vh;
+  max-height: 90dvh; /* Dynamic viewport height */
+  overflow-y: auto;
+  position: relative;
+}
+
+/* Dark mode specific modal background */
+html.dark .onboarding-modal-content {
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+}
+
+/* Modal header improvements */
+.onboarding-modal-header {
+  border-bottom: 1px solid var(--border-color);
+  background-color: var(--bg-primary);
+  display: flex;
+  align-items: center;
+  justify-content: between;
+  padding: 1.5rem;
+}
+
+html.dark .onboarding-modal-header {
+  background-color: var(--bg-secondary);
+  border-bottom-color: var(--border-color);
+}
+
+.onboarding-header-content {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex: 1;
+}
+
+.onboarding-modal-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.onboarding-step-counter {
+  font-size: 0.875rem;
+  color: var(--text-muted);
+}
+
+.onboarding-close-btn {
+  color: var(--text-muted);
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: color var(--transition-fast);
+  padding: 0.5rem;
+  margin: -0.5rem;
+}
+
+.onboarding-close-btn:hover {
+  color: var(--text-secondary);
+}
+
+.onboarding-close-icon {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+/* Progress bar container */
+.onboarding-progress-container {
+  padding: 1rem 1.5rem 0;
+}
+
+/* Progress bar fill with dynamic width based on data attribute */
+.onboarding-progress-fill[data-progress="14.285714285714286"] { width: 14.285714285714286%; }
+.onboarding-progress-fill[data-progress="28.571428571428573"] { width: 28.571428571428573%; }
+.onboarding-progress-fill[data-progress="42.857142857142854"] { width: 42.857142857142854%; }
+.onboarding-progress-fill[data-progress="57.14285714285714"] { width: 57.14285714285714%; }
+.onboarding-progress-fill[data-progress="71.42857142857143"] { width: 71.42857142857143%; }
+.onboarding-progress-fill[data-progress="85.71428571428571"] { width: 85.71428571428571%; }
+.onboarding-progress-fill[data-progress="100"] { width: 100%; }
+
+/* Content section */
+.onboarding-content {
+  padding: 1.5rem;
+}
+
+/* Modal footer improvements */
+.onboarding-modal-footer {
+  border-top: 1px solid var(--border-color);
+  background-color: var(--bg-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.5rem;
+}
+
+html.dark .onboarding-modal-footer {
+  background-color: var(--bg-tertiary);
+  border-top-color: var(--border-color);
+}
+
+.onboarding-footer-left {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.onboarding-footer-right {
+  display: flex;
+  gap: 0.75rem;
+}
+
+/* Content layout classes */
+.onboarding-welcome-content {
+  text-align: center;
+}
+
+.onboarding-step-content {
+  /* No special styling needed */
+}
+
+.onboarding-step-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1rem;
+  gap: 0.75rem;
+}
+
+.onboarding-step-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.onboarding-final-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 1rem 0;
+}
+
+/* Text classes */
+.onboarding-text-primary {
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.onboarding-text-mb {
+  margin-bottom: 1rem;
+}
+
+/* List improvements - remove redundant bullets and improve spacing */
+.onboarding-list {
+  list-style-type: disc;
+  padding-left: 1.25rem;
+  margin: 0;
+  color: var(--text-secondary);
+}
+
+.onboarding-list li {
+  position: relative;
+  padding-left: 0;
+  margin-bottom: 0.5rem;
+  line-height: 1.5;
+}
+
+/* Icon sizing and positioning */
+.onboarding-icon-large {
+  width: 4rem;
+  height: 4rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1rem;
+}
+
+.onboarding-icon-small {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.onboarding-icon-svg-large {
+  width: 2rem;
+  height: 2rem;
+}
+
+.onboarding-icon-svg-small {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+/* Quick tips box improvements */
+.onboarding-tips-box {
+  background-color: var(--bg-info);
+  border: 1px solid var(--border-info);
+  color: var(--text-info);
+  padding: 1rem;
+  border-radius: 0.5rem;
+  text-align: left;
+}
+
+html.dark .onboarding-tips-box {
+  background-color: var(--info-bg);
+  border-color: var(--info-border);
+  color: var(--info-text);
+}
+
+.onboarding-tips-title {
+  color: var(--text-info);
+  font-weight: 500;
+  margin: 0 0 0.5rem 0;
+}
+
+html.dark .onboarding-tips-title {
+  color: var(--info-text);
+}
+
+.onboarding-tips-list {
+  color: var(--text-info);
+  font-size: 0.875rem;
+  list-style-type: disc;
+  padding-left: 1.25rem;
+  margin: 0;
+}
+
+html.dark .onboarding-tips-list {
+  color: var(--info-text);
+}
+
+.onboarding-tips-list li {
+  list-style-type: disc;
+  margin-bottom: 0.25rem;
+  line-height: 1.4;
+}
+
+/* Button improvements for better dark mode support */
+.onboarding-btn-primary {
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.5rem 1.5rem;
+  border-radius: 0.5rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color var(--transition-fast);
+}
+
+.onboarding-btn-primary:hover {
+  background-color: var(--primary-hover);
+}
+
+.onboarding-btn-secondary {
+  background-color: transparent;
+  color: var(--text-secondary);
+  border: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.onboarding-btn-secondary:hover {
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
+}
+
+.onboarding-btn-secondary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.onboarding-btn-secondary:disabled:hover {
+  background-color: transparent;
+  color: var(--text-secondary);
+}
+
+.onboarding-btn-icon {
+  width: 1rem;
+  height: 1rem;
+  flex-shrink: 0;
+}
+
+.onboarding-skip-btn {
+  color: var(--text-secondary);
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: color var(--transition-fast);
+  font-weight: 500;
+}
+
+.onboarding-skip-btn:hover {
+  color: var(--text-primary);
+}
+
+/* Icon backgrounds with better dark mode support */
+.onboarding-icon-blue {
+  background-color: var(--color-primary-50);
+  color: var(--color-primary-600);
+}
+
+html.dark .onboarding-icon-blue {
+  background-color: rgba(59, 130, 246, 0.1);
+  color: var(--color-primary-600);
+}
+
+.onboarding-icon-green {
+  background-color: rgba(34, 197, 94, 0.1);
+  color: #059669;
+}
+
+html.dark .onboarding-icon-green {
+  background-color: rgba(34, 197, 94, 0.1);
+  color: #34d399;
+}
+
+.onboarding-icon-yellow {
+  background-color: rgba(245, 158, 11, 0.1);
+  color: #d97706;
+}
+
+html.dark .onboarding-icon-yellow {
+  background-color: rgba(245, 158, 11, 0.1);
+  color: #fbbf24;
+}
+
+.onboarding-icon-purple {
+  background-color: rgba(147, 51, 234, 0.1);
+  color: #7c3aed;
+}
+
+html.dark .onboarding-icon-purple {
+  background-color: rgba(147, 51, 234, 0.1);
+  color: #a855f7;
+}
+
+.onboarding-icon-red {
+  background-color: rgba(239, 68, 68, 0.1);
+  color: #dc2626;
+}
+
+html.dark .onboarding-icon-red {
+  background-color: rgba(239, 68, 68, 0.1);
+  color: #f87171;
+}
+
+/* Responsive improvements for mobile devices */
+@media (max-width: 640px) {
+  .onboarding-modal-backdrop {
+    padding: 0.5rem;
+  }
+  
+  .onboarding-modal-content {
+    max-height: 95vh;
+    max-height: 95dvh;
+    border-radius: 0.5rem;
+  }
+  
+  .onboarding-content,
+  .onboarding-modal-header,
+  .onboarding-modal-footer {
+    padding: 1rem;
+  }
+  
+  .onboarding-progress-container {
+    padding: 0.75rem 1rem 0;
+  }
+  
+  .onboarding-footer-right {
+    gap: 0.5rem;
+  }
+  
+  .onboarding-btn-primary,
+  .onboarding-btn-secondary {
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+  }
+}
