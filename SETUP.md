@@ -29,17 +29,25 @@ Before running the Traffic Simulator, ensure you have the following installed:
 
 ## Quick Start Guide
 
-### 1. Backend Setup (Flask)
+### 1. Backend Setup (Flask + SQLite)
 
 ```bash
 # Navigate to backend directory
 cd backend
 
-# Install Python dependencies (already done via VS Code)
-# The virtual environment is located at: .venv/Scripts/python.exe
+# Activate virtual environment (if not already active)
+# Windows:
+.\.venv\Scripts\activate
+# Linux/Mac:
+source .venv/bin/activate
+
+# Install Python dependencies
+pip install -r requirements.txt
 
 # Verify SUMO installation
 sumo --help
+
+# The SQLite database (traffic_simulator.db) will be created automatically on first run
 ```
 
 ### 2. Frontend Setup (React)
@@ -51,36 +59,59 @@ cd frontend
 # Install Node.js dependencies
 npm install
 
-# Start development server
+# Start development server (with proxy to backend)
 npm start
 ```
 
 ### 3. Running the Application
 
 #### Method 1: Using VS Code Tasks (Recommended)
-1. Press `Ctrl+Shift+P` (Windows) or `Cmd+Shift+P` (Mac)
-2. Type "Tasks: Run Task"
-3. Select "Start Traffic Simulator"
+VS Code tasks are configured for this project:
+- **Start Backend Server**: Runs Flask app with database initialization
+- **Start Frontend Server**: Runs React development server with hot reload
+- **Install Frontend Dependencies**: Runs npm install in frontend directory
+
+Access via: `Ctrl+Shift+P` → "Tasks: Run Task" → Select desired task
 
 #### Method 2: Manual Startup
 
-**Terminal 1 - Backend:**
+**Terminal 1 - Backend (Flask + SQLite):**
 ```bash
 cd backend
-.venv\Scripts\python.exe app.py
+# Ensure virtual environment is activated
+.\.venv\Scripts\python.exe app.py
 ```
 
-**Terminal 2 - Frontend:**
+**Terminal 2 - Frontend (React):**
 ```bash
 cd frontend
 npm start
+```
+
+#### Method 3: Production Build
+```bash
+# Build optimized frontend
+cd frontend
+npm run build
+
+# Serve built frontend (optional - Flask can serve static files)
+npx serve -s build -l 3000
 ```
 
 ### 4. Access the Application
 
 - **Frontend (React)**: http://localhost:3000
 - **Backend API**: http://localhost:5000
-- **WebSocket**: ws://localhost:5000
+- **WebSocket**: ws://localhost:5000/socket.io/
+- **Database**: SQLite file at `backend/traffic_simulator.db`
+
+### 5. Application Workflow
+
+1. **Home Page** (http://localhost:3000) - System status and onboarding
+2. **Configuration** → Set SUMO parameters (timing, vehicles, traffic control)
+3. **Network Selection** → Choose from 6 Philippine traffic scenarios
+4. **Simulation** → Launch SUMO with real-time monitoring
+5. **Analytics** → View KPIs, charts, and AI recommendations
 
 ## Troubleshooting
 
@@ -125,8 +156,27 @@ npm install
 
 **Solution**:
 - Ensure backend is running before starting frontend
-- Check firewall settings
-- Verify both applications are using correct ports
+- Check firewall settings for ports 3000 and 5000
+- Verify Flask-SocketIO is properly configured
+- Check browser console for WebSocket connection errors
+
+#### 6. Database Issues
+**Error**: SQLite database errors or session data missing
+
+**Solution**:
+- Database is created automatically on first backend startup
+- Delete `backend/traffic_simulator.db` to reset database
+- Check file permissions in backend directory
+- Ensure SQLAlchemy version compatibility (2.0+)
+
+#### 7. Multi-Session Conflicts
+**Error**: Sessions interfering with each other
+
+**Solution**:
+- Each session uses unique ports (8813, 8814, etc.)
+- Check `backend/sessions/` directory for session isolation
+- Restart backend to clear stuck sessions
+- Ensure adequate system resources for concurrent simulations
 
 ### Windows-Specific Notes
 
@@ -170,22 +220,41 @@ npm install
 
 ```
 traffic-simulator/
-├── backend/                 # Flask API server
-│   ├── app.py              # Main Flask application
-│   ├── sumo_controller.py  # SUMO integration
-│   ├── websocket_handler.py# Real-time communication
-│   └── requirements.txt    # Python dependencies
-├── frontend/               # React web application
+├── backend/                        # Flask backend with database
+│   ├── app.py                     # Main Flask app (1544 lines) - comprehensive API
+│   ├── enhanced_session_manager.py# Multi-session support (553 lines)
+│   ├── simulation_manager.py      # Core workflow logic (3048 lines)
+│   ├── analytics_engine.py        # KPI analysis (855 lines)
+│   ├── sumo_controller.py         # SUMO/TraCI integration (318 lines)
+│   ├── websocket_handler.py       # Real-time communication
+│   ├── multi_session_api.py       # V2 API endpoints
+│   ├── traffic_simulator.db       # SQLite database (auto-created)
+│   ├── requirements.txt           # Python dependencies
+│   ├── database/                  # Database layer
+│   │   ├── models.py              # 8 SQLAlchemy models
+│   │   └── service.py             # Database operations (632 lines)
+│   ├── networks/                  # Philippine traffic scenarios
+│   │   ├── jollibee_molino/       # Complete SUMO network + metadata
+│   │   ├── sm_bacoor_area/        # Complete SUMO network + metadata
+│   │   ├── sm_molino_area/        # Complete SUMO network + metadata
+│   │   ├── pag_asa_area/          # Complete SUMO network + metadata  
+│   │   ├── st_dominic_area/       # Complete SUMO network + metadata
+│   │   └── statesfield_area/      # Complete SUMO network + metadata
+│   └── sessions/                  # Dynamic session directories
+├── frontend/                      # Modern React application
 │   ├── src/
-│   │   ├── components/     # Reusable React components
-│   │   ├── pages/         # Main page components
-│   │   ├── utils/         # Helper functions
-│   │   └── App.js         # Main application
-│   └── package.json       # Node.js dependencies
-├── sumo_data/             # SUMO simulation files
-│   ├── networks/          # Network definitions (.net.xml)
-│   └── scenarios/         # Simulation scenarios (.sumocfg)
-└── README.md              # This documentation
+│   │   ├── components/           # 11 React components
+│   │   ├── pages/               # 5 main pages (workflow-based)
+│   │   ├── contexts/            # React context providers
+│   │   └── utils/              # API clients and helpers
+│   ├── package.json            # Dependencies (React 18, Socket.io, Charts)
+│   └── public/                 # Static assets
+├── osm_importer/               # Network import utility
+│   ├── osm_scenario_importer.py# Tool for importing new OSM networks
+│   └── osm_scenarios/          # Staging for new imports
+├── .venv/                      # Python virtual environment
+├── README.md                   # Updated project documentation
+└── SETUP.md                   # This detailed setup guide
 ```
 
 ## Getting Help
@@ -202,10 +271,22 @@ If you encounter issues:
 
 Once you have the application running:
 
-1. **Take the Onboarding Tour**: Click "Take the Tour" on the home page
-2. **Try Sample Simulation**: Use the predefined network and scenario
-3. **Explore Features**: Test each section (Network → Configuration → Simulation → Analytics)
-4. **Customize**: Modify configurations and observe changes
-5. **Export Data**: Test the analytics export functionality
+1. **System Check**: Verify backend and SUMO status on home page (http://localhost:3000)
+2. **Onboarding Tour**: Click "Take the Tour" for guided workflow explanation
+3. **Configuration First**: Start at /configuration to set SUMO parameters
+4. **Network Selection**: Choose from 6 Philippine traffic scenarios (/network-selection)
+5. **Live Simulation**: Launch and monitor simulation with real-time data (/simulation)
+6. **Analytics Dashboard**: View comprehensive KPIs and AI recommendations (/analytics)
+7. **Multi-Session Testing**: Try running multiple concurrent simulations
+8. **Data Export**: Test PDF report generation and data downloads
+
+### Key Features to Test:
+
+- **Real-time Updates**: WebSocket data streaming during simulation
+- **Traffic Control**: Fixed timer vs adaptive traffic light configurations  
+- **Vehicle Types**: Enable/disable different vehicle categories
+- **Session Isolation**: Multiple simulations running simultaneously
+- **Database Persistence**: Session data stored and retrievable
+- **Analytics Engine**: KPI calculations and recommendation generation
 
 Happy simulating! 🚗📊
