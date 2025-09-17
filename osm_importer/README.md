@@ -2,6 +2,16 @@
 
 This module handles importing OSM Web Wizard generated scenarios into the traffic simulator web application, preserving realistic traffic patterns while enabling configuration overlays.
 
+## Recent Changes (Solution 1: Preserve Original Files)
+
+**September 2025 Update**: The importer now prioritizes preserving original OSM Web Wizard files for realistic traffic simulation:
+
+- **Prioritizes `.trips.xml` files** over `.rou.xml` files to maintain original timing patterns
+- **Preserves realistic vehicle spawning/despawning** at edge roads as intended by OSM Web Wizard
+- **Maintains proper traffic flow diversity** with realistic lane usage and vehicle variety
+- **Route enhancement is optional** and warns about potential impact on realism
+- **Better vehicle movement patterns** compared to processed/enhanced route files
+
 ## Directory Structure
 
 ```

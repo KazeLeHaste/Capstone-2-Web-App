@@ -37,6 +37,57 @@ except ImportError:
     print("Warning: TraCI not available. Live data collection will be disabled.")
     TRACI_AVAILABLE = False
 
+def find_network_file(directory: Path, network_id: str) -> Optional[Path]:
+    """
+    Find the correct network file (compressed or uncompressed) in a directory
+    
+    Args:
+        directory: Directory to search in
+        network_id: Network identifier (without extension)
+        
+    Returns:
+        Path to the network file (with correct extension) or None if not found
+    """
+    # Check for compressed version first (preferred for OSM scenarios)
+    compressed_path = directory / f"{network_id}.net.xml.gz"
+    if compressed_path.exists():
+        return compressed_path
+    
+    # Check for uncompressed version
+    uncompressed_path = directory / f"{network_id}.net.xml"
+    if uncompressed_path.exists():
+        return uncompressed_path
+    
+    return None
+
+def get_network_filename(network_id: str, is_compressed: bool = False) -> str:
+    """
+    Get the correct network filename based on compression status
+    
+    Args:
+        network_id: Network identifier
+        is_compressed: Whether the network file should be compressed
+        
+    Returns:
+        Complete filename with correct extension
+    """
+    return f"{network_id}.net.xml.gz" if is_compressed else f"{network_id}.net.xml"
+
+def glob_network_files(directory: Path) -> List[Path]:
+    """
+    Find all network files (both compressed and uncompressed) in a directory
+    
+    Args:
+        directory: Directory to search in
+        
+    Returns:
+        List of network file paths
+    """
+    network_files = []
+    network_files.extend(directory.glob("*.net.xml"))
+    network_files.extend(directory.glob("*.net.xml.gz"))
+    return network_files
+
 class SimulationManager:
     def __init__(self, base_networks_dir: str = "networks", websocket_handler=None, db_service=None):
         """
@@ -153,73 +204,84 @@ class SimulationManager:
         try:
             networks = []
             
-            # Scan for .net.xml files in the networks directory
-            for network_file in self.base_networks_dir.glob("**/*.net.xml"):
-                try:
-                    # Parse network file to get basic info
-                    tree = ET.parse(network_file)
-                    root = tree.getroot()
-                    
-                    # Count edges and junctions
-                    edges = len([e for e in root.findall(".//edge") if not e.get('function')])
-                    junctions = len(root.findall('.//junction[@type!="internal"]'))
-                    lanes = len(root.findall(".//lane"))
-                    
-                    # Get file info
-                    stat = network_file.stat()
-                    
-                    # Check if this is an OSM scenario
-                    network_dir = network_file.parent
-                    metadata_file = network_dir / "metadata.json"
-                    is_osm_scenario = False
-                    vehicle_types = []
-                    osm_metadata = {}
-                    
-                    if metadata_file.exists():
-                        try:
-                            with open(metadata_file, 'r') as f:
-                                osm_metadata = json.load(f)
-                                is_osm_scenario = osm_metadata.get('is_osm_scenario', False)
-                                vehicle_types = osm_metadata.get('vehicle_types', [])
-                        except Exception:
-                            pass
-                    
-                    # Check for OSM route files (legacy detection)
-                    if not is_osm_scenario:
-                        osm_routes = self._find_osm_route_files(network_file.stem)
-                        has_osm_routes = len(osm_routes) > 0
-                        if has_osm_routes:
-                            vehicle_types = self._extract_vehicle_types_from_routes(osm_routes)
-                    else:
-                        has_osm_routes = True
-                    
-                    # Build description
-                    description = f"SUMO network with {edges} edges and {junctions} junctions"
-                    if is_osm_scenario:
-                        description = f"OSM scenario: {description}"
-                    
-                    network_info = {
-                        "id": network_file.stem,
-                        "name": network_file.stem.replace("_", " ").title(),
-                        "path": str(network_file),
-                        "description": description,
-                        "edges": edges,
-                        "junctions": junctions,
-                        "lanes": lanes,
-                        "fileSize": f"{stat.st_size / 1024:.1f} KB",
-                        "lastModified": datetime.fromtimestamp(stat.st_mtime).strftime("%Y-%m-%d %H:%M"),
-                        "isOsmScenario": is_osm_scenario,
-                        "hasRealisticTraffic": is_osm_scenario,
-                        "vehicleTypes": vehicle_types,
-                        "routeSource": "OSM Web Wizard" if has_osm_routes else "Generated",
-                        "metadata": osm_metadata
-                    }
-                    
-                    networks.append(network_info)
-                    
-                except Exception as e:
-                    print(f"Error parsing network file {network_file}: {e}")
-                    continue
+            # Scan for both compressed and uncompressed network files
+            network_patterns = ["**/*.net.xml", "**/*.net.xml.gz"]
+            for pattern in network_patterns:
+                for network_file in self.base_networks_dir.glob(pattern):
+                    try:
+                        # Parse network file to get basic info (handle compression)
+                        if network_file.suffix == '.gz':
+                            import gzip
+                            with gzip.open(network_file, 'rt', encoding='utf-8') as f:
+                                content = f.read()
+                            root = ET.fromstring(content)
+                        else:
+                            tree = ET.parse(network_file)
+                            root = tree.getroot()
+                        
+                        # Count edges and junctions
+                        edges = len([e for e in root.findall(".//edge") if not e.get('function')])
+                        junctions = len(root.findall('.//junction[@type!="internal"]'))
+                        lanes = len(root.findall(".//lane"))
+                        
+                        # Get file info
+                        stat = network_file.stat()
+                        
+                        # Check if this is an OSM scenario
+                        network_dir = network_file.parent
+                        metadata_file = network_dir / "metadata.json"
+                        is_osm_scenario = False
+                        vehicle_types = []
+                        osm_metadata = {}
+                        
+                        if metadata_file.exists():
+                            try:
+                                with open(metadata_file, 'r') as f:
+                                    osm_metadata = json.load(f)
+                                    is_osm_scenario = osm_metadata.get('is_osm_scenario', False)
+                                    vehicle_types = osm_metadata.get('vehicle_types', [])
+                            except Exception:
+                                pass
+                        
+                        # Check for OSM route files (legacy detection)
+                        if not is_osm_scenario:
+                            osm_routes = self._find_osm_route_files(network_file.stem)
+                            has_osm_routes = len(osm_routes) > 0
+                            if has_osm_routes:
+                                vehicle_types = self._extract_vehicle_types_from_routes(osm_routes)
+                        else:
+                            has_osm_routes = True
+                        
+                        # Build description
+                        description = f"SUMO network with {edges} edges and {junctions} junctions"
+                        if is_osm_scenario:
+                            description = f"OSM scenario: {description}"
+                        
+                        # Generate clean network ID by removing all network file extensions
+                        clean_id = network_file.name.replace('.net.xml.gz', '').replace('.net.xml', '')
+                        
+                        network_info = {
+                            "id": clean_id,
+                            "name": clean_id.replace("_", " ").title(),
+                            "path": str(network_file),
+                            "description": description,
+                            "edges": edges,
+                            "junctions": junctions,
+                            "lanes": lanes,
+                            "fileSize": f"{stat.st_size / 1024:.1f} KB",
+                            "lastModified": datetime.fromtimestamp(stat.st_mtime).strftime("%Y-%m-%d %H:%M"),
+                            "isOsmScenario": is_osm_scenario,
+                            "hasRealisticTraffic": is_osm_scenario,
+                            "vehicleTypes": vehicle_types,
+                            "routeSource": "OSM Web Wizard" if has_osm_routes else "Generated",
+                            "metadata": osm_metadata
+                        }
+                        
+                        networks.append(network_info)
+                        
+                    except Exception as e:
+                        print(f"Error parsing network file {network_file}: {e}")
+                        continue
             
             return {
                 "success": True,
@@ -273,16 +335,21 @@ class SimulationManager:
             session_dir = self.sessions_dir / session_id
             session_dir.mkdir(exist_ok=True)
             
-            network_dest = session_dir / f"{network_id}.net.xml"
-            
             # Check if we need to generate network programmatically or copy existing
             if network_path == "generated":
-                # Generate network based on config
+                # Generate network based on config (always uncompressed for generated networks)
+                network_dest = session_dir / f"{network_id}.net.xml"
                 self._generate_network_programmatically(network_dest, config)
                 is_osm_scenario = False
             else:
                 # Copy existing network files to session directory
                 network_source = Path(network_path)
+                
+                # Determine correct destination path based on source compression
+                if network_source.suffix == '.gz':
+                    network_dest = session_dir / f"{network_id}.net.xml.gz"
+                else:
+                    network_dest = session_dir / f"{network_id}.net.xml"
                 network_source_dir = network_source.parent
                 
                 # Check if this is an OSM scenario
@@ -319,7 +386,7 @@ class SimulationManager:
                 "config_applied": True,
                 "created_at": datetime.now().isoformat(),
                 "files": {
-                    "network": f"{network_id}.net.xml",
+                    "network": network_dest.name,
                     "routes": f"{network_id}.rou.xml" if not is_osm_scenario else "routes/",
                     "config": f"{network_id}.sumocfg",
                     "additional": f"{network_id}.add.xml"
@@ -377,11 +444,15 @@ class SimulationManager:
             config: Configuration to apply
         """
         try:
-            # Copy main network file
-            network_files = list(source_dir.glob("*.net.xml"))
+            # Copy main network file (preserve compression)
+            network_files = glob_network_files(source_dir)
             if network_files:
                 network_source = network_files[0]
-                network_dest = session_dir / f"{network_id}.net.xml"
+                # Preserve the original file extension (compressed or uncompressed)
+                if network_source.suffix == '.gz':
+                    network_dest = session_dir / f"{network_id}.net.xml.gz"
+                else:
+                    network_dest = session_dir / f"{network_id}.net.xml"
                 shutil.copy2(network_source, network_dest)
             
             # Copy routes directory with vehicle filtering FIRST
@@ -399,7 +470,7 @@ class SimulationManager:
                     enabled_vehicles = ['passenger']
                 
                 print(f"Enabled vehicle types: {enabled_vehicles}")
-                self._copy_and_filter_routes(routes_source_dir, routes_dest_dir, enabled_vehicles, config)
+                self._copy_and_filter_routes(routes_source_dir, routes_dest_dir, enabled_vehicles, config, is_osm_scenario=True)
             
             # Copy SUMO config file AFTER route files are in place
             config_files = list(source_dir.glob("*.sumocfg"))
@@ -439,29 +510,39 @@ class SimulationManager:
             tree = ET.parse(source_config)
             root = tree.getroot()
             
-            # Update network file reference
+            # Update network file reference (handle both compressed and uncompressed)
             net_input = root.find('.//net-file')
             if net_input is not None:
-                # Use the actual copied network filename
-                network_files = list(dest_config.parent.glob("*.net.xml"))
+                # Find the actual copied network file (compressed or uncompressed)
+                network_files = glob_network_files(dest_config.parent)
                 if network_files:
+                    # Use the first (and should be only) network file found
                     actual_network_filename = network_files[0].name
                     net_input.set('value', actual_network_filename)
                     print(f"Set network file reference to: {actual_network_filename}")
                 else:
+                    # Fallback to uncompressed format
                     net_input.set('value', f"{network_id}.net.xml")
             
-            # Update route files based on enabled vehicles - only include files that exist
+            # Update route files based on enabled vehicles - prioritize .trips.xml for realistic patterns
             enabled_vehicles = config.get('enabledVehicles', ['passenger', 'bus', 'truck', 'motorcycle'])
             route_files = []
             for vehicle_type in enabled_vehicles:
+                # Check for trips file first (better realism), then route file as fallback
+                trips_file = f"routes/osm.{vehicle_type}.trips.xml"
                 route_file = f"routes/osm.{vehicle_type}.rou.xml"
+                
+                trips_path = dest_config.parent / trips_file
                 route_path = dest_config.parent / route_file
-                if route_path.exists():
+                
+                if trips_path.exists():
+                    route_files.append(trips_file)
+                    print(f"Including trips file in config: {trips_file}")
+                elif route_path.exists():
                     route_files.append(route_file)
                     print(f"Including route file in config: {route_file}")
                 else:
-                    print(f"Route file not found, skipping: {route_file}")
+                    print(f"No route or trips file found for {vehicle_type}, skipping")
             
             route_input = root.find('.//route-files')
             if route_input is not None:
@@ -533,9 +614,9 @@ class SimulationManager:
                 return
             
             # Generate traffic light configurations
-            network_file = session_dir / f"{network_id}.net.xml"
-            if not network_file.exists():
-                print(f"DEBUG: Network file not found: {network_file}")
+            network_file = find_network_file(session_dir, network_id)
+            if not network_file or not network_file.exists():
+                print(f"DEBUG: Network file not found for network_id: {network_id}")
                 return
             
             tl_configs = self._generate_traffic_light_configs(network_file, traffic_control_config)
@@ -653,17 +734,64 @@ class SimulationManager:
             print(f"ERROR: Failed to update OSM config with additional file: {e}")
     
     def _copy_and_filter_routes(self, source_dir: Path, dest_dir: Path, 
-                              enabled_vehicles: List[str], config: Dict[str, Any]):
+                              enabled_vehicles: List[str], config: Dict[str, Any], is_osm_scenario: bool = None):
         """
-        Copy route files and apply vehicle type filtering
+        Copy route files and apply vehicle type filtering, preserving OSM Web Wizard route variety.
+        Prioritizes .trips.xml files for realistic traffic patterns.
         
         Args:
             source_dir: Source routes directory
             dest_dir: Destination routes directory
             enabled_vehicles: List of enabled vehicle types
             config: Configuration parameters
+            
+        Note:
+            This method now prioritizes .trips.xml files over .rou.xml files to maintain
+            the original OSM Web Wizard timing patterns and realistic vehicle behavior.
         """
         try:
+            # Check if this is an OSM scenario (has pre-generated varied routes)
+            if is_osm_scenario is None:
+                # Fall back to metadata file detection if not explicitly provided
+                session_dir = dest_dir.parent
+                metadata_file = session_dir / "session_metadata.json"  # Fixed: correct filename
+                is_osm_scenario = False
+                
+                if metadata_file.exists():
+                    try:
+                        with open(metadata_file, 'r') as f:
+                            metadata = json.load(f)
+                            is_osm_scenario = metadata.get('is_osm_scenario', False)
+                    except:
+                        pass
+            
+            # For OSM scenarios, preserve the original route variety instead of generating new routes
+            if is_osm_scenario:
+                print("🌟 Preserving OSM Web Wizard route variety...")
+                self._preserve_osm_route_variety(source_dir, dest_dir, enabled_vehicles, config)
+                return
+            
+            # For non-OSM scenarios, check if we should generate diverse routes
+            generate_diverse = config.get('generate_diverse_routes', True)  # Default to True for better analytics
+            
+            if generate_diverse and 'passenger' in enabled_vehicles:
+                print("🎯 Generating diverse routes for better traffic analytics...")
+                
+                # Find network file for route generation
+                network_files = glob_network_files(session_dir)
+                
+                if network_files:
+                    network_file = network_files[0]
+                    # Extract network_id properly (handle .net.xml.gz extension)
+                    network_id = network_file.name.replace('.net.xml.gz', '').replace('.net.xml', '')
+                    
+                    # Generate diverse routes for passenger vehicles
+                    self._generate_diverse_osm_routes(session_dir, network_id, config, enabled_vehicles)
+                    return
+                else:
+                    print("⚠️  Network file not found, falling back to copying existing routes")
+            
+            # Fallback: Copy existing routes (original behavior)
             traffic_density = config.get('trafficDensity', 1.0)
             
             # Copy and filter route files - only copy enabled vehicle types
@@ -708,6 +836,183 @@ class SimulationManager:
             for file in source_dir.iterdir():
                 if file.is_file():
                     shutil.copy2(file, dest_dir / file.name)
+    
+    def _generate_diverse_osm_routes(self, session_dir: Path, network_id: str, config: Dict[str, Any], enabled_vehicles: List[str]):
+        """
+        Generate diverse routes for OSM scenarios instead of using static routes
+        
+        Args:
+            session_dir: Session directory containing network file
+            network_id: Network identifier
+            config: Configuration parameters
+            enabled_vehicles: List of enabled vehicle types
+        """
+        try:
+            network_file = find_network_file(session_dir, network_id)
+            if not network_file:
+                raise FileNotFoundError(f"Network file not found for network_id: {network_id}")
+            routes_dir = session_dir / "routes"
+            routes_dir.mkdir(exist_ok=True)
+            
+            # Calculate vehicle count from config
+            vehicle_count = config.get('vehicles', 20)
+            traffic_scale = config.get('sumo_traffic_scale', 1.0)
+            simulation_time = config.get('simulationTime', 300)
+            
+            # Scale vehicle count based on simulation time and traffic scale
+            adjusted_count = max(int(vehicle_count * traffic_scale * (simulation_time / 300)), 5)
+            
+            print(f"🚗 Generating {adjusted_count} diverse vehicles for {simulation_time}s simulation")
+            
+            # Generate diverse routes for each enabled vehicle type
+            for vehicle_type in enabled_vehicles:
+                route_file = routes_dir / f"osm.{vehicle_type}.rou.xml"
+                
+                try:
+                    # Use enhanced randomTrips.py for this vehicle type
+                    import subprocess
+                    import os
+                    
+                    sumo_home = os.environ.get('SUMO_HOME', 'C:\\Program Files (x86)\\Eclipse\\Sumo')
+                    randomtrips_script = os.path.join(sumo_home, 'tools', 'randomTrips.py')
+                    
+                    if not os.path.exists(randomtrips_script):
+                        print(f"⚠️  randomTrips.py not found, falling back to simple generation for {vehicle_type}")
+                        self._create_simple_osm_route_file(route_file, vehicle_type, adjusted_count)
+                        continue
+                    
+                    # Enhanced parameters for realistic traffic
+                    # Convert paths to absolute strings to avoid subprocess path issues
+                    network_file_str = str(network_file.resolve())
+                    route_file_str = str(route_file.resolve())
+                    
+                    cmd = [
+                        "python", randomtrips_script,
+                        "-n", network_file_str,
+                        "-o", route_file_str,
+                        "--route-file", route_file_str,
+                        "--period", str(max(simulation_time / adjusted_count, 1.0)),  # Distribute over simulation time
+                        "--fringe-factor", "2.0",  # Reduce border concentration
+                        "--intermediate", "1",  # Add waypoints for longer routes
+                        "--min-distance", "200",  # Minimum trip distance
+                        "--max-distance", "2000",  # Maximum trip distance
+                        "--speed-exponent", "1.5",  # Weight by road importance
+                        "--lanes",  # Consider lane count
+                        "--random-factor", "0.3",  # Add randomness
+                        "--fringe-start-attributes", f'departSpeed="max" type="veh_{vehicle_type}"',
+                        "--trip-attributes", f'departLane="best" type="veh_{vehicle_type}"',
+                        "--validate",  # Ensure routes are valid
+                        "--begin", "0",
+                        "--end", str(simulation_time),
+                        "--seed", str(hash(network_id + vehicle_type) % 1000)  # Reproducible but different per type
+                    ]
+                    
+                    # Add vehicle class parameter if supported
+                    if vehicle_type != 'passenger':
+                        cmd.extend(["--vehicle-class", vehicle_type])
+                    
+                    print(f"🔧 Generating diverse routes for {vehicle_type}...")
+                    result = subprocess.run(cmd, capture_output=True, text=True, cwd=session_dir, timeout=30)
+                    
+                    if result.returncode == 0:
+                        print(f"✅ Generated diverse {vehicle_type} routes: {route_file.name}")
+                        
+                        # Add vehicle type definition to the route file
+                        self._add_vehicle_type_to_route_file(route_file, vehicle_type)
+                    else:
+                        print(f"⚠️  randomTrips failed for {vehicle_type}: {result.stderr}")
+                        print(f"   Falling back to simple generation...")
+                        self._create_simple_osm_route_file(route_file, vehicle_type, adjusted_count)
+                        
+                except Exception as e:
+                    print(f"⚠️  Error generating diverse routes for {vehicle_type}: {e}")
+                    print(f"   Creating simple fallback routes...")
+                    self._create_simple_osm_route_file(route_file, vehicle_type, adjusted_count)
+            
+            print("🎯 Diverse route generation completed!")
+            
+        except Exception as e:
+            print(f"❌ Error in diverse OSM route generation: {e}")
+            raise
+    
+    def _create_simple_osm_route_file(self, route_file: Path, vehicle_type: str, vehicle_count: int):
+        """Create a simple route file for OSM scenarios when randomTrips fails"""
+        
+        # Get network edges from the network file
+        network_dir = route_file.parent.parent
+        network_id = network_dir.name.split('_')[0]
+        network_file = find_network_file(network_dir, network_id)
+        
+        if not network_file:
+            # Fallback: find any network file in the directory
+            network_files = glob_network_files(network_dir)
+            if network_files:
+                network_file = network_files[0]
+        
+        edge_ids = self._extract_edge_ids(network_file) if network_file.exists() else []
+        
+        if not edge_ids:
+            print(f"No edges found for {vehicle_type}, creating minimal route file")
+            edge_ids = ['dummy_edge']
+        
+        # Create diverse routes using available edges
+        route_content = f'''<?xml version="1.0" encoding="UTF-8"?>
+<routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/routes_file.xsd">
+    <vType id="veh_{vehicle_type}" vClass="{vehicle_type}" color="yellow"/>
+'''
+        
+        # Create routes with some variety
+        used_edges = edge_ids[:min(len(edge_ids), 20)]  # Use up to 20 different edges
+        
+        for i in range(vehicle_count):
+            if len(used_edges) >= 2:
+                # Create routes between different edges
+                from_edge = used_edges[i % len(used_edges)]
+                to_edge = used_edges[(i + len(used_edges)//2) % len(used_edges)]
+                
+                depart_time = (i * 300) / vehicle_count  # Distribute over 5 minutes
+                
+                route_content += f'''    <vehicle id="{vehicle_type}_{i}" type="veh_{vehicle_type}" depart="{depart_time:.1f}" departLane="best" departSpeed="max">
+        <route edges="{from_edge} {to_edge}"/>
+    </vehicle>
+'''
+        
+        route_content += '</routes>'
+        
+        with open(route_file, 'w', encoding='utf-8') as f:
+            f.write(route_content)
+        
+        print(f"✅ Created simple diverse routes for {vehicle_type}")
+    
+    def _add_vehicle_type_to_route_file(self, route_file: Path, vehicle_type: str):
+        """Add vehicle type definition to route file if missing"""
+        try:
+            with open(route_file, 'r', encoding='utf-8') as f:
+                content = f.read()
+            
+            # Check if vehicle type already exists
+            if f'veh_{vehicle_type}' in content:
+                return  # Already has vehicle type
+            
+            # Add vehicle type definition
+            vtype_colors = {
+                'passenger': 'yellow',
+                'bus': 'blue', 
+                'truck': 'red',
+                'motorcycle': 'green'
+            }
+            
+            color = vtype_colors.get(vehicle_type, 'gray')
+            vtype_def = f'    <vType id="veh_{vehicle_type}" vClass="{vehicle_type}" color="{color}"/>\n'
+            
+            # Insert after the opening routes tag
+            content = content.replace('<routes xmlns:xsi', f'{vtype_def}<routes xmlns:xsi')
+            
+            with open(route_file, 'w', encoding='utf-8') as f:
+                f.write(content)
+                
+        except Exception as e:
+            print(f"Warning: Could not add vehicle type to {route_file}: {e}")
     
     def _scale_route_file(self, source_file: Path, dest_file: Path, scale_factor: float):
         """
@@ -764,6 +1069,340 @@ class SimulationManager:
         
         except Exception as e:
             print(f"Error creating disabled route file: {e}")
+    
+    def _preserve_osm_route_variety(self, source_dir: Path, dest_dir: Path, 
+                                   enabled_vehicles: List[str], config: Dict[str, Any]):
+        """
+        Preserve the original route variety from OSM Web Wizard scenarios while applying filtering
+        
+        Args:
+            source_dir: Source routes directory
+            dest_dir: Destination routes directory  
+            enabled_vehicles: List of enabled vehicle types
+            config: Configuration parameters
+        """
+        try:
+            traffic_density = config.get('trafficDensity', 1.0)
+            vehicle_count_override = config.get('vehicles')
+            
+            print(f"📊 Processing OSM routes for {len(enabled_vehicles)} enabled vehicle types...")
+            
+            # Process trip files first for enabled vehicle types (better realism)
+            copied_types = set()
+            for trip_file in source_dir.glob("*.trips.xml"):
+                # Determine vehicle type from filename
+                vehicle_type = None
+                for vtype in ['passenger', 'bus', 'truck', 'motorcycle']:
+                    if vtype in trip_file.name.lower():
+                        vehicle_type = vtype
+                        break
+                
+                if vehicle_type and vehicle_type in enabled_vehicles:
+                    dest_file = dest_dir / trip_file.name
+                    # For trip files, preserve them directly for realistic patterns
+                    if traffic_density != 1.0:
+                        self._scale_route_file(trip_file, dest_file, traffic_density)
+                    else:
+                        shutil.copy2(trip_file, dest_file)
+                    
+                    copied_types.add(vehicle_type)
+                    print(f"✅ Preserved {vehicle_type} trip file (realistic patterns): {trip_file.name}")
+                elif vehicle_type:
+                    print(f"⏭️  Skipped disabled vehicle type: {vehicle_type}")
+            
+            # Process route files as fallback for types not covered by trip files
+            for route_file in source_dir.glob("*.rou.xml"):
+                # Determine vehicle type from filename
+                vehicle_type = None
+                for vtype in ['passenger', 'bus', 'truck', 'motorcycle']:
+                    if vtype in route_file.name.lower():
+                        vehicle_type = vtype
+                        break
+                
+                if vehicle_type and vehicle_type in enabled_vehicles and vehicle_type not in copied_types:
+                    dest_file = dest_dir / route_file.name
+                    
+                    # Preserve original route variety with intelligent filtering
+                    self._filter_and_enhance_osm_routes(route_file, dest_file, vehicle_type, 
+                                                       traffic_density, vehicle_count_override)
+                    
+                    print(f"✅ Preserved {vehicle_type} route variety: {route_file.name}")
+                elif vehicle_type:
+                    print(f"⏭️  Skipped disabled vehicle type: {vehicle_type}")
+                        
+        except Exception as e:
+            print(f"❌ Error preserving OSM route variety: {e}")
+            # Fallback to basic copying
+            self._copy_routes_basic(source_dir, dest_dir, enabled_vehicles, config)
+    
+    def _filter_and_enhance_osm_routes(self, source_file: Path, dest_file: Path, 
+                                      vehicle_type: str, traffic_density: float, 
+                                      vehicle_count_override: Optional[int]):
+        """
+        Filter OSM routes while preserving variety and applying enhancements
+        
+        Args:
+            source_file: Source route file
+            dest_file: Destination route file
+            vehicle_type: Vehicle type being processed
+            traffic_density: Traffic scaling factor
+            vehicle_count_override: Optional vehicle count override
+        """
+        try:
+            tree = ET.parse(source_file)
+            root = tree.getroot()
+            
+            # Collect all vehicles and analyze variety
+            vehicles = root.findall('.//vehicle')
+            original_count = len(vehicles)
+            
+            if original_count == 0:
+                print(f"⚠️  No vehicles found in {source_file.name}")
+                shutil.copy2(source_file, dest_file)
+                return
+            
+            # Apply vehicle count filtering if specified
+            target_count = original_count
+            if vehicle_count_override and vehicle_count_override > 0:
+                target_count = min(vehicle_count_override, original_count)
+            
+            # Apply traffic density scaling
+            if traffic_density != 1.0:
+                target_count = max(1, int(target_count * traffic_density))
+            
+            # Select vehicles to preserve variety
+            if target_count < original_count:
+                # Intelligently sample vehicles to preserve variety
+                selected_vehicles = self._select_diverse_vehicles(vehicles, target_count)
+                
+                # Remove unselected vehicles
+                for vehicle in vehicles:
+                    if vehicle not in selected_vehicles:
+                        root.remove(vehicle)
+                        
+                print(f"📉 Filtered {vehicle_type}: {original_count} → {len(selected_vehicles)} vehicles")
+            else:
+                print(f"📊 Preserved all {original_count} {vehicle_type} vehicles")
+            
+            # Enhance vehicle definitions for better simulation
+            self._enhance_osm_vehicle_definitions(root, vehicle_type)
+            
+            # Apply traffic density to departure times if needed
+            if traffic_density != 1.0:
+                self._scale_departure_times(root, traffic_density)
+            
+            # Save the processed file
+            tree.write(dest_file, encoding='utf-8', xml_declaration=True)
+            
+        except Exception as e:
+            print(f"❌ Error filtering OSM routes for {vehicle_type}: {e}")
+            # Fallback: just copy the original file
+            shutil.copy2(source_file, dest_file)
+    
+    def _select_diverse_vehicles(self, vehicles: List[ET.Element], target_count: int) -> List[ET.Element]:
+        """
+        Intelligently select a subset of vehicles that preserves route diversity
+        
+        Args:
+            vehicles: List of vehicle elements
+            target_count: Target number of vehicles to select
+            
+        Returns:
+            List of selected vehicle elements that maintain diversity
+        """
+        if target_count >= len(vehicles):
+            return vehicles
+        
+        # Analyze route diversity
+        route_patterns = {}
+        
+        for vehicle in vehicles:
+            route_elem = vehicle.find('route')
+            if route_elem is not None:
+                edges = route_elem.get('edges', '')
+                # Create a pattern from start/end edges
+                edge_list = edges.split()
+                if len(edge_list) >= 2:
+                    pattern = f"{edge_list[0]}->{edge_list[-1]}"
+                else:
+                    pattern = edges
+                
+                if pattern not in route_patterns:
+                    route_patterns[pattern] = []
+                route_patterns[pattern].append(vehicle)
+        
+        # Select vehicles to maintain pattern diversity
+        selected = []
+        patterns = list(route_patterns.keys())
+        
+        # First, select one vehicle from each unique route pattern
+        for pattern in patterns:
+            if len(selected) < target_count:
+                selected.append(route_patterns[pattern][0])
+        
+        # Fill remaining slots by cycling through patterns
+        pattern_index = 0
+        vehicle_indices = {pattern: 1 for pattern in patterns}  # Start from second vehicle
+        
+        while len(selected) < target_count:
+            pattern = patterns[pattern_index % len(patterns)]
+            vehicles_in_pattern = route_patterns[pattern]
+            vehicle_index = vehicle_indices[pattern]
+            
+            if vehicle_index < len(vehicles_in_pattern):
+                selected.append(vehicles_in_pattern[vehicle_index])
+                vehicle_indices[pattern] += 1
+            
+            pattern_index += 1
+            
+            # Prevent infinite loop
+            if pattern_index > target_count * len(patterns):
+                break
+        
+        print(f"🎯 Selected {len(selected)} vehicles from {len(patterns)} route patterns")
+        return selected[:target_count]
+    
+    def _enhance_osm_vehicle_definitions(self, root: ET.Element, vehicle_type: str):
+        """
+        Enhance OSM vehicle definitions with better parameters for simulation
+        
+        Args:
+            root: Root element of the routes XML
+            vehicle_type: Type of vehicles being enhanced
+        """
+        try:
+            # Ensure vehicle type definition exists
+            vtype_id = f"veh_{vehicle_type}"
+            vtype_elem = root.find(f".//vType[@id='{vtype_id}']")
+            
+            if vtype_elem is None:
+                # Create vehicle type definition
+                vtype_elem = ET.Element('vType')
+                vtype_elem.set('id', vtype_id)
+                vtype_elem.set('vClass', vehicle_type)
+                
+                # Set appropriate color for vehicle type
+                color_map = {
+                    'passenger': 'yellow',
+                    'bus': 'blue', 
+                    'truck': 'orange',
+                    'motorcycle': 'red'
+                }
+                vtype_elem.set('color', color_map.get(vehicle_type, 'gray'))
+                
+                # Insert at the beginning
+                root.insert(0, vtype_elem)
+            
+            # Enhance individual vehicles
+            for vehicle in root.findall('.//vehicle'):
+                # Ensure vehicle uses the correct type
+                if not vehicle.get('type'):
+                    vehicle.set('type', vtype_id)
+                
+                # Add optimized departure attributes if missing
+                if not vehicle.get('departLane'):
+                    vehicle.set('departLane', 'best')
+                if not vehicle.get('departSpeed'):
+                    vehicle.set('departSpeed', 'max')
+                    
+        except Exception as e:
+            print(f"⚠️  Warning: Could not enhance vehicle definitions: {e}")
+    
+    def _scale_departure_times(self, root: ET.Element, scale_factor: float):
+        """
+        Scale departure times while preserving relative timing patterns
+        
+        Args:
+            root: Root element of routes XML
+            scale_factor: Scaling factor for traffic density
+        """
+        try:
+            vehicles = root.findall('.//vehicle')
+            if not vehicles:
+                return
+            
+            # Extract and scale departure times
+            departure_times = []
+            for vehicle in vehicles:
+                depart = vehicle.get('depart')
+                if depart and depart != 'triggered':
+                    try:
+                        departure_times.append((vehicle, float(depart)))
+                    except ValueError:
+                        pass
+            
+            if not departure_times:
+                return
+            
+            # Sort by departure time
+            departure_times.sort(key=lambda x: x[1])
+            
+            # Scale while preserving relative spacing
+            for i, (vehicle, original_time) in enumerate(departure_times):
+                if scale_factor < 1.0:
+                    # Reduce density by spacing out departures more
+                    scaled_time = original_time / scale_factor
+                else:
+                    # Increase density by compacting departures
+                    scaled_time = original_time / scale_factor
+                
+                vehicle.set('depart', f"{scaled_time:.2f}")
+                
+        except Exception as e:
+            print(f"⚠️  Warning: Could not scale departure times: {e}")
+    
+    def _copy_routes_basic(self, source_dir: Path, dest_dir: Path, 
+                          enabled_vehicles: List[str], config: Dict[str, Any]):
+        """
+        Basic route copying fallback method
+        
+        Args:
+            source_dir: Source routes directory
+            dest_dir: Destination routes directory
+            enabled_vehicles: List of enabled vehicle types
+            config: Configuration parameters
+        """
+        traffic_density = config.get('trafficDensity', 1.0)
+        copied_types = set()
+        
+        # Copy trip files first - prioritize for realistic patterns
+        for trip_file in source_dir.glob("*.trips.xml"):
+            # Determine vehicle type from filename
+            vehicle_type = None
+            for vtype in ['passenger', 'bus', 'truck', 'motorcycle']:
+                if vtype in trip_file.name.lower():
+                    vehicle_type = vtype
+                    break
+            
+            if vehicle_type and vehicle_type in enabled_vehicles:
+                dest_file = dest_dir / trip_file.name
+                if traffic_density != 1.0:
+                    # Apply traffic density scaling
+                    self._scale_route_file(trip_file, dest_file, traffic_density)
+                else:
+                    # Just copy the file
+                    shutil.copy2(trip_file, dest_file)
+                copied_types.add(vehicle_type)
+                print(f"Copied trip file for enabled vehicle type: {vehicle_type}")
+        
+        # Copy route files as fallback - only for types not covered by trip files
+        for route_file in source_dir.glob("*.rou.xml"):
+            # Determine vehicle type from filename
+            vehicle_type = None
+            for vtype in ['passenger', 'bus', 'truck', 'motorcycle']:
+                if vtype in route_file.name.lower():
+                    vehicle_type = vtype
+                    break
+            
+            if vehicle_type and vehicle_type in enabled_vehicles and vehicle_type not in copied_types:
+                dest_file = dest_dir / route_file.name
+                if traffic_density != 1.0:
+                    # Apply traffic density scaling
+                    self._scale_route_file(route_file, dest_file, traffic_density)
+                else:
+                    # Just copy the file
+                    shutil.copy2(route_file, dest_file)
+                print(f"Copied route file for enabled vehicle type: {vehicle_type}")
     
     def _apply_network_modifications(self, network_file: Path, config: Dict[str, Any]):
         """
@@ -881,7 +1520,9 @@ class SimulationManager:
             config: Configuration parameters
         """
         route_file = session_dir / f"{network_id}.rou.xml"
-        network_file = session_dir / f"{network_id}.net.xml"
+        network_file = find_network_file(session_dir, network_id)
+        if not network_file:
+            raise FileNotFoundError(f"Network file not found for network_id: {network_id}")
         
         # First, check if we have OSM-generated route files for this network
         osm_routes = self._find_osm_route_files(network_id)
@@ -1054,61 +1695,60 @@ class SimulationManager:
     
     def _generate_sumo_routes(self, session_dir: Path, network_id: str, edge_ids: List[str], vehicle_count: int):
         """
-        Use SUMO's built-in tools to generate realistic routes
+        Use SUMO's enhanced randomTrips.py to generate diverse, realistic routes
         """
         import subprocess
-        import tempfile
+        import os
         
-        network_file = session_dir / f"{network_id}.net.xml"
+        network_file = find_network_file(session_dir, network_id)
+        if not network_file:
+            raise FileNotFoundError(f"Network file not found for network_id: {network_id}")
         route_file = session_dir / f"{network_id}.rou.xml"
         
-        # Create trips file first
-        trips_file = session_dir / f"{network_id}.trips.xml"
-        
-        # Generate random trips using SUMO's randomTrips.py
         try:
-            # Use a subset of edges as origins/destinations
-            selected_edges = edge_ids[:min(20, len(edge_ids))]
+            # Find SUMO tools directory
+            sumo_home = os.environ.get('SUMO_HOME', 'C:\\Program Files (x86)\\Eclipse\\Sumo')
+            randomtrips_script = os.path.join(sumo_home, 'tools', 'randomTrips.py')
             
-            trips_content = '''<?xml version="1.0" encoding="UTF-8"?>
-<trips xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/trips_file.xsd">
-'''
-            
-            # Create simple trips between different edges
-            for i in range(vehicle_count):
-                if len(selected_edges) >= 2:
-                    from_edge = selected_edges[i % len(selected_edges)]
-                    to_edge = selected_edges[(i + 1) % len(selected_edges)]
-                    depart_time = i * 5  # 5 second intervals
-                    
-                    trips_content += f'    <trip id="trip_{i}" depart="{depart_time}" from="{from_edge}" to="{to_edge}"/>\n'
-            
-            trips_content += '</trips>'
-            
-            with open(trips_file, 'w') as f:
-                f.write(trips_content)
-            
-            # Convert trips to routes using duarouter
-            duarouter_cmd = [
-                "C:\\Program Files (x86)\\Eclipse\\Sumo\\bin\\duarouter.exe",
+            # Enhanced randomTrips.py with parameters for realistic diversity
+            randomtrips_cmd = [
+                "python", randomtrips_script,
                 "-n", str(network_file),
-                "-t", str(trips_file),
                 "-o", str(route_file),
-                "--ignore-errors"
+                "--route-file", str(route_file),  # Generate routes directly
+                "--period", "3.0",  # Average 3 seconds between vehicles
+                "--fringe-factor", "2.0",  # Reduce border concentration
+                "--intermediate", "1",  # Add waypoints for longer routes
+                "--min-distance", "300",  # Minimum trip distance (meters)
+                "--max-distance", "3000",  # Maximum trip distance  
+                "--speed-exponent", "1.5",  # Weight by road speed/importance
+                "--lanes",  # Consider lane count
+                "--random-factor", "0.3",  # Add 30% randomness to selection
+                "--fringe-start-attributes", 'departSpeed="max"',
+                "--trip-attributes", 'departLane="best"',
+                "--validate",  # Ensure routes are valid
+                "--begin", "0",
+                "--end", str(vehicle_count * 3),  # Scale time period
+                "--seed", "42"  # Reproducible but diverse
             ]
             
-            result = subprocess.run(duarouter_cmd, capture_output=True, text=True, cwd=session_dir)
+            print(f"Generating diverse routes with command: {' '.join(randomtrips_cmd)}")
+            result = subprocess.run(randomtrips_cmd, capture_output=True, text=True, cwd=session_dir)
             
             if result.returncode == 0:
-                print("Successfully generated routes using duarouter")
+                print(f"Successfully generated diverse routes using enhanced randomTrips.py")
+                print(f"Route generation output: {result.stdout}")
                 return
             else:
-                print(f"duarouter failed: {result.stderr}")
-                raise Exception("duarouter failed")
+                print(f"Enhanced randomTrips.py failed: {result.stderr}")
+                print(f"Falling back to simple route generation...")
+                # Fallback to original simple method
+                self._create_simple_route_file(route_file, edge_ids, vehicle_count)
                 
         except Exception as e:
-            print(f"Error in SUMO route generation: {e}")
-            raise
+            print(f"Error in enhanced route generation: {e}")
+            # Fallback to simple route generation
+            self._create_simple_route_file(route_file, edge_ids, vehicle_count)
     
     def _create_simple_route_file(self, route_file: Path, edge_ids: List[str], vehicle_count: int):
         """
@@ -1234,6 +1874,14 @@ class SimulationManager:
         additional_file = session_dir / f"{network_id}.add.xml"
         gui_settings_file = session_dir / "gui-settings.xml"
         
+        # Determine the actual network filename (compressed or uncompressed)
+        network_file = find_network_file(session_dir, network_id)
+        if not network_file:
+            # Fallback to uncompressed if not found
+            network_filename = f"{network_id}.net.xml"
+        else:
+            network_filename = network_file.name
+        
         # Generate additional file for road closures and other modifications
         self._generate_additional_file(additional_file, config)
         
@@ -1272,7 +1920,7 @@ class SimulationManager:
 <configuration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/sumoConfiguration.xsd">
 
     <input>
-        <net-file value="{network_id}.net.xml"/>
+        <net-file value="{network_filename}"/>
         <route-files value="{network_id}.rou.xml"/>
         <additional-files value="{network_id}.add.xml"/>
     </input>
@@ -1388,8 +2036,8 @@ class SimulationManager:
         # Generate traffic light configurations if specified
         traffic_control_config = config.get('trafficControl')
         if traffic_control_config:
-            network_file = additional_file.parent / f"{additional_file.stem}.net.xml"
-            if network_file.exists():
+            network_file = find_network_file(additional_file.parent, additional_file.stem)
+            if network_file and network_file.exists():
                 tl_configs = self._generate_traffic_light_configs(network_file, traffic_control_config)
                 if tl_configs:
                     additional_content = additional_content.replace(

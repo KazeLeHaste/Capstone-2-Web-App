@@ -1,0 +1,29 @@
+{
+  "name": "SM Molino Area",
+  "type": "osm_imported",
+  "is_osm_scenario": true,
+  "import_date": "2025-09-17T22:06:15.202860",
+  "original_scenario": "SM Molino Area",
+  "vehicle_types": [
+    "passenger",
+    "bus",
+    "truck",
+    "motorcycle"
+  ],
+  "network_info": {
+    "edges": 24,
+    "junctions": 23,
+    "lanes": 106,
+    "boundary": "-15.66,-15.29,697.88,455.82",
+    "file_size": 12000
+  },
+  "stats": {
+    "total_files": 21,
+    "route_files": 0,
+    "trip_files": 0,
+    "total_size": 589236
+  },
+  "description": "Imported OSM scenario: SM Molino Area",
+  "supports_realistic_traffic": true,
+  "configuration_overlay_supported": true
+}
