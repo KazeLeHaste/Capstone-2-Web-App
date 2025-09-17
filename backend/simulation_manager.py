@@ -1,11 +1,16 @@
 """
-Simulation Management Module
+Simulation Management Module - Passive Data Collection Implementation
 
 Handles the configuration-first simulation workflow including:
 - Session configuration storage
 - Network copying and modification
-- SUMO simulation launching with live data streaming
+- SUMO simulation launching with PASSIVE live data streaming
 - File management for session isolation
+
+PASSIVE DATA COLLECTION: This module uses passive TraCI data collection that
+preserves user control over simulation timing and delay settings. It reads
+simulation data without stepping, allowing SUMO GUI delay controls to work
+as expected.
 
 Author: Traffic Simulator Team
 Date: August 2025
@@ -75,6 +80,38 @@ class SimulationManager:
             session_config_dir = self.sessions_dir / session_id
             session_config_dir.mkdir(exist_ok=True)
             
+            # Process configuration data before saving
+            processed_config = config_data.copy()
+            
+            # Extract the actual config if nested
+            config_to_process = processed_config.get('config', processed_config)
+            
+            # Use traffic_scale directly from frontend (no conversion needed)
+            if 'traffic_scale' in config_to_process:
+                traffic_scale = config_to_process['traffic_scale']
+                config_to_process['sumo_traffic_scale'] = traffic_scale
+                print(f"DEBUG: Using traffic_scale {traffic_scale} directly as sumo_traffic_scale")
+            
+            # Legacy support for old terminology (backward compatibility)
+            elif 'trafficIntensity' in config_to_process:
+                config_to_process['sumo_traffic_scale'] = config_to_process['trafficIntensity']
+                print(f"DEBUG: Mapped legacy trafficIntensity {config_to_process['trafficIntensity']} to sumo_traffic_scale")
+            elif 'vehicles_per_minute' in config_to_process:
+                # Convert legacy vehicles_per_minute to traffic scale
+                baseline_vehicles_per_minute = 10.0
+                vehicles_per_minute = config_to_process['vehicles_per_minute']
+                traffic_scale = vehicles_per_minute / baseline_vehicles_per_minute
+                config_to_process['sumo_traffic_scale'] = traffic_scale
+                print(f"DEBUG: Converted legacy vehicles_per_minute {vehicles_per_minute} to sumo_traffic_scale {traffic_scale} (baseline: {baseline_vehicles_per_minute})")
+            else:
+                # Default traffic scale if not provided
+                config_to_process['sumo_traffic_scale'] = 1.0
+                print(f"DEBUG: Using default sumo_traffic_scale 1.0")
+            
+            # Update the processed config with the modified config
+            if 'config' in processed_config:
+                processed_config['config'] = config_to_process
+            
             # Save to database if available
             if self.db_service:
                 # Create session in database
@@ -84,14 +121,14 @@ class SimulationManager:
                 )
                 
                 # Save configuration to database
-                success = self.db_service.save_configuration(session_id, config_data)
+                success = self.db_service.save_configuration(session_id, processed_config)
                 if not success:
                     print(f"Warning: Failed to save configuration to database for session {session_id}")
             
             # Also save to file as backup (maintain backward compatibility)
             config_file = session_config_dir / "config.json"
             with open(config_file, 'w') as f:
-                json.dump(config_data, f, indent=2)
+                json.dump(processed_config, f, indent=2)
             
             return {
                 "success": True,
@@ -233,11 +270,6 @@ class SimulationManager:
             Result dictionary with session path
         """
         try:
-            # Map frontend configuration to backend configuration
-            if 'trafficIntensity' in config:
-                config['sumo_traffic_intensity'] = config['trafficIntensity']
-                print(f"DEBUG: Mapped trafficIntensity {config['trafficIntensity']} to sumo_traffic_intensity")
-            
             session_dir = self.sessions_dir / session_id
             session_dir.mkdir(exist_ok=True)
             
@@ -1214,7 +1246,7 @@ class SimulationManager:
         end_time = config.get('sumo_end', 1800)   # From --end parameter
         step_length = config.get('sumo_step_length', 1.0)  # From --step-length parameter
         time_to_teleport = config.get('sumo_time_to_teleport', 300)  # From --time-to-teleport parameter
-        traffic_intensity = config.get('sumo_traffic_intensity', 1.0)  # Traffic intensity multiplier
+        traffic_scale = config.get('sumo_traffic_scale', config.get('traffic_scale', config.get('sumo_traffic_intensity', 1.0)))  # Traffic scale multiplier
         
         # Fallback to original config structure for backward compatibility
         if 'original_config' in config:
@@ -1287,8 +1319,8 @@ class SimulationManager:
         print(f"  Duration: {simulation_end_time - begin_time}s")
         print(f"  Step length: {step_length}s")
         print(f"  Time to teleport: {time_to_teleport}s")
-        print(f"  Traffic intensity: {traffic_intensity}x")
-        if traffic_intensity != 1.0:
+        print(f"  Traffic scale: {traffic_scale}x")
+        if traffic_scale != 1.0:
             print(f"  Traffic scaling: enabled via --scale parameter")
     
     def _calculate_simulation_duration(self, route_file: Path) -> int:
@@ -1790,6 +1822,11 @@ class SimulationManager:
                 "--no-warnings"  # Reduce console spam
             ])
             
+            # Add step-length parameter from user configuration
+            step_length = config.get('sumo_step_length', 1.0)  # Default to 1.0 for normal time progression
+            sumo_cmd.extend(["--step-length", str(step_length)])
+            print(f"DEBUG: Using step-length: {step_length}s")
+            
             # Extract end time from config and add --end parameter for automatic termination
             # This ensures SUMO will automatically terminate when the simulation time is reached
             duration_seconds = None
@@ -1837,13 +1874,13 @@ class SimulationManager:
 
             # Note: We no longer add --end parameter to command line since we update the config file directly
             
-            # Add traffic intensity scaling if specified
-            traffic_intensity = config.get('sumo_traffic_intensity', 1.0)
-            if traffic_intensity != 1.0:
-                sumo_cmd.extend(["--scale", str(traffic_intensity)])
-                print(f"DEBUG: Adding traffic scaling: --scale {traffic_intensity}")
+            # Add traffic scale if specified
+            traffic_scale = config.get('sumo_traffic_scale', config.get('traffic_scale', config.get('sumo_traffic_intensity', 1.0)))  # Legacy fallback
+            if traffic_scale != 1.0:
+                sumo_cmd.extend(["--scale", str(traffic_scale)])
+                print(f"DEBUG: Adding traffic scaling: --scale {traffic_scale}")
             else:
-                print(f"DEBUG: No traffic scaling (intensity = 1.0)")
+                print(f"DEBUG: No traffic scaling (scale = 1.0)")
             
             # Add gaming mode settings for GUI (automatic start and better UX)
             if enable_gui:
@@ -1851,26 +1888,38 @@ class SimulationManager:
                 gui_settings_path = os.path.join(os.path.dirname(__file__), "gui_settings.xml")
                 sumo_cmd.extend([
                     "--gui-settings-file", gui_settings_path,  # Use custom GUI settings
-                    "--start",       # Start simulation automatically
                     "--game",        # Enable gaming mode
                     "--game.mode", "tls",  # Traffic Light Signal gaming mode
                     "--window-size", "1200,800",  # Set consistent window size
-                    "--delay", "50"  # Override delay for more responsive gaming
                 ])
+                
+                # Add user-specified delay from configuration
+                gui_delay = config.get('sumo_gui_delay', 0)  # Get delay from frontend config
+                sumo_cmd.extend(["--delay", str(gui_delay)])
+                print(f"DEBUG: Using user-specified GUI delay: {gui_delay}ms")
+                
                 # Gaming mode: Interactive traffic light control and enhanced user experience
                 print(f"DEBUG: Using GUI settings file: {gui_settings_path}")
             else:
                 sumo_cmd.extend(["--quit-on-end"])
             
-            # Enable TraCI when live data is requested, regardless of GUI mode
-            if enable_live_data:
-                # Enable TraCI for live data collection
+            # SOLUTION: For GUI mode, don't use TraCI at all to preserve full user control
+            # This gives complete simulation control to the SUMO GUI interface
+            if enable_live_data and not enable_gui:
+                # Only add remote port for headless mode (no GUI)
                 sumo_cmd.extend([
-                    "--remote-port", "8813"
+                    "--remote-port", "8813",
+                    "--start"  # Start simulation immediately for headless mode
                 ])
-                # Add --start flag only if GUI is disabled (GUI mode already adds it above)
-                if not enable_gui:
-                    sumo_cmd.extend(["--start"])  # Start simulation immediately for headless mode
+                print("DEBUG: Headless mode with TraCI control")
+            elif enable_gui:
+                # GUI-ONLY MODE: No TraCI, pure GUI control for immediate simulation start
+                sumo_cmd.extend([
+                    "--start"  # Start simulation immediately in GUI mode
+                ])
+                print("DEBUG: Pure GUI mode - no TraCI, immediate simulation start with --start flag")
+                print("DEBUG: SUMO GUI has full control, simulation will start automatically")
+                enable_live_data = False  # Critical: No data streaming threads, no TraCI
             
             # Launch SUMO process
             print(f"DEBUG: Executing SUMO command: {' '.join(sumo_cmd)}")
@@ -1920,10 +1969,10 @@ class SimulationManager:
             
             # Start data collection thread if live data is enabled
             if enable_live_data and TRACI_AVAILABLE and self.websocket_handler:
-                print(f"Starting data collection thread for session {session_id}")
+                print(f"Starting delayed data collection thread for session {session_id}")
                 def start_data_collection():
-                    print(f"Data collection thread starting, waiting 3 seconds for SUMO startup...")
-                    time.sleep(3)  # Wait for SUMO to start up
+                    print(f"Data collection thread starting, waiting 10 seconds for SUMO to fully initialize...")
+                    time.sleep(10)  # Wait longer for SUMO to fully start and begin simulation
                     self._start_data_collection_thread(session_id, 8813, config)
                 
                 threading.Thread(target=start_data_collection, daemon=True).start()
@@ -2273,15 +2322,39 @@ class SimulationManager:
             print(f"DEBUG: Active processes: {list(self.active_processes.keys())}")
             
             if session_id and TRACI_AVAILABLE:
-                # Pause the simulation by stopping the simulation step loop
-                # We'll set a flag to pause the simulation loop
-                if session_id in self.active_processes:
+                # Use TraCI to directly pause the simulation
+                try:
+                    # Connect to TraCI if not already connected
+                    port = 8813  # Default TraCI port
+                    try:
+                        # Test if TraCI is already connected
+                        traci.simulation.getTime()
+                    except:
+                        # Connect to TraCI
+                        traci.init(port)
+                    
+                    # Pause the simulation using TraCI
+                    # Note: SUMO doesn't have a direct pause command via TraCI
+                    # We'll use the pause functionality through GUI if available
+                    if hasattr(traci.gui, 'pauseSimulation'):
+                        traci.gui.pauseSimulation()
+                    else:
+                        # Alternative: Set extremely high delay to effectively pause
+                        traci.gui.setDelay("View #0", 99999)
+                    
                     self.active_processes[session_id]["paused"] = True
-                    print(f"DEBUG: Set paused flag to True for session {session_id}")
+                    print(f"DEBUG: Paused simulation via TraCI for session {session_id}")
                     
                     return {
                         "success": True,
                         "message": "Simulation paused successfully",
+                        "processId": process_id
+                    }
+                except Exception as traci_e:
+                    print(f"DEBUG: TraCI pause failed: {traci_e}")
+                    return {
+                        "success": False,
+                        "message": f"Failed to pause via TraCI: {str(traci_e)}",
                         "processId": process_id
                     }
             
@@ -2319,14 +2392,38 @@ class SimulationManager:
             print(f"DEBUG: Found session_id: {session_id}")
             
             if session_id and TRACI_AVAILABLE:
-                # Resume the simulation by clearing the pause flag
-                if session_id in self.active_processes:
+                # Use TraCI to directly resume the simulation
+                try:
+                    # Connect to TraCI if not already connected
+                    port = 8813  # Default TraCI port
+                    try:
+                        # Test if TraCI is already connected
+                        traci.simulation.getTime()
+                    except:
+                        # Connect to TraCI
+                        traci.init(port)
+                    
+                    # Resume the simulation using TraCI
+                    if hasattr(traci.gui, 'resumeSimulation'):
+                        traci.gui.resumeSimulation()
+                    else:
+                        # Alternative: Reset delay to normal speed
+                        previous_delay = self.active_processes[session_id].get("previous_delay", 100)
+                        traci.gui.setDelay("View #0", previous_delay)
+                    
                     self.active_processes[session_id]["paused"] = False
-                    print(f"DEBUG: Set paused flag to False for session {session_id}")
+                    print(f"DEBUG: Resumed simulation via TraCI for session {session_id}")
                     
                     return {
                         "success": True,
                         "message": "Simulation resumed successfully",
+                        "processId": process_id
+                    }
+                except Exception as traci_e:
+                    print(f"DEBUG: TraCI resume failed: {traci_e}")
+                    return {
+                        "success": False,
+                        "message": f"Failed to resume via TraCI: {str(traci_e)}",
                         "processId": process_id
                     }
             
@@ -2532,6 +2629,17 @@ class SimulationManager:
             try:
                 # Extract configuration settings
                 step_length = config.get('stepLength', 1.0)  # Default to 1 second
+                gui_delay = config.get('sumo_gui_delay', 0)  # Get GUI delay in milliseconds
+                
+                # HYBRID APPROACH: TraCI polling frequency (independent of SUMO GUI timing)
+                # Since we're not controlling simulation steps, we just need to poll for data
+                # Use a reasonable polling interval that provides smooth live updates
+                traci_polling_interval = 0.1  # Poll every 100ms for live data
+                data_collection_frequency = 1  # Collect data every poll since we're not stepping
+                
+                print(f"DEBUG: HYBRID MODE - TraCI polling every {traci_polling_interval}s")
+                print(f"DEBUG: SUMO GUI delay setting: {gui_delay}ms (controlled by SUMO GUI, not TraCI)")
+                print(f"DEBUG: TraCI will collect data without interfering with GUI timing")
                 
                 # Extract duration using the same logic as in launch_simulation
                 duration_seconds = None
@@ -2582,26 +2690,27 @@ class SimulationManager:
                 if not connected:
                     return
                 
-                # Ensure simulation starts automatically
-                print(f"Starting simulation automatically for session {session_id}")
+                # PASSIVE DATA COLLECTION with INITIAL START: Start simulation then let GUI control timing
+                print(f"PASSIVE MODE: TraCI connected - starting simulation then switching to passive data collection")
                 
-                # Start simulation if it's not already running
-                # This ensures SUMO GUI starts immediately instead of staying paused
+                # Wait for SUMO GUI to initialize
+                print("Waiting for SUMO GUI to initialize completely...")
+                time.sleep(2)  # Give SUMO GUI time to start (already waited 10s before calling this function)
+                
                 try:
-                    # Check if simulation needs to be started
-                    current_time = traci.simulation.getTime()
-                    print(f"Initial simulation time: {current_time}")
+                    # CRITICAL: Send one simulationStep to actually start the simulation
+                    # After this, we switch to passive data collection to preserve user delay control
+                    print("Sending initial simulation step to start the simulation...")
+                    traci.simulationStep()
                     
-                    # Force simulation to start if it's at time 0 and paused
-                    if current_time == 0:
-                        print("Simulation at time 0, ensuring it starts...")
-                        # Step once to initialize
-                        traci.simulationStep()
-                        current_time = traci.simulation.getTime()
-                        print(f"After initial step, simulation time: {current_time}")
+                    # Now check the simulation time to confirm it started
+                    current_time = traci.simulation.getTime()
+                    print(f"SUCCESS: Simulation started! Initial time: {current_time}")
+                    print("Switching to PASSIVE data collection mode - SUMO GUI now controls all timing")
                     
                 except Exception as e:
-                    print(f"Error during simulation initialization: {e}")
+                    print(f"Warning: Could not start simulation: {e}")
+                    print("SUMO GUI may still be starting up - continuing with data collection")
                 
                 # Initialize simulation time tracking
                 last_sim_time = 0
@@ -2622,17 +2731,27 @@ class SimulationManager:
                             time.sleep(0.5)  # Check every half second if still paused
                             continue
                         
-                        # Step the simulation forward (this starts/continues the simulation)
-                        traci.simulationStep()
+                        # PASSIVE DATA COLLECTION: Don't step the simulation - let SUMO GUI control timing
+                        # Just read the current simulation state without interfering with user delay settings
+                        try:
+                            sim_time = traci.simulation.getTime()
+                        except traci.exceptions.FatalTraCIError:
+                            # Simulation may have ended or disconnected
+                            print(f"TraCI connection lost or simulation ended for session {session_id}")
+                            break
                         
-                        # Get current simulation time after stepping
-                        sim_time = traci.simulation.getTime()
-                        
-                        # Check if simulation time is progressing
-                        if sim_time == last_sim_time and sim_time > 0:
-                            print(f"Warning: Simulation time not advancing for session {session_id} at time {sim_time}")
-                        
-                        last_sim_time = sim_time
+                        # In passive mode, simulation time might not advance if SUMO GUI is paused
+                        # This is normal behavior - SUMO GUI controls the timing completely
+                        if sim_time != last_sim_time:
+                            # Simulation is progressing
+                            last_sim_time = sim_time
+                        elif sim_time == 0:
+                            # Simulation hasn't started yet, which is normal
+                            pass
+                        else:
+                            # Simulation might be paused in GUI, which is fine
+                            # Only warn if we haven't seen progress for a very long time
+                            pass
                         
                         # Check if simulation has reached configured duration
                         if sim_time >= duration_seconds:
@@ -2653,28 +2772,37 @@ class SimulationManager:
                         if int(sim_time) % (step_length * 30) == 0 and int(sim_time) > 0:
                             print(f"Simulation time: {sim_time}s for session {session_id}")
                         
-                        # Get vehicle data
-                        vehicle_ids = traci.vehicle.getIDList()
-                        total_vehicles = len(vehicle_ids)
+                        # Only collect expensive data based on frequency (optimize for fast delays)
+                        step_count += 1
+                        should_collect_data = (step_count % data_collection_frequency == 0)
                         
-                        # Calculate average speed
-                        total_speed = 0
-                        if total_vehicles > 0:
-                            for veh_id in vehicle_ids:
-                                try:
-                                    speed = traci.vehicle.getSpeed(veh_id)
-                                    total_speed += speed
-                                except:
-                                    pass
-                            avg_speed = total_speed / total_vehicles
+                        if should_collect_data:
+                            # Get vehicle data (expensive operation)
+                            vehicle_ids = traci.vehicle.getIDList()
+                            total_vehicles = len(vehicle_ids)
+                            
+                            # Calculate average speed (expensive - queries each vehicle)
+                            total_speed = 0
+                            if total_vehicles > 0:
+                                for veh_id in vehicle_ids:
+                                    try:
+                                        speed = traci.vehicle.getSpeed(veh_id)
+                                        total_speed += speed
+                                    except:
+                                        pass
+                                avg_speed = total_speed / total_vehicles
+                            else:
+                                avg_speed = 0
+                            
+                            # Get throughput (vehicles per hour)
+                            throughput = total_vehicles * 3600 / max(sim_time, 1)
                         else:
-                            avg_speed = 0
+                            # Use cached values for non-collection steps
+                            total_vehicles = getattr(self, '_last_vehicle_count', 0)
+                            avg_speed = getattr(self, '_last_avg_speed', 0)
+                            throughput = getattr(self, '_last_throughput', 0)
                         
-                        # Get throughput (vehicles per hour)
-                        # This is a simplified calculation
-                        throughput = total_vehicles * 3600 / max(sim_time, 1)
-                        
-                        # Prepare live statistics data
+                        # Always prepare live statistics data (but with potentially cached values)
                         live_data = {
                             'simulation_time': int(sim_time),
                             'active_vehicles': total_vehicles,
@@ -2684,38 +2812,45 @@ class SimulationManager:
                             'session_id': session_id
                         }
                         
-                        # Add zoom level to live data (try to get it, but don't fail if it doesn't work)
-                        try:
-                            zoom_level = traci.gui.getZoom("View #0")
-                            live_data['zoom_level'] = round(zoom_level, 2)
-                        except Exception:
-                            # Zoom might not be available in headless mode
-                            pass
+                        # Cache values for next iteration
+                        if should_collect_data:
+                            self._last_vehicle_count = total_vehicles
+                            self._last_avg_speed = avg_speed
+                            self._last_throughput = throughput
+                        
+                        # Add zoom level only when collecting full data (expensive GUI query)
+                        if should_collect_data:
+                            try:
+                                zoom_level = traci.gui.getZoom("View #0")
+                                live_data['zoom_level'] = round(zoom_level, 2)
+                            except Exception:
+                                # Zoom might not be available in headless mode
+                                pass
                         
                         # Debug: Print data every few steps
-                        step_count += 1
                         if step_count % 5 == 0:  # Print every 5 steps
                             print(f"Step {step_count}: sim_time={sim_time}s, vehicles={total_vehicles}, avg_speed={avg_speed:.1f}m/s")
                         
-                        # Save to database every 10 steps to avoid overwhelming the database
-                        if self.db_service and step_count % 10 == 0:
+                        # Save to database less frequently for fast delays
+                        db_save_frequency = max(10, data_collection_frequency * 2)  # At least every 10 steps
+                        if self.db_service and step_count % db_save_frequency == 0:
                             try:
                                 self.db_service.save_live_data(session_id, live_data)
                             except Exception as db_error:
                                 print(f"Warning: Failed to save live data to database: {db_error}")
                         
-                        # Broadcast data via WebSocket
-                        if self.websocket_handler:
+                        # Broadcast WebSocket data only when we collect new data (reduce network overhead)
+                        if should_collect_data and self.websocket_handler:
                             self.websocket_handler.broadcast_simulation_data(live_data)
-                        else:
+                        elif not self.websocket_handler and should_collect_data:
                             print("Warning: No WebSocket handler available for broadcasting")
                         
-                        # Sleep for the configured step length
-                        time.sleep(step_length)  # Use user-configured step length
+                        # Sleep for the TraCI polling interval (independent of SUMO GUI timing)
+                        time.sleep(traci_polling_interval)  # Poll every 100ms for live data
                         
                     except Exception as e:
                         print(f"Error collecting data for session {session_id}: {e}")
-                        time.sleep(step_length)  # Use step length even for error recovery
+                        time.sleep(traci_polling_interval)  # Use polling interval for error recovery
                 
                 print(f"Data collection ended for session {session_id}")
                 print(f"Final simulation time: {traci.simulation.getTime()}s")

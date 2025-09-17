@@ -400,8 +400,9 @@ class EnhancedSessionManager:
             "--no-warnings"
         ])
         
-        if config.get('sumo_traffic_intensity', 1.0) != 1.0:
-            cmd.extend(["--scale", str(config['sumo_traffic_intensity'])])
+        traffic_scale = config.get('sumo_traffic_scale', config.get('traffic_scale', config.get('sumo_traffic_intensity', 1.0)))  # Legacy fallback
+        if traffic_scale != 1.0:
+            cmd.extend(["--scale", str(traffic_scale)])
         
         if not session_info['enable_gui']:
             cmd.extend(["--quit-on-end", "--start"])
@@ -426,15 +427,34 @@ class EnhancedSessionManager:
             traci.init(port=traci_port)
             print(f"Connected to TraCI for session {session_id} on port {traci_port}")
             
-            step_count = 0
+            # CRITICAL: Send one simulationStep to actually start the simulation
+            # After this, we switch to passive data collection to preserve user delay control
+            print(f"Sending initial simulation step to start simulation for session {session_id}")
+            try:
+                traci.simulationStep()
+                initial_time = traci.simulation.getTime()
+                print(f"SUCCESS: Simulation started for session {session_id}! Initial time: {initial_time}")
+                print("Switching to PASSIVE data collection mode - SUMO GUI controls timing")
+            except Exception as e:
+                print(f"Warning: Could not start simulation for session {session_id}: {e}")
+            
+            last_collected_time = 0
+            last_collection_timestamp = time.time()
+            collection_interval = 1.0  # Collect data every 1 second
+            
             while session_info['status'] == 'running' and session_info['process'].poll() is None:
                 try:
-                    # Advance simulation
-                    traci.simulationStep()
+                    # Passive data collection - don't step the simulation
                     current_time = traci.simulation.getTime()
+                    current_timestamp = time.time()
                     
-                    # Collect data every few steps to avoid overwhelming the system
-                    if step_count % 5 == 0:
+                    # Only collect data if simulation time has advanced or enough real time has passed
+                    should_collect = (
+                        current_time > last_collected_time or 
+                        (current_timestamp - last_collection_timestamp) >= collection_interval
+                    )
+                    
+                    if should_collect:
                         # Get vehicle data
                         vehicle_ids = traci.vehicle.getIDList()
                         vehicle_count = len(vehicle_ids)
@@ -448,7 +468,7 @@ class EnhancedSessionManager:
                             'timestamp': current_time,
                             'vehicle_count': vehicle_count,
                             'total_waiting_time': total_waiting_time,
-                            'step': step_count
+                            'simulation_time': current_time
                         }
                         
                         # Save to database
@@ -462,9 +482,11 @@ class EnhancedSessionManager:
                         if self.websocket_handler:
                             live_data['session_id'] = session_id
                             self.websocket_handler.broadcast_simulation_data(live_data)
+                        
+                        last_collected_time = current_time
+                        last_collection_timestamp = current_timestamp
                     
-                    step_count += 1
-                    time.sleep(0.1)  # Small delay between steps
+                    time.sleep(0.1)  # Check every 100ms without stepping
                     
                 except traci.TraCIException as e:
                     if "connection closed" in str(e).lower():

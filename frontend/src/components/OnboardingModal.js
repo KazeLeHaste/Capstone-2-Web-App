@@ -62,7 +62,7 @@ const OnboardingModal = ({ onComplete, onClose }) => {
             <li>Configure time step and teleport settings</li>
             <li>Choose vehicle types (passenger, bus, truck, motorcycle)</li>
             <li>Set traffic control (fixed timing or adaptive signals)</li>
-            <li>Adjust traffic intensity and volume</li>
+            <li>Adjust traffic scale</li>
           </ul>
         </div>
       )

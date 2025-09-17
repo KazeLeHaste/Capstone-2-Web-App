@@ -60,6 +60,12 @@ const SimulationPage = ({ socket }) => {
     }
   });
   
+  // Real-time tracking (separate from simulation time)
+  const [realTimeStats, setRealTimeStats] = useState({
+    startTime: null,
+    elapsedRealTime: 0
+  });
+  
   const [connectionStatus, setConnectionStatus] = useState('disconnected');
   
   // Zoom control state
@@ -122,6 +128,26 @@ const SimulationPage = ({ socket }) => {
     
     return () => stopLiveDataPolling();
   }, [simulationState, sumoProcess]);
+  
+  // Real-time elapsed time tracking
+  useEffect(() => {
+    let realTimeInterval;
+    
+    if (simulationState === 'running' && realTimeStats.startTime) {
+      realTimeInterval = setInterval(() => {
+        setRealTimeStats(prev => ({
+          ...prev,
+          elapsedRealTime: Date.now() - prev.startTime
+        }));
+      }, 1000); // Update every second
+    }
+    
+    return () => {
+      if (realTimeInterval) {
+        clearInterval(realTimeInterval);
+      }
+    };
+  }, [simulationState, realTimeStats.startTime]);
 
   const loadSessionData = () => {
     console.log('SimulationPage: Loading session data...', location.state);
@@ -193,6 +219,12 @@ const SimulationPage = ({ socket }) => {
     if (status.status === 'completed' || status.status === 'stopped') {
       setSimulationState('finished');
       console.log(`Simulation ${status.status}: ${status.message}`);
+      
+      // Reset real-time tracking
+      setRealTimeStats({
+        startTime: null,
+        elapsedRealTime: 0
+      });
       
       // Show completion notification
       if (status.reason) {
@@ -281,7 +313,7 @@ const SimulationPage = ({ socket }) => {
         sessionPath: sessionData.sessionPath,
         config: config.config,
         enableGui: true, // Launch SUMO GUI
-        enableLiveData: true
+        enableLiveData: true  // Re-enabled for optimized TraCI implementation
       };
 
       const response = await apiClient.post('/api/simulation/launch', launchData);
@@ -289,6 +321,13 @@ const SimulationPage = ({ socket }) => {
       if (response.data.success) {
         setSumoProcess(response.data.process);
         setSimulationState('running');
+        
+        // Start real-time tracking
+        setRealTimeStats(prev => ({
+          ...prev,
+          startTime: Date.now(),
+          elapsedRealTime: 0
+        }));
         
         // Notify via socket if available
         if (socket) {
@@ -485,6 +524,18 @@ const SimulationPage = ({ socket }) => {
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
+  const formatRealTime = (milliseconds) => {
+    const totalSeconds = Math.floor(milliseconds / 1000);
+    const hours = Math.floor(totalSeconds / 3600);
+    const mins = Math.floor((totalSeconds % 3600) / 60);
+    const secs = totalSeconds % 60;
+    
+    if (hours > 0) {
+      return `${hours}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+    }
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
+
   const getStatusColor = () => {
     switch (simulationState) {
       case 'running': return 'text-primary';
@@ -610,15 +661,17 @@ const SimulationPage = ({ socket }) => {
                 {simulationState === 'running' && (
                   <>
                     <button
-                      onClick={handlePauseSimulation}
-                      className="simulation-control-btn"
+                      disabled
+                      className="simulation-control-btn disabled"
+                      title="Controls disabled - use SUMO GUI directly"
                     >
                       <Pause className="w-4 h-4" />
                       Pause
                     </button>
                     <button
-                      onClick={handleStopSimulation}
-                      className="simulation-control-btn"
+                      disabled
+                      className="simulation-control-btn disabled"
+                      title="Controls disabled - use SUMO GUI directly"
                     >
                       <Square className="w-4 h-4" />
                       Stop
@@ -629,15 +682,17 @@ const SimulationPage = ({ socket }) => {
                 {simulationState === 'paused' && (
                   <>
                     <button
-                      onClick={handleResumeSimulation}
-                      className="simulation-control-btn primary"
+                      disabled
+                      className="simulation-control-btn disabled"
+                      title="Controls disabled - use SUMO GUI directly"
                     >
                       <Play className="w-4 h-4" />
                       Resume
                     </button>
                     <button
-                      onClick={handleStopSimulation}
-                      className="simulation-control-btn"
+                      disabled
+                      className="simulation-control-btn disabled"
+                      title="Controls disabled - use SUMO GUI directly"
                     >
                       <Square className="w-4 h-4" />
                       Stop
@@ -736,51 +791,7 @@ const SimulationPage = ({ socket }) => {
               )}
             </div>
 
-            {/* Live Statistics */}
-            {simulationState === 'running' && (
-              <div className="bg-primary rounded-lg p-6 shadow-sm">
-                <div className="flex items-center justify-between mb-4">
-                  <h2 className="text-lg font-semibold text-primary">Live Statistics</h2>
-                  <div className="text-sm text-secondary">
-                    Updates every second
-                  </div>
-                </div>
-                
-                <div className="simulation-stats-grid">
-                  <div className="simulation-stat-card">
-                    <Clock className="simulation-stat-icon" />
-                    <div className="simulation-stat-value">
-                      {formatTime(liveStats.simulationTime || 0)}
-                    </div>
-                    <div className="simulation-stat-label">Simulation Time</div>
-                  </div>
-                  
-                  <div className="simulation-stat-card">
-                    <Car className="simulation-stat-icon" />
-                    <div className="simulation-stat-value">
-                      {liveStats.runningVehicles || 0}
-                    </div>
-                    <div className="simulation-stat-label">Active Vehicles</div>
-                  </div>
-                  
-                  <div className="simulation-stat-card">
-                    <TrendingUp className="simulation-stat-icon" />
-                    <div className="simulation-stat-value">
-                      {(liveStats.averageSpeed || 0).toFixed(1)} km/h
-                    </div>
-                    <div className="simulation-stat-label">Avg Speed</div>
-                  </div>
-                  
-                  <div className="simulation-stat-card">
-                    <Activity className="simulation-stat-icon" />
-                    <div className="simulation-stat-value">
-                      {liveStats.throughput || 0}
-                    </div>
-                    <div className="simulation-stat-label">Throughput/hr</div>
-                  </div>
-                </div>
-              </div>
-            )}
+
           </div>
 
           {/* Sidebar */}
@@ -794,29 +805,32 @@ const SimulationPage = ({ socket }) => {
               </div>
               <div className="space-y-2 text-sm">
                 <div>
-                  {config.config.original_config ? (
-                    // Simplified configuration structure
-                    <span className="font-medium">Duration:</span>
-                  ) : (
-                    // Legacy configuration structure
-                    <span className="font-medium">Duration:</span>
-                  )}
+                  <span className="font-medium">Simulation Duration:</span>
                   {" "}
                   {config.config.original_config 
                     ? Math.floor(((config.config.sumo_end || 0) - (config.config.sumo_begin || 0)) / 60)
                     : Math.floor((config.config.duration || 0) / 60)
                   } min
+                  <span className="text-xs text-gray-500 block">Simulated time to cover</span>
                 </div>
+                {simulationState === 'running' && realTimeStats.startTime && (
+                  <div>
+                    <span className="font-medium">Real-time Elapsed:</span>
+                    {" "}
+                    {formatRealTime(realTimeStats.elapsedRealTime)}
+                    <span className="text-xs text-gray-500 block">Actual time spent (affected by delay)</span>
+                  </div>
+                )}
                 <div>
                   {config.config.original_config ? (
-                    // Simplified configuration structure - show traffic intensity
+                    // Current configuration structure - show traffic scale
                     <>
-                      <span className="font-medium">Traffic Intensity:</span> {((config.config.sumo_traffic_intensity || 1.0) * 100).toFixed(0)}% ({config.config.sumo_traffic_intensity || 1.0}x)
+                      <span className="font-medium">Traffic Scale:</span> {(config.config.sumo_traffic_scale || config.config.traffic_scale || config.config.sumo_traffic_intensity || 1.0)}x
                     </>
                   ) : (
-                    // Legacy configuration structure - show old traffic volume
+                    // Legacy configuration structure - show traffic scale fallback
                     <>
-                      <span className="font-medium">Traffic Volume:</span> {Math.round((config.config.trafficVolume || 0) * 100)}%
+                      <span className="font-medium">Traffic Scale:</span> {(config.config.trafficVolume || 1.0)}x
                     </>
                   )}
                 </div>
