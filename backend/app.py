@@ -287,9 +287,6 @@ def run_simulation_thread(config):
                 # Broadcast data to all connected clients
                 websocket_handler.broadcast_simulation_data(sim_data)
                 
-                # Step simulation forward
-                sumo_controller.step_simulation()
-                
                 # Control simulation speed (adjust as needed)
                 time.sleep(0.1)
                 

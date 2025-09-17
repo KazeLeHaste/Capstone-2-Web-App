@@ -1,11 +1,15 @@
 """
-SUMO Controller Module
+SUMO Controller Module - Passive Data Collection Implementation
 
 Handles all SUMO simulation management including:
 - Process lifecycle management
-- TraCI communication
-- Data retrieval and processing
+- TraCI communication with PASSIVE data collection
+- Data retrieval without simulation stepping
 - Network and scenario management
+
+IMPORTANT: This controller uses passive data collection to preserve user control
+over simulation timing and delay settings. It never calls traci.simulationStep()
+and allows SUMO GUI to control all timing aspects.
 
 Author: Traffic Simulator Team
 Date: August 2025
@@ -40,7 +44,6 @@ class SumoController:
         self.simulation_running = False
         self.traci_port = 8813
         self.current_config = None
-        self.step_counter = 0
     
     def check_sumo_availability(self) -> bool:
         """
@@ -120,10 +123,10 @@ class SumoController:
                 "--start"
             ]
             
-            # Add traffic intensity scaling if specified
-            traffic_intensity = config.get('sumo_traffic_intensity', 1.0)
-            if traffic_intensity != 1.0:
-                sumo_cmd.extend(["--scale", str(traffic_intensity)])
+            # Add traffic scale if specified
+            traffic_scale = config.get('sumo_traffic_scale', config.get('traffic_scale', config.get('sumo_traffic_intensity', 1.0)))  # Legacy fallback
+            if traffic_scale != 1.0:
+                sumo_cmd.extend(["--scale", str(traffic_scale)])
             
             # Start SUMO process
             self.sumo_process = subprocess.Popen(
@@ -138,9 +141,16 @@ class SumoController:
             # Connect to SUMO via TraCI
             traci.init(self.traci_port)
             
+            # CRITICAL: Send one simulationStep to actually start the simulation
+            # This is required when TraCI is enabled - SUMO waits for TraCI to start the simulation
+            print("Sending initial simulation step to start the simulation...")
+            traci.simulationStep()
+            initial_time = traci.simulation.getTime()
+            print(f"Simulation started! Initial time: {initial_time}")
+            print("Note: Further stepping will be controlled by the application logic")
+            
             self.simulation_running = True
             self.current_config = config
-            self.step_counter = 0
             
             print(f"SUMO simulation started successfully with scenario: {scenario_id}")
             return True
@@ -164,7 +174,6 @@ class SumoController:
                 self.sumo_process.wait(timeout=5)
                 self.sumo_process = None
             
-            self.step_counter = 0
             print("SUMO simulation stopped")
             
         except Exception as e:
@@ -189,22 +198,42 @@ class SumoController:
             return True
         except:
             return False
-    
-    def step_simulation(self):
+
+    def get_passive_simulation_data(self, last_collected_time: float = 0) -> Dict[str, Any]:
         """
-        Advance simulation by one step
+        Get simulation data using fully passive collection approach.
+        Only collects data if simulation time has progressed since last collection.
+        
+        Args:
+            last_collected_time: The simulation time when data was last collected
+            
+        Returns:
+            Dictionary containing simulation data, or empty dict if no new data
         """
-        if self.simulation_running:
-            try:
-                traci.simulationStep()
-                self.step_counter += 1
-            except Exception as e:
-                print(f"Error stepping simulation: {e}")
-                self.simulation_running = False
+        if not self.simulation_running:
+            return {}
+        
+        try:
+            # Check current simulation time without stepping
+            current_time = traci.simulation.getTime()
+            
+            # Only collect data if simulation time has actually progressed
+            if current_time <= last_collected_time:
+                return {'simulation_time': current_time, 'data_collected': False}
+            
+            # Simulation has progressed - collect fresh data
+            data = self.get_simulation_data()
+            data['data_collected'] = True
+            return data
+            
+        except Exception as e:
+            print(f"Error in passive data collection: {e}")
+            return {}
     
     def get_simulation_data(self) -> Dict[str, Any]:
         """
-        Get current simulation data including vehicle positions and network status
+        Get current simulation data using passive collection approach.
+        This method reads data without stepping the simulation, preserving user delay control.
         
         Returns:
             Dictionary containing simulation data
@@ -213,7 +242,7 @@ class SumoController:
             return {}
         
         try:
-            # Get current simulation time
+            # PASSIVE DATA COLLECTION: Only read current state, don't step simulation
             current_time = traci.simulation.getTime()
             
             # Get vehicle information
@@ -274,7 +303,7 @@ class SumoController:
             
             return {
                 'timestamp': current_time,
-                'step': self.step_counter,
+                'simulation_time': current_time,
                 'vehicles': vehicles,
                 'edges': edges,
                 'junctions': junctions,
@@ -314,4 +343,3 @@ class SumoController:
         
         self.simulation_running = False
         self.current_config = None
-        self.step_counter = 0

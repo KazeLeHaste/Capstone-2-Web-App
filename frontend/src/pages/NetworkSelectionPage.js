@@ -307,13 +307,13 @@ const NetworkSelectionPage = ({ socket, onLoadingChange }) => {
                     Duration: {Math.floor((sessionConfig.config.sumo_end - sessionConfig.config.sumo_begin) / 60)}min | 
                     Step: {sessionConfig.config.sumo_step_length}s | 
                     Teleport: {sessionConfig.config.sumo_time_to_teleport}s | 
-                    Traffic: {((sessionConfig.config.sumo_traffic_intensity || 1.0) * 100).toFixed(0)}%
+                    Traffic: {(sessionConfig.config.sumo_traffic_scale || sessionConfig.config.traffic_scale || sessionConfig.config.sumo_traffic_intensity || 1.0)}x
                   </>
                 ) : (
                   // Legacy configuration structure (backward compatibility)
                   <>
                     Duration: {Math.floor((sessionConfig.config.duration || 1800) / 60)}min | 
-                    Traffic: {Math.round((sessionConfig.config.trafficVolume || 0.5) * 100)}% | 
+                    Traffic: {(sessionConfig.config.trafficVolume || 1.0)}x | 
                     Modifications: {(sessionConfig.config.speedLimits || []).length + (sessionConfig.config.roadClosures || []).length} items
                   </>
                 )}
@@ -471,7 +471,7 @@ const NetworkSelectionPage = ({ socket, onLoadingChange }) => {
               <ul className="list-spaced">
                 <li>Speed limit changes to specified edges</li>
                 <li>Road closures during simulation time</li>
-                <li>Traffic volume and vehicle type distribution</li>
+                <li>Traffic scale and vehicle type distribution</li>
                 <li>Advanced SUMO parameters and models</li>
               </ul>
             </div>
