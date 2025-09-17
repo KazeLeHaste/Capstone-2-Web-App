@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- generated on 2025-09-17 21:44:05.124775 by randomTrips.py v1_24_0+0000-b72eb3fabc8
+<configuration>
+    <net-file value="osm.net.xml.gz"/>
+    <output-trip-file value="osm.motorcycle.trips.xml"/>
+    <route-file value="osm.motorcycle.rou.xml"/>
+    <prefix value="motorcycle"/>
+    <trip-attributes value="departLane=&quot;best&quot;"/>
+    <fringe-start-attributes value="departSpeed=&quot;max&quot;"/>
+    <vehicle-class value="motorcycle"/>
+    <fringe-factor value="2"/>
+    <edge-permission value="motorcycle"/>
+    <via-edge-types value="highway.motorway,highway.motorway_link,highway.trunk_link,highway.primary_link,highway.secondary_link,highway.tertiary_link"/>
+    <seed value="43"/>
+    <max-distance value="1200.0"/>
+    <remove-loops value="True"/>
+    <insertion-density value="4.0"/>
+</configuration>
+-->
+
+<!-- generated on 2025-09-17 21:44:05 by Eclipse SUMO duarouter Version 1.24.0
+<duarouterConfiguration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/duarouterConfiguration.xsd">
+
+    <input>
+        <net-file value="osm.net.xml.gz"/>
+        <route-files value="osm.motorcycle.trips.xml"/>
+    </input>
+
+    <output>
+        <output-file value="osm.motorcycle.rou.xml"/>
+        <alternatives-output value="NUL"/>
+    </output>
+
+    <processing>
+        <remove-loops value="true"/>
+    </processing>
+
+    <time>
+        <begin value="0.0"/>
+        <end value="3600.0"/>
+    </time>
+
+    <report>
+        <no-warnings value="true"/>
+        <ignore-errors value="true"/>
+        <no-step-log value="true"/>
+    </report>
+
+</duarouterConfiguration>
+-->
+
+<routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/routes_file.xsd">
+    <vType id="motorcycle_motorcycle" vClass="motorcycle"/>
+    <vehicle id="motorcycle0" type="motorcycle_motorcycle" depart="0.00" departLane="best" departSpeed="max">
+        <route edges="-130048902#1 665787533"/>
+    </vehicle>
+    <vehicle id="motorcycle1" type="motorcycle_motorcycle" depart="205.20" departLane="best" departSpeed="max">
+        <route edges="-130048902#1 130048903#0 129113596#0"/>
+    </vehicle>
+    <vehicle id="motorcycle2" type="motorcycle_motorcycle" depart="410.40" departLane="best" departSpeed="max">
+        <route edges="183710979#0 665787533"/>
+    </vehicle>
+    <vehicle id="motorcycle3" type="motorcycle_motorcycle" depart="615.60" departLane="best">
+        <route edges="130048903#0 129113596#0"/>
+    </vehicle>
+    <vehicle id="motorcycle4" type="motorcycle_motorcycle" depart="820.80" departLane="best" departSpeed="max">
+        <route edges="-130048902#1 130048903#0 129113596#0"/>
+    </vehicle>
+    <vehicle id="motorcycle5" type="motorcycle_motorcycle" depart="1026.00" departLane="best" departSpeed="max">
+        <route edges="130049554#0 665787533"/>
+    </vehicle>
+    <vehicle id="motorcycle6" type="motorcycle_motorcycle" depart="1231.20" departLane="best">
+        <route edges="130048903#0 -665515504"/>
+    </vehicle>
+    <vehicle id="motorcycle7" type="motorcycle_motorcycle" depart="1436.40" departLane="best" departSpeed="max">
+        <route edges="665787524 795097767#0"/>
+    </vehicle>
+    <vehicle id="motorcycle8" type="motorcycle_motorcycle" depart="1641.61" departLane="best">
+        <route edges="130048903#0 -665515504"/>
+    </vehicle>
+    <vehicle id="motorcycle9" type="motorcycle_motorcycle" depart="1846.81" departLane="best" departSpeed="max">
+        <route edges="130049554#0 130048903#0 129113596#0"/>
+    </vehicle>
+    <vehicle id="motorcycle10" type="motorcycle_motorcycle" depart="2052.01" departLane="best" departSpeed="max">
+        <route edges="183710979#0 130048903#0"/>
+    </vehicle>
+    <vehicle id="motorcycle11" type="motorcycle_motorcycle" depart="2257.21" departLane="best" departSpeed="max">
+        <route edges="130049554#0 130048903#0"/>
+    </vehicle>
+    <vehicle id="motorcycle12" type="motorcycle_motorcycle" depart="2462.41" departLane="best">
+        <route edges="130048903#0 -665515504"/>
+    </vehicle>
+    <vehicle id="motorcycle13" type="motorcycle_motorcycle" depart="2667.61" departLane="best" departSpeed="max">
+        <route edges="-130048902#1 795097767#0"/>
+    </vehicle>
+    <vehicle id="motorcycle14" type="motorcycle_motorcycle" depart="2872.81" departLane="best" departSpeed="max">
+        <route edges="665787524 -665787530"/>
+    </vehicle>
+    <vehicle id="motorcycle15" type="motorcycle_motorcycle" depart="3078.01" departLane="best" departSpeed="max">
+        <route edges="665787524 130048903#0 129113596#0"/>
+    </vehicle>
+    <vehicle id="motorcycle16" type="motorcycle_motorcycle" depart="3283.21" departLane="best" departSpeed="max">
+        <route edges="-130048902#1 795097767#0"/>
+    </vehicle>
+    <vehicle id="motorcycle17" type="motorcycle_motorcycle" depart="3488.41" departLane="best" departSpeed="max">
+        <route edges="130049554#0 795097767#0"/>
+    </vehicle>
+</routes>
