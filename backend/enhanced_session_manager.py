@@ -16,11 +16,11 @@ import tempfile
 import threading
 import time
 import uuid
+import subprocess
 from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Dict, Any, List, Optional, Set
 import shutil
-import subprocess
 
 class EnhancedSessionManager:
     """Enhanced session manager supporting multiple concurrent simulations"""
@@ -214,10 +214,32 @@ class EnhancedSessionManager:
         session_info = self.active_sessions[session_id]
         
         try:
-            # Stop SUMO process
+            # Stop data collection thread if running
+            if session_info.get('data_thread') and session_info['data_thread'].is_alive():
+                session_info['status'] = 'stopping'  # Signal thread to stop
+                session_info['data_thread'].join(timeout=2)
+            
+            # Close TraCI connection properly
+            try:
+                import traci
+                traci.close()
+                print(f"TraCI connection closed for session {session_id}")
+            except Exception as traci_error:
+                print(f"Warning: Could not close TraCI connection for session {session_id}: {traci_error}")
+            
+            # Stop SUMO process forcefully if needed
             if session_info['process'] and session_info['process'].poll() is None:
+                print(f"Terminating SUMO process for session {session_id}")
                 session_info['process'].terminate()
-                session_info['process'].wait(timeout=5)
+                
+                # Wait for graceful termination
+                try:
+                    session_info['process'].wait(timeout=5)
+                    print(f"SUMO process terminated gracefully for session {session_id}")
+                except subprocess.TimeoutExpired:
+                    print(f"Force killing SUMO process for session {session_id}")
+                    session_info['process'].kill()
+                    session_info['process'].wait()
             
             # Update status
             session_info['status'] = 'completed'
@@ -236,6 +258,7 @@ class EnhancedSessionManager:
             }
             
         except Exception as e:
+            print(f"Error stopping session {session_id}: {e}")
             return {
                 'success': False,
                 'message': f'Error stopping session: {str(e)}'
@@ -442,7 +465,7 @@ class EnhancedSessionManager:
             last_collection_timestamp = time.time()
             collection_interval = 1.0  # Collect data every 1 second
             
-            while session_info['status'] == 'running' and session_info['process'].poll() is None:
+            while session_info['status'] in ['running'] and session_info['process'].poll() is None:
                 try:
                     # Passive data collection - don't step the simulation
                     current_time = traci.simulation.getTime()

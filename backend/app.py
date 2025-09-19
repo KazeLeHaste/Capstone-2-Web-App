@@ -17,7 +17,6 @@ import time
 import json
 from datetime import datetime
 from pathlib import Path
-from sumo_controller import SumoController
 from websocket_handler import WebSocketHandler
 from simulation_manager import SimulationManager
 from analytics_engine import TrafficAnalyticsEngine
@@ -40,9 +39,8 @@ db_service = DatabaseService()
 # Initialize networks in database from filesystem  
 db_service.initialize_networks_from_filesystem(str(Path(__file__).parent / "networks"))
 
-# Initialize SUMO controller and WebSocket handler
-sumo_controller = SumoController()
-websocket_handler = WebSocketHandler(socketio, sumo_controller)
+# Initialize WebSocket handler (without singleton SumoController)
+websocket_handler = WebSocketHandler(socketio)
 sim_manager = SimulationManager(websocket_handler=websocket_handler, db_service=db_service)
 analytics_engine = TrafficAnalyticsEngine(db_service=db_service)
 
@@ -60,9 +58,7 @@ def log_request_info():
     if request.is_json and request.get_json():
         print(f"DEBUG: Request data: {request.get_json()}")
 
-# Global variables for simulation state
-simulation_active = False
-simulation_thread = None
+# Legacy simulation state removed - now using multi-session architecture
 
 @app.route('/')
 def home():
@@ -70,11 +66,20 @@ def home():
     API health check endpoint
     Returns basic application information
     """
+    # Check SUMO availability using the enhanced session manager
+    sumo_available = False
+    try:
+        import subprocess
+        result = subprocess.run(['sumo', '--help'], capture_output=True, text=True, timeout=5)
+        sumo_available = result.returncode == 0
+    except:
+        sumo_available = False
+    
     return jsonify({
         'message': 'Traffic Simulator Backend API',
-        'version': '1.0.0',
+        'version': '2.0.0',  # Updated version for multi-session architecture
         'status': 'running',
-        'sumo_available': sumo_controller.check_sumo_availability()
+        'sumo_available': sumo_available
     })
 
 @app.route('/api/status')
@@ -82,10 +87,29 @@ def api_status():
     """
     Get current application and simulation status
     """
+    # Check SUMO availability
+    sumo_available = False
+    try:
+        import subprocess
+        result = subprocess.run(['sumo', '--help'], capture_output=True, text=True, timeout=5)
+        sumo_available = result.returncode == 0
+    except:
+        sumo_available = False
+    
+    # Check SUMO availability
+    sumo_available = False
+    try:
+        import subprocess
+        result = subprocess.run(['sumo', '--help'], capture_output=True, text=True, timeout=5)
+        sumo_available = result.returncode == 0
+    except:
+        sumo_available = False
+    
     return jsonify({
         'backend_status': 'running',
-        'simulation_active': len(sim_manager.active_processes) > 0,
-        'sumo_available': sumo_controller.check_sumo_availability(),
+        'simulation_active': len(enhanced_session_manager.active_sessions) > 0,
+        'active_sessions': len(enhanced_session_manager.active_sessions),
+        'sumo_available': sumo_available,
         'connected_clients': len(websocket_handler.connected_clients)
     })
 
@@ -95,24 +119,33 @@ def sync_simulation_state():
     Force synchronization of frontend with backend simulation state
     """
     try:
-        active_sessions = []
+        # Get active sessions from both systems
+        enhanced_sessions = enhanced_session_manager.get_active_sessions()
+        legacy_sessions = []
+        
+        # Also check legacy sim_manager for backward compatibility
         for session_id, data in sim_manager.active_processes.items():
             process = data["process"]
             if process.poll() is None:  # Process is still running
-                active_sessions.append({
+                legacy_sessions.append({
                     'session_id': session_id,
                     'process_id': data["info"]["processId"],
                     'start_time': data["info"]["startTime"]
                 })
         
+        # Combine both types of sessions
+        all_sessions = enhanced_sessions + legacy_sessions
+        
         # If no active sessions, broadcast that all simulations are completed
-        if not active_sessions:
+        if not all_sessions:
             websocket_handler.broadcast_simulation_status('idle', 'No active simulations', {})
         
         return jsonify({
             'success': True,
-            'simulation_active': len(active_sessions) > 0,
-            'active_sessions': active_sessions
+            'simulation_active': len(all_sessions) > 0,
+            'active_sessions': all_sessions,
+            'enhanced_sessions': len(enhanced_sessions),
+            'legacy_sessions': len(legacy_sessions)
         })
         
     except Exception as e:
@@ -145,7 +178,8 @@ def get_scenarios():
     Get list of available simulation scenarios
     """
     try:
-        scenarios = sumo_controller.get_available_scenarios()
+        # Use simulation manager instead of singleton controller
+        scenarios = sim_manager.get_available_networks().get('networks', [])
         return jsonify({
             'success': True,
             'scenarios': scenarios
@@ -159,15 +193,14 @@ def get_scenarios():
 @app.route('/api/simulation/start', methods=['POST'])
 def start_simulation():
     """
-    Start SUMO simulation with specified configuration
-    Expects JSON payload with network and scenario information
+    Start SUMO simulation with specified configuration (backward compatible)
+    Now uses multi-session architecture but provides single-session interface
     """
-    global simulation_active, simulation_thread
-    
     try:
         data = request.get_json()
         
-        if simulation_active:
+        # Check if any session is already running (for backward compatibility)
+        if len(enhanced_session_manager.active_sessions) > 0:
             return jsonify({
                 'success': False,
                 'error': 'Simulation is already running'
@@ -182,19 +215,46 @@ def start_simulation():
                     'error': f'Missing required field: {field}'
                 }), 400
         
-        # Start simulation in separate thread
-        simulation_thread = threading.Thread(
-            target=run_simulation_thread,
-            args=(data,)
-        )
-        simulation_thread.daemon = True
-        simulation_thread.start()
+        # Extract network ID and create configuration
+        network_id = data.get('network')
+        config = {
+            'network': network_id,
+            'scenario': data.get('scenario'),
+            'traffic_scale': data.get('traffic_scale', 1.0),
+            'simulation_time': data.get('simulation_time', 3600),
+            'enable_gui': data.get('enable_gui', True)
+        }
         
-        simulation_active = True
+        # Create session using enhanced session manager
+        session_result = enhanced_session_manager.create_session(
+            network_id=network_id,
+            config=config,
+            enable_gui=config['enable_gui']
+        )
+        
+        if not session_result['success']:
+            return jsonify({
+                'success': False,
+                'error': session_result['message']
+            }), 500
+        
+        # Launch the simulation
+        session_id = session_result['session_id']
+        launch_result = enhanced_session_manager.launch_simulation(session_id)
+        
+        if not launch_result['success']:
+            # Cleanup session if launch failed
+            enhanced_session_manager.cleanup_session(session_id)
+            return jsonify({
+                'success': False,
+                'error': launch_result['message']
+            }), 500
         
         return jsonify({
             'success': True,
-            'message': 'Simulation started successfully'
+            'message': 'Simulation started successfully',
+            'session_id': session_id,
+            'process_id': launch_result['process_id']
         })
         
     except Exception as e:
@@ -204,29 +264,37 @@ def start_simulation():
         }), 500
 
 @app.route('/api/simulation/stop', methods=['POST'])
-def stop_legacy_simulation():
+def stop_simulation():
     """
-    Stop the currently running SUMO simulation (legacy endpoint)
+    Stop the currently running SUMO simulation (backward compatible)
+    Now uses multi-session architecture
     """
-    global simulation_active
-    
     try:
-        if not simulation_active:
+        active_sessions = enhanced_session_manager.get_active_sessions()
+        
+        if not active_sessions:
             return jsonify({
                 'success': False,
                 'error': 'No simulation is currently running'
             }), 400
         
-        # Stop SUMO simulation
-        sumo_controller.stop_simulation()
-        simulation_active = False
+        # Stop all active sessions (for backward compatibility with single-session interface)
+        stopped_sessions = []
+        for session in active_sessions:
+            session_id = session['session_id']
+            stop_result = enhanced_session_manager.stop_simulation(session_id)
+            if stop_result['success']:
+                stopped_sessions.append(session_id)
         
         # Notify all connected clients
-        websocket_handler.broadcast_simulation_status('stopped')
+        websocket_handler.broadcast_simulation_status('stopped', 'All simulations stopped', {
+            'stopped_sessions': stopped_sessions
+        })
         
         return jsonify({
             'success': True,
-            'message': 'Simulation stopped successfully'
+            'message': f'Stopped {len(stopped_sessions)} simulation(s) successfully',
+            'stopped_sessions': stopped_sessions
         })
         
     except Exception as e:
@@ -239,18 +307,43 @@ def stop_legacy_simulation():
 def get_simulation_data():
     """
     Get current simulation data (vehicles, network status)
+    Backward compatible - returns data from first active session
     """
     try:
-        if not simulation_active:
+        active_sessions = enhanced_session_manager.get_active_sessions()
+        
+        if not active_sessions:
             return jsonify({
                 'success': False,
                 'error': 'No simulation is currently running'
             }), 400
         
-        data = sumo_controller.get_simulation_data()
+        # For backward compatibility, return data from the first active session
+        first_session = active_sessions[0]
+        session_id = first_session['session_id']
+        
+        # Get live data from database if available
+        if db_service:
+            live_data = db_service.get_latest_live_data(session_id, limit=1)
+            if live_data:
+                data = live_data[0].to_dict()
+                return jsonify({
+                    'success': True,
+                    'data': data,
+                    'session_id': session_id
+                })
+        
+        # Fallback to basic session info
         return jsonify({
             'success': True,
-            'data': data
+            'data': {
+                'session_id': session_id,
+                'status': first_session.get('status', 'running'),
+                'timestamp': first_session.get('created_at', ''),
+                'vehicles': [],
+                'edges': [],
+                'junctions': []
+            }
         })
         
     except Exception as e:
@@ -259,51 +352,7 @@ def get_simulation_data():
             'error': str(e)
         }), 500
 
-def run_simulation_thread(config):
-    """
-    Run SUMO simulation in separate thread
-    Handles simulation lifecycle and data broadcasting
-    """
-    global simulation_active
-    
-    try:
-        # Initialize simulation
-        websocket_handler.broadcast_simulation_status('initializing')
-        success = sumo_controller.start_simulation(config)
-        
-        if not success:
-            simulation_active = False
-            websocket_handler.broadcast_simulation_status('error')
-            return
-        
-        websocket_handler.broadcast_simulation_status('running')
-        
-        # Main simulation loop
-        while simulation_active and sumo_controller.is_simulation_running():
-            try:
-                # Get current simulation data
-                sim_data = sumo_controller.get_simulation_data()
-                
-                # Broadcast data to all connected clients
-                websocket_handler.broadcast_simulation_data(sim_data)
-                
-                # Control simulation speed (adjust as needed)
-                time.sleep(0.1)
-                
-            except Exception as e:
-                print(f"Error in simulation loop: {e}")
-                break
-        
-        # Simulation ended
-        simulation_active = False
-        websocket_handler.broadcast_simulation_status('finished')
-        sumo_controller.cleanup()
-        
-    except Exception as e:
-        print(f"Error in simulation thread: {e}")
-        simulation_active = False
-        websocket_handler.broadcast_simulation_status('error')
-        sumo_controller.cleanup()
+# Legacy run_simulation_thread removed - now using EnhancedSessionManager
 
 # WebSocket event handlers
 @socketio.on('connect')
@@ -315,8 +364,10 @@ def handle_connect():
     websocket_handler.add_client(request.sid)
     
     # Send current status to newly connected client
+    active_sessions = enhanced_session_manager.get_active_sessions()
     emit('simulation_status', {
-        'active': simulation_active,
+        'active': len(active_sessions) > 0,
+        'active_sessions': len(active_sessions),
         'message': 'Connected to traffic simulator'
     })
 
@@ -333,10 +384,25 @@ def handle_data_request():
     """
     Handle client request for current simulation data
     """
-    if simulation_active:
+    active_sessions = enhanced_session_manager.get_active_sessions()
+    if active_sessions:
         try:
-            data = sumo_controller.get_simulation_data()
-            emit('simulation_data', data)
+            # Get data from first active session for backward compatibility
+            session_id = active_sessions[0]['session_id']
+            if db_service:
+                live_data = db_service.get_latest_live_data(session_id, limit=1)
+                if live_data:
+                    emit('simulation_data', live_data[0].to_dict())
+                    return
+            
+            # Fallback
+            emit('simulation_data', {
+                'session_id': session_id,
+                'timestamp': time.time(),
+                'vehicles': [],
+                'edges': [],
+                'junctions': []
+            })
         except Exception as e:
             emit('error', {'message': str(e)})
     else:
@@ -534,9 +600,9 @@ def get_simulation_stats(process_id):
         }), 500
 
 @app.route('/api/simulation/stop/<int:process_id>', methods=['POST'])
-def stop_simulation(process_id):
+def stop_simulation_by_process_id(process_id):
     """
-    Stop running simulation
+    Stop running simulation by process ID
     """
     try:
         result = sim_manager.stop_simulation(process_id)
