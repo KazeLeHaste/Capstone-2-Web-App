@@ -9,7 +9,7 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import axios from 'axios';
+import apiClient from '../utils/apiClient';
 import { 
   TrendingUp, 
   Activity,
@@ -19,11 +19,14 @@ import {
   FileText,
   LineChart,
   AlertCircle,
-  AlertTriangle,
   GitCompare,
   Eye,
   Calendar,
-  Database
+  Database,
+  MapPin,
+  Leaf,
+  Shield,
+  Network
 } from 'lucide-react';
 
 // Import our new components
@@ -31,7 +34,16 @@ import KPIDashboard from '../components/KPIDashboard';
 import AnalyticsCharts from '../components/AnalyticsCharts';
 import RecommendationsPanel from '../components/RecommendationsPanel';
 import SessionComparison from '../components/SessionComparison';
-import { exportAnalyticsAsPDF } from '../utils/reportExport';
+import NetworkHeatmap from '../components/NetworkHeatmap';
+import EmissionsAnalysis from '../components/EmissionsAnalysis';
+import SafetyAnalysis from '../components/SafetyAnalysis';
+import { 
+  exportAnalyticsAsPDF, 
+  exportAdvancedAnalyticsAsCSV,
+  exportEmissionsDataAsCSV,
+  exportSafetyDataAsCSV,
+  exportNetworkDataAsCSV
+} from '../utils/reportExport';
 
 const AnalyticsPage = ({ socket, simulationData, simulationStatus }) => {
   const [searchParams] = useSearchParams();
@@ -46,61 +58,106 @@ const AnalyticsPage = ({ socket, simulationData, simulationStatus }) => {
   const [activeTab, setActiveTab] = useState('kpis');
   const [showComparison, setShowComparison] = useState(false);
   const [selectedSessionsForComparison, setSelectedSessionsForComparison] = useState([]);
+  const [showSessionComparison, setShowSessionComparison] = useState(false);
+  const [isInitialized, setIsInitialized] = useState(false);
+  const [exportDropdownOpen, setExportDropdownOpen] = useState(false);
 
   const loadAvailableSessions = useCallback(async () => {
     try {
-      const response = await axios.get('/api/analytics/sessions');
+      const response = await apiClient.get('/api/analytics/sessions');
+      
       if (response.data.success) {
         setAvailableSessions(response.data.sessions);
         
-        if (!selectedSession && response.data.sessions.length > 0) {
+        // Auto-select first analyzable session if none selected
+        if (!selectedSession && !isInitialized && response.data.sessions.length > 0) {
           const firstAnalyzable = response.data.sessions.find(s => s.can_analyze);
           if (firstAnalyzable) {
             setSelectedSession(firstAnalyzable.session_id);
           }
         }
+        setIsInitialized(true);
       }
     } catch (err) {
-      console.error('Error loading sessions:', err);
+      console.error('Failed to load sessions:', err);
+      setError('Failed to load sessions');
     }
-  }, [selectedSession]);
+  }, [selectedSession, isInitialized]);
 
-  const loadSessionAnalytics = useCallback(async (sessionId, silent = false) => {
+  const loadSessionAnalytics = useCallback(async (sessionId) => {
+    if (!sessionId) {
+      return;
+    }
+
+    // Clear previous state and set loading
+    setLoading(true);
+    setError(null);
+    setAnalyticsData(null);
+
     try {
-      if (!silent) {
-        setLoading(true);
-        setError(null);
-      }
-
-      const response = await axios.get(`/api/analytics/session/${sessionId}`);
+      const response = await apiClient.get(`/api/analytics/session/${sessionId}`);
       
-      if (response.data.success) {
+      if (response.data && response.data.success && response.data.analytics) {
         setAnalyticsData(response.data.analytics);
+        setError(null);
       } else {
-        setError(response.data.message);
+        const errorMsg = response.data?.message || 'No analytics data available';
+        setError(errorMsg);
+        setAnalyticsData(null);
       }
     } catch (err) {
-      const errorMessage = err.response?.data?.message || 'Failed to load analytics data';
+      const errorMessage = err.response?.data?.message || `Failed to load analytics: ${err.message}`;
       setError(errorMessage);
+      setAnalyticsData(null);
     } finally {
-      if (!silent) {
-        setLoading(false);
-      }
+      setLoading(false);
     }
   }, []);
 
+  // Load sessions on component mount
   useEffect(() => {
     loadAvailableSessions();
-  }, [loadAvailableSessions]);
+  }, []); // Empty dependency array - only run on mount
 
+  // Load analytics when session changes
   useEffect(() => {
-    if (selectedSession) {
+    if (selectedSession && isInitialized) {
       loadSessionAnalytics(selectedSession);
     }
-  }, [selectedSession, loadSessionAnalytics]);
+  }, [selectedSession, isInitialized]); // Only depend on selectedSession and initialization
+
+  // Handle click outside to close dropdown
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      // Check if click is outside the dropdown container
+      if (exportDropdownOpen && !event.target.closest('.dropdown')) {
+        closeExportDropdown();
+      }
+    };
+
+    document.addEventListener('click', handleClickOutside);
+    return () => {
+      document.removeEventListener('click', handleClickOutside);
+    };
+  }, [exportDropdownOpen]);
+
+  // Handle click outside dropdown to close it
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (exportDropdownOpen && !event.target.closest('.dropdown')) {
+        setExportDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [exportDropdownOpen]);
 
   const handleSessionChange = (sessionId) => {
     setSelectedSession(sessionId);
+    setAnalyticsData(null); // Clear previous data
     setError(null);
   };
 
@@ -129,7 +186,12 @@ const AnalyticsPage = ({ socket, simulationData, simulationStatus }) => {
       exported_at: new Date().toISOString(),
       kpis: analyticsData.kpis,
       recommendations: analyticsData.recommendations,
-      time_series: analyticsData.time_series
+      time_series: analyticsData.time_series,
+      emissions_data: analyticsData.emissions_data,
+      safety_data: analyticsData.safety_data,
+      network_analysis: analyticsData.network_analysis,
+      route_analysis: analyticsData.route_analysis,
+      temporal_patterns: analyticsData.temporal_patterns
     };
     
     const dataStr = JSON.stringify(exportData, null, 2);
@@ -140,6 +202,60 @@ const AnalyticsPage = ({ socket, simulationData, simulationStatus }) => {
     link.download = `analytics_${selectedSession}_${new Date().toISOString().split('T')[0]}.json`;
     link.click();
     URL.revokeObjectURL(url);
+  };
+
+  const handleExportAdvancedCSV = async () => {
+    if (!analyticsData) return;
+    
+    try {
+      await exportAdvancedAnalyticsAsCSV(analyticsData, selectedSession);
+    } catch (error) {
+      console.error('Advanced CSV export failed:', error);
+    }
+  };
+
+  const handleExportEmissions = () => {
+    if (!analyticsData) return;
+    
+    try {
+      exportEmissionsDataAsCSV(analyticsData, `emissions_${selectedSession}`);
+    } catch (error) {
+      console.error('Emissions export failed:', error);
+    }
+  };
+
+  const handleExportSafety = () => {
+    if (!analyticsData) return;
+    
+    try {
+      exportSafetyDataAsCSV(analyticsData, `safety_${selectedSession}`);
+    } catch (error) {
+      console.error('Safety export failed:', error);
+    }
+  };
+
+  const handleExportNetwork = () => {
+    if (!analyticsData) return;
+    
+    try {
+      exportNetworkDataAsCSV(analyticsData, `network_${selectedSession}`);
+    } catch (error) {
+      console.error('Network export failed:', error);
+    }
+  };
+
+  // Export dropdown handlers
+  const toggleExportDropdown = () => {
+    setExportDropdownOpen(!exportDropdownOpen);
+  };
+
+  const closeExportDropdown = () => {
+    setExportDropdownOpen(false);
+  };
+
+  const handleExportClick = (exportFunction) => {
+    exportFunction();
+    closeExportDropdown();
   };
 
   const handleCompareToggle = () => {
@@ -164,11 +280,16 @@ const AnalyticsPage = ({ socket, simulationData, simulationStatus }) => {
   const tabs = [
     { id: 'kpis', name: 'KPIs', icon: TrendingUp },
     { id: 'charts', name: 'Charts', icon: LineChart },
+    { id: 'emissions', name: 'Environmental', icon: Leaf },
+    { id: 'safety', name: 'Safety', icon: Shield },
+    { id: 'network', name: 'Network', icon: MapPin },
     { id: 'recommendations', name: 'Recommendations', icon: AlertCircle },
   ];
 
   return (
     <div className="analytics-page">
+
+      
       {/* Header */}
       <div className="analytics-header">
         <div className="analytics-header-content">
@@ -220,23 +341,79 @@ const AnalyticsPage = ({ socket, simulationData, simulationStatus }) => {
                 Compare
               </button>
 
-              <button
-                onClick={handleExportPDF}
-                disabled={!analyticsData}
-                className="btn btn-primary btn-sm"
-              >
-                <Download />
-                Export PDF
-              </button>
-
-              <button
-                onClick={handleExportData}
-                disabled={!analyticsData}
-                className="btn btn-outline btn-sm"
-              >
-                <FileText />
-                Export Data
-              </button>
+              {/* Export Dropdown */}
+              <div className="dropdown dropdown-end">
+                <button
+                  onClick={toggleExportDropdown}
+                  disabled={!analyticsData}
+                  className="btn btn-primary btn-sm"
+                >
+                  <Download />
+                  Export
+                  <svg className="w-2 h-2 ml-1" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
+                  </svg>
+                </button>
+                <div className={`dropdown-content ${exportDropdownOpen ? 'show' : ''}`}>
+                  <ul className="menu">
+                  <li>
+                    <button onClick={() => handleExportClick(handleExportPDF)} disabled={!analyticsData} className="text-sm">
+                      <FileText className="w-4 h-4" />
+                      <div>
+                        <div className="font-medium">PDF Report</div>
+                        <div className="text-xs text-gray-500">Comprehensive analytics report</div>
+                      </div>
+                    </button>
+                  </li>
+                  <li>
+                    <button onClick={() => handleExportClick(handleExportAdvancedCSV)} disabled={!analyticsData} className="text-sm">
+                      <Download className="w-4 h-4" />
+                      <div>
+                        <div className="font-medium">Advanced CSV Package</div>
+                        <div className="text-xs text-gray-500">All analytics data in CSV format</div>
+                      </div>
+                    </button>
+                  </li>
+                  <li>
+                    <button onClick={() => handleExportClick(handleExportData)} disabled={!analyticsData} className="text-sm">
+                      <FileText className="w-4 h-4" />
+                      <div>
+                        <div className="font-medium">JSON Data</div>
+                        <div className="text-xs text-gray-500">Raw analytics data</div>
+                      </div>
+                    </button>
+                  </li>
+                  <div className="divider my-1"></div>
+                  <li>
+                    <button onClick={() => handleExportClick(handleExportEmissions)} disabled={!analyticsData} className="text-sm">
+                      <Leaf className="w-4 h-4" />
+                      <div>
+                        <div className="font-medium">Emissions Data</div>
+                        <div className="text-xs text-gray-500">Environmental impact CSV</div>
+                      </div>
+                    </button>
+                  </li>
+                  <li>
+                    <button onClick={() => handleExportClick(handleExportSafety)} disabled={!analyticsData} className="text-sm">
+                      <Shield className="w-4 h-4" />
+                      <div>
+                        <div className="font-medium">Safety Data</div>
+                        <div className="text-xs text-gray-500">Safety metrics CSV</div>
+                      </div>
+                    </button>
+                  </li>
+                  <li>
+                    <button onClick={() => handleExportClick(handleExportNetwork)} disabled={!analyticsData} className="text-sm">
+                      <Network className="w-4 h-4" />
+                      <div>
+                        <div className="font-medium">Network Data</div>
+                        <div className="text-xs text-gray-500">Network performance CSV</div>
+                      </div>
+                    </button>
+                  </li>
+                  </ul>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -274,14 +451,19 @@ const AnalyticsPage = ({ socket, simulationData, simulationStatus }) => {
               
               <div className="btn-group">
                 <button
-                  onClick={() => setShowComparison(false)}
+                  onClick={() => {
+                    setShowComparison(false);
+                    setSelectedSessionsForComparison([]);
+                    setShowSessionComparison(false);
+                  }}
                   className="btn btn-outline btn-sm"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={() => {
-                    // Open comparison modal with selected sessions
+                    // Start comparison with selected sessions
+                    setShowSessionComparison(true);
                   }}
                   disabled={!canStartComparison}
                   className="btn btn-primary btn-sm"
@@ -374,12 +556,15 @@ const AnalyticsPage = ({ socket, simulationData, simulationStatus }) => {
           </div>
         )}
 
+
+
         {/* Loading State */}
         {loading && (
           <div className="card">
             <div className="card-body text-center py-xl">
               <RefreshCw className="icon-medium icon-primary icon-center animate-spin mb-md" />
               <p>Loading analytics data...</p>
+              <p className="text-sm text-muted">Session: {selectedSession}</p>
             </div>
           </div>
         )}
@@ -419,6 +604,18 @@ const AnalyticsPage = ({ socket, simulationData, simulationStatus }) => {
                   <AnalyticsCharts analyticsData={analyticsData} loading={false} />
                 )}
 
+                {activeTab === 'emissions' && (
+                  <EmissionsAnalysis analyticsData={analyticsData} loading={false} />
+                )}
+
+                {activeTab === 'safety' && (
+                  <SafetyAnalysis analyticsData={analyticsData} loading={false} />
+                )}
+
+                {activeTab === 'network' && (
+                  <NetworkHeatmap analyticsData={analyticsData} loading={false} />
+                )}
+
                 {activeTab === 'recommendations' && (
                   <RecommendationsPanel 
                     recommendations={analyticsData.recommendations} 
@@ -432,10 +629,11 @@ const AnalyticsPage = ({ socket, simulationData, simulationStatus }) => {
       </div>
 
       {/* Session Comparison Modal */}
-      {canStartComparison && (
+      {showSessionComparison && selectedSessionsForComparison.length >= 2 && (
         <SessionComparison
           selectedSessions={selectedSessionsForComparison}
           onClose={() => {
+            setShowSessionComparison(false);
             setShowComparison(false);
             setSelectedSessionsForComparison([]);
           }}

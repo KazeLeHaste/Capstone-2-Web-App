@@ -497,6 +497,40 @@ class OSMScenarioImporter:
                 if route_files:
                     route_input.set('value', ','.join(route_files))
             
+            # Ensure output section exists and add missing outputs for analytics
+            output_section = root.find('.//output')
+            if output_section is None:
+                # Create output section if it doesn't exist
+                output_section = ET.SubElement(root, 'output')
+            
+            # Add summary-output if missing (critical for time series analytics)
+            summary_output = output_section.find('summary-output')
+            if summary_output is None:
+                summary_output = ET.SubElement(output_section, 'summary-output')
+                summary_output.set('value', f'{network_name}_summary.xml')
+                print(f"Added summary-output to config: {network_name}_summary.xml")
+            
+            # Ensure tripinfo-output exists for trip analytics
+            tripinfo_output = output_section.find('tripinfo-output')
+            if tripinfo_output is None:
+                tripinfo_output = ET.SubElement(output_section, 'tripinfo-output')
+                tripinfo_output.set('value', f'{network_name}_tripinfo.xml')
+                print(f"Added tripinfo-output to config: {network_name}_tripinfo.xml")
+            
+            # Add emission-output for environmental analytics
+            emission_output = output_section.find('emission-output')
+            if emission_output is None:
+                emission_output = ET.SubElement(output_section, 'emission-output')
+                emission_output.set('value', f'{network_name}_emissions.xml')
+                print(f"Added emission-output to config: {network_name}_emissions.xml")
+            
+            # Add edgedata-output for network analysis
+            edgedata_output = output_section.find('edgedata-output')
+            if edgedata_output is None:
+                edgedata_output = ET.SubElement(output_section, 'edgedata-output')
+                edgedata_output.set('value', f'{network_name}_edgedata.xml')
+                print(f"Added edgedata-output to config: {network_name}_edgedata.xml")
+            
             # Save updated config
             tree.write(target_config, encoding='utf-8', xml_declaration=True)
             

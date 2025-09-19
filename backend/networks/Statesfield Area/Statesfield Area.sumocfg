@@ -10,7 +10,7 @@
     <output>
         <tripinfo-output value="Statesfield Area.tripinfos.xml" />
         <statistic-output value="Statesfield Area.stats.xml" />
-    </output>
+    <summary-output value="Statesfield Area_summary.xml" /><emission-output value="Statesfield Area_emissions.xml" /><edgedata-output value="Statesfield Area_edgedata.xml" /></output>
 
     <processing>
         <ignore-route-errors value="true" />

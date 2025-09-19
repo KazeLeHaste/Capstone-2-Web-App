@@ -10,7 +10,7 @@
     <output>
         <tripinfo-output value="SM Bacoor Area.tripinfos.xml" />
         <statistic-output value="SM Bacoor Area.stats.xml" />
-    </output>
+    <summary-output value="SM Bacoor Area_summary.xml" /><emission-output value="SM Bacoor Area_emissions.xml" /><edgedata-output value="SM Bacoor Area_edgedata.xml" /></output>
 
     <processing>
         <ignore-route-errors value="true" />

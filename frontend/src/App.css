@@ -7598,3 +7598,281 @@ html.dark .onboarding-icon-red {
     font-size: 0.875rem;
   }
 }
+
+/* ============================================
+   DEBUG PANEL STYLES (Development Only)
+   ============================================ */
+
+.debug-panel {
+  position: fixed;
+  top: 10px;
+  left: 10px;
+  background: #fff3cd;
+  border: 1px solid #ffeaa7;
+  padding: 10px;
+  z-index: 9999;
+  border-radius: 5px;
+  font-size: 12px;
+  max-width: 350px;
+  font-family: 'Courier New', monospace;
+}
+
+.debug-status-success {
+  color: #22543d;
+  font-weight: bold;
+}
+
+.debug-status-error {
+  color: #c53030;
+  font-weight: bold;
+}
+
+.debug-status-warning {
+  color: #d69e2e;
+  font-weight: bold;
+}
+
+.debug-panel-section {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid #ccc;
+}
+
+/* ============================================
+   API TEST COMPONENT STYLES (Development Only)
+   ============================================ */
+
+.api-test-container {
+  padding: 20px;
+  border: 1px solid #ccc;
+  margin: 20px;
+  background: #f9f9f9;
+}
+
+.api-test-error {
+  color: #c53030;
+  font-weight: bold;
+}
+
+.api-test-pre {
+  background: #f5f5f5;
+  padding: 10px;
+  overflow: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
+  max-height: 300px;
+}
+
+/* ============================================
+   DYNAMIC PROGRESS BAR STYLES
+   ============================================ */
+
+.progress-bar-dynamic {
+  transition: all 0.3s ease;
+}
+
+.progress-bar-dynamic.safety-score {
+  background-color: #10B981;
+}
+
+.progress-bar-dynamic.risk-factor {
+  transition: all 0.3s ease;
+}
+
+/* ============================================
+   DYNAMIC COLOR STYLES FOR ANALYTICS
+   ============================================ */
+
+.dynamic-color-icon {
+  /* Will be overridden by inline style for dynamic colors */
+}
+
+.dynamic-color-text {
+  /* Will be overridden by inline style for dynamic colors */
+}
+
+.dynamic-width-bar {
+  transition: all 0.3s ease;
+  /* Width will be set dynamically via inline styles */
+}
+
+.dynamic-gradient-bar {
+  transition: all 0.3s ease;
+  /* Background gradient will be set dynamically via inline styles */
+}
+
+.dynamic-color-indicator {
+  transition: all 0.3s ease;
+  /* Background color will be set dynamically via inline styles */
+}
+
+/* ============================================
+   RECOMMENDATIONS PANEL STYLES
+   ============================================ */
+
+.recommendations-category-select {
+  min-width: 150px;
+}
+
+.recommendations-priority-select {
+  min-width: 120px;
+}
+
+/* ============================================
+   SIMULATION STATS STYLES
+   ============================================ */
+
+.progress-bar-fill-complete {
+  width: 100%;
+}
+
+/* ============================================
+   EXPORT DROPDOWN STYLES
+   ============================================ */
+
+/* Export dropdown container */
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.dropdown-end {
+  /* Right-aligned dropdown */
+}
+
+/* Export dropdown content (hidden by default) */
+.dropdown-content {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  z-index: 50;
+  min-width: 18rem;
+  margin-top: 0.5rem;
+  background-color: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 0.75rem;
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-10px);
+  transition: all var(--transition-normal);
+}
+
+/* Show dropdown when active */
+.dropdown-content.show {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+/* Export dropdown menu */
+.dropdown-content .menu {
+  padding: 0.5rem;
+  margin: 0;
+  list-style: none;
+  background: none;
+}
+
+.dropdown-content .menu li {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.dropdown-content .menu li button {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: none;
+  border-radius: 0.5rem;
+  background: none;
+  color: var(--text-primary);
+  text-align: left;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: all var(--transition-normal);
+  cursor: pointer;
+  min-height: 44px;
+}
+
+.dropdown-content .menu li button:hover {
+  background-color: var(--bg-secondary);
+  color: var(--primary-color);
+}
+
+.dropdown-content .menu li button:focus {
+  outline: 2px solid var(--primary-color);
+  outline-offset: 2px;
+}
+
+.dropdown-content .menu li button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.dropdown-content .menu li button:disabled:hover {
+  background: none;
+  color: var(--text-primary);
+}
+
+/* Menu item content */
+.dropdown-content .menu li button > div {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+}
+
+.dropdown-content .menu li button .font-medium {
+  font-weight: 600;
+  color: inherit;
+}
+
+.dropdown-content .menu li button .text-xs.text-gray-500 {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  font-weight: 400;
+}
+
+/* Divider in dropdown */
+.dropdown-content .divider {
+  height: 1px;
+  background-color: var(--border-color);
+  margin: 0.25rem 0;
+  border: none;
+}
+
+/* ============================================
+   THEME-AWARE UTILITY CLASSES
+   ============================================ */
+
+/* Text color utilities */
+.text-primary {
+  color: var(--text-primary);
+}
+
+.text-secondary {
+  color: var(--text-secondary);
+}
+
+.text-success {
+  color: var(--success-color);
+}
+
+.text-error {
+  color: var(--error-color);
+}
+
+/* Border utilities */
+.border-color {
+  border-color: var(--border-color);
+}
+
+/* Background utilities */
+.bg-secondary {
+  background-color: var(--bg-secondary);
+}

@@ -17,7 +17,10 @@ from pathlib import Path
 import json
 import os
 
-from .models import Base, Session, Configuration, LiveData, KPI, Trip, TimeSeries, Recommendation, Network
+from .models import (
+    Base, Session, Configuration, LiveData, KPI, Trip, TimeSeries, Recommendation, Network,
+    VehicleEmissions, EdgeData, SafetyMetrics, RouteAnalysis, TemporalPatterns
+)
 
 class DatabaseService:
     """Database service for traffic simulator"""
@@ -616,6 +619,159 @@ class DatabaseService:
                         
         except Exception as e:
             print(f"Error initializing networks from filesystem: {e}")
+    
+    def save_vehicle_emissions(self, session_id: str, emissions_data: List[Dict[str, Any]]) -> bool:
+        """Save vehicle emissions data for session"""
+        db_session = self.get_session()
+        try:
+            # Delete existing emissions data for this session
+            db_session.query(VehicleEmissions).filter_by(session_id=session_id).delete()
+            
+            # Add new emissions data
+            for emission in emissions_data:
+                vehicle_emission = VehicleEmissions(session_id=session_id, **emission)
+                db_session.add(vehicle_emission)
+            
+            db_session.commit()
+            return True
+        except Exception as e:
+            db_session.rollback()
+            print(f"Error saving vehicle emissions: {e}")
+            return False
+        finally:
+            db_session.close()
+    
+    def save_edge_data(self, session_id: str, edge_data: List[Dict[str, Any]]) -> bool:
+        """Save edge data for session"""
+        db_session = self.get_session()
+        try:
+            # Delete existing edge data for this session
+            db_session.query(EdgeData).filter_by(session_id=session_id).delete()
+            
+            # Add new edge data
+            for edge in edge_data:
+                edge_record = EdgeData(session_id=session_id, **edge)
+                db_session.add(edge_record)
+            
+            db_session.commit()
+            return True
+        except Exception as e:
+            db_session.rollback()
+            print(f"Error saving edge data: {e}")
+            return False
+        finally:
+            db_session.close()
+    
+    def save_safety_metrics(self, session_id: str, safety_data: Dict[str, Any]) -> bool:
+        """Save safety metrics for session"""
+        db_session = self.get_session()
+        try:
+            # Check if safety metrics already exist
+            existing_safety = db_session.query(SafetyMetrics).filter_by(session_id=session_id).first()
+            
+            if existing_safety:
+                # Update existing safety metrics
+                for key, value in safety_data.items():
+                    if hasattr(existing_safety, key):
+                        if key in ['critical_periods', 'peak_collision_times', 'high_risk_edges', 'intersection_hotspots']:
+                            # Handle JSON fields
+                            setattr(existing_safety, key, json.dumps(value) if value else None)
+                        else:
+                            setattr(existing_safety, key, value)
+                safety_metrics = existing_safety
+            else:
+                # Create new safety metrics
+                # Convert list/dict fields to JSON strings
+                processed_data = safety_data.copy()
+                for json_field in ['critical_periods', 'peak_collision_times', 'high_risk_edges', 'intersection_hotspots']:
+                    if json_field in processed_data and processed_data[json_field]:
+                        processed_data[json_field] = json.dumps(processed_data[json_field])
+                
+                safety_metrics = SafetyMetrics(session_id=session_id, **processed_data)
+                db_session.add(safety_metrics)
+            
+            db_session.commit()
+            return True
+        except Exception as e:
+            db_session.rollback()
+            print(f"Error saving safety metrics: {e}")
+            return False
+        finally:
+            db_session.close()
+    
+    def save_route_analysis(self, session_id: str, route_data: Dict[str, Any]) -> bool:
+        """Save route analysis for session"""
+        db_session = self.get_session()
+        try:
+            # Check if route analysis already exists
+            existing_route = db_session.query(RouteAnalysis).filter_by(session_id=session_id).first()
+            
+            if existing_route:
+                # Update existing route analysis
+                for key, value in route_data.items():
+                    if hasattr(existing_route, key):
+                        if key in ['most_used_routes', 'route_usage_distribution']:
+                            # Handle JSON fields
+                            setattr(existing_route, key, json.dumps(value) if value else None)
+                        else:
+                            setattr(existing_route, key, value)
+                route_analysis = existing_route
+            else:
+                # Create new route analysis
+                # Convert list/dict fields to JSON strings
+                processed_data = route_data.copy()
+                for json_field in ['most_used_routes', 'route_usage_distribution']:
+                    if json_field in processed_data and processed_data[json_field]:
+                        processed_data[json_field] = json.dumps(processed_data[json_field])
+                
+                route_analysis = RouteAnalysis(session_id=session_id, **processed_data)
+                db_session.add(route_analysis)
+            
+            db_session.commit()
+            return True
+        except Exception as e:
+            db_session.rollback()
+            print(f"Error saving route analysis: {e}")
+            return False
+        finally:
+            db_session.close()
+    
+    def save_temporal_patterns(self, session_id: str, temporal_data: Dict[str, Any]) -> bool:
+        """Save temporal patterns for session"""
+        db_session = self.get_session()
+        try:
+            # Check if temporal patterns already exist
+            existing_temporal = db_session.query(TemporalPatterns).filter_by(session_id=session_id).first()
+            
+            if existing_temporal:
+                # Update existing temporal patterns
+                for key, value in temporal_data.items():
+                    if hasattr(existing_temporal, key):
+                        if key in ['hourly_flow_patterns', 'congestion_timeline']:
+                            # Handle JSON fields
+                            setattr(existing_temporal, key, json.dumps(value) if value else None)
+                        else:
+                            setattr(existing_temporal, key, value)
+                temporal_patterns = existing_temporal
+            else:
+                # Create new temporal patterns
+                # Convert list/dict fields to JSON strings
+                processed_data = temporal_data.copy()
+                for json_field in ['hourly_flow_patterns', 'congestion_timeline']:
+                    if json_field in processed_data and processed_data[json_field]:
+                        processed_data[json_field] = json.dumps(processed_data[json_field])
+                
+                temporal_patterns = TemporalPatterns(session_id=session_id, **processed_data)
+                db_session.add(temporal_patterns)
+            
+            db_session.commit()
+            return True
+        except Exception as e:
+            db_session.rollback()
+            print(f"Error saving temporal patterns: {e}")
+            return False
+        finally:
+            db_session.close()
     
     def get_database_stats(self) -> Dict[str, Any]:
         """Get database statistics"""

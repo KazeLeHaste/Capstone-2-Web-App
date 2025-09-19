@@ -10,7 +10,7 @@
     <output>
         <tripinfo-output value="Jollibee Molino Area.tripinfos.xml" />
         <statistic-output value="Jollibee Molino Area.stats.xml" />
-    </output>
+    <summary-output value="Jollibee Molino Area_summary.xml" /><emission-output value="Jollibee Molino Area_emissions.xml" /><edgedata-output value="Jollibee Molino Area_edgedata.xml" /></output>
 
     <processing>
         <ignore-route-errors value="true" />
