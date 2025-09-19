@@ -10,7 +10,7 @@
     <output>
         <tripinfo-output value="Bayanan Area.tripinfos.xml" />
         <statistic-output value="Bayanan Area.stats.xml" />
-    </output>
+    <summary-output value="Bayanan Area_summary.xml" /><emission-output value="Bayanan Area_emissions.xml" /><edgedata-output value="Bayanan Area_edgedata.xml" /></output>
 
     <processing>
         <ignore-route-errors value="true" />

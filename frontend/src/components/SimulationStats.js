@@ -119,7 +119,7 @@ const SimulationStats = ({ stats = {}, isRunning = false }) => {
             <span className="text-sm text-gray-500">Real-time updates</span>
           </div>
           <div className="progress-bar">
-            <div className="progress-bar-fill" style={{ width: '100%' }}></div>
+            <div className="progress-bar-fill progress-bar-fill-complete"></div>
           </div>
         </div>
       )}

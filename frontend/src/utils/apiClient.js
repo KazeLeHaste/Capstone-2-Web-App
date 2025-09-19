@@ -12,7 +12,8 @@ import axios from 'axios';
 
 // Create axios instance with default configuration
 const apiClient = axios.create({
-  baseURL: process.env.REACT_APP_API_URL || 'http://localhost:5000',
+  // In development, use relative URLs to leverage the proxy
+  baseURL: process.env.NODE_ENV === 'development' ? '' : (process.env.REACT_APP_API_URL || 'http://localhost:5000'),
   timeout: 30000, // 30 seconds timeout
   headers: {
     'Content-Type': 'application/json',

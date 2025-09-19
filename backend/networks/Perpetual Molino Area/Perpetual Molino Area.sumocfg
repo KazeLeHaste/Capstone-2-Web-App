@@ -10,7 +10,7 @@
     <output>
         <tripinfo-output value="Perpetual Molino Area.tripinfos.xml" />
         <statistic-output value="Perpetual Molino Area.stats.xml" />
-    </output>
+    <summary-output value="Perpetual Molino Area_summary.xml" /><emission-output value="Perpetual Molino Area_emissions.xml" /><edgedata-output value="Perpetual Molino Area_edgedata.xml" /></output>
 
     <processing>
         <ignore-route-errors value="true" />

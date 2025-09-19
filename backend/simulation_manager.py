@@ -1944,6 +1944,8 @@ class SimulationManager:
     <output>
         <summary-output value="{network_id}_summary.xml"/>
         <tripinfo-output value="{network_id}_tripinfo.xml"/>
+        <emission-output value="{network_id}_emissions.xml"/>
+        <edgedata-output value="{network_id}_edgedata.xml"/>
     </output>
 
     <report>

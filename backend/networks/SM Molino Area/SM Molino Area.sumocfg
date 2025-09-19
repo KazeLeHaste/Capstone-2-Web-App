@@ -10,7 +10,7 @@
     <output>
         <tripinfo-output value="SM Molino Area.tripinfos.xml" />
         <statistic-output value="SM Molino Area.stats.xml" />
-    </output>
+    <summary-output value="SM Molino Area_summary.xml" /><emission-output value="SM Molino Area_emissions.xml" /><edgedata-output value="SM Molino Area_edgedata.xml" /></output>
 
     <processing>
         <ignore-route-errors value="true" />

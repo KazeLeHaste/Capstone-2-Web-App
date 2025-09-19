@@ -10,7 +10,7 @@
     <output>
         <tripinfo-output value="St Dominic Area.tripinfos.xml" />
         <statistic-output value="St Dominic Area.stats.xml" />
-    </output>
+    <summary-output value="St Dominic Area_summary.xml" /><emission-output value="St Dominic Area_emissions.xml" /><edgedata-output value="St Dominic Area_edgedata.xml" /></output>
 
     <processing>
         <ignore-route-errors value="true" />

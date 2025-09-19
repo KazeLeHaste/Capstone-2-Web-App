@@ -38,12 +38,22 @@ import {
 const AnalyticsCharts = ({ analyticsData, loading = false }) => {
   const [selectedChart, setSelectedChart] = useState('timeSeries');
 
+  // Define colors first to avoid temporal dead zone errors
+  const colors = {
+    primary: '#3B82F6',
+    secondary: '#10B981',
+    accent: '#F59E0B',
+    danger: '#EF4444',
+    purple: '#8B5CF6',
+    teal: '#14B8A6'
+  };
+
   if (loading) {
     return (
       <div className="space-y-6">
         <div className="animate-pulse">
-          <div className="h-4 bg-gray-200 rounded w-1/4 mb-4"></div>
-          <div className="h-80 bg-gray-200 rounded"></div>
+          <div className="h-4 bg-secondary rounded w-1/4 mb-4"></div>
+          <div className="h-80 bg-secondary rounded"></div>
         </div>
       </div>
     );
@@ -52,9 +62,9 @@ const AnalyticsCharts = ({ analyticsData, loading = false }) => {
   if (!analyticsData || analyticsData.error) {
     return (
       <div className="text-center py-12">
-        <BarChart3 className="mx-auto h-12 w-12 text-gray-400" />
-        <h3 className="mt-2 text-lg font-medium text-gray-900">No Chart Data Available</h3>
-        <p className="mt-1 text-gray-500">
+        <BarChart3 className="mx-auto h-12 w-12 text-secondary" />
+        <h3 className="mt-2 text-lg font-medium text-primary">No Chart Data Available</h3>
+        <p className="mt-1 text-secondary">
           {analyticsData?.error || 'Run a simulation to see analytics charts'}
         </p>
       </div>
@@ -132,14 +142,117 @@ const AnalyticsCharts = ({ analyticsData, loading = false }) => {
     };
   });
 
-  const colors = {
-    primary: '#3B82F6',
-    secondary: '#10B981',
-    accent: '#F59E0B',
-    danger: '#EF4444',
-    purple: '#8B5CF6',
-    teal: '#14B8A6'
-  };
+  // Prepare emissions data
+  const emissionsData = [
+    {
+      metric: 'CO2 Emissions',
+      value: analyticsData.kpis?.total_co2 || 0,
+      perKm: analyticsData.kpis?.avg_co2_per_km || 0,
+      unit: 'kg',
+      color: colors.danger
+    },
+    {
+      metric: 'NOx Emissions',
+      value: analyticsData.kpis?.total_nox || 0,
+      perKm: (analyticsData.kpis?.total_nox || 0) / Math.max(analyticsData.kpis?.total_distance_traveled || 1, 1) * 1000,
+      unit: 'g',
+      color: colors.accent
+    },
+    {
+      metric: 'Fuel Consumption',
+      value: analyticsData.kpis?.total_fuel_consumption || 0,
+      perKm: analyticsData.kpis?.avg_fuel_per_km || 0,
+      unit: 'L',
+      color: colors.primary
+    },
+    {
+      metric: 'Energy Usage',
+      value: analyticsData.kpis?.total_energy_consumption || 0,
+      perKm: (analyticsData.kpis?.total_energy_consumption || 0) / Math.max(analyticsData.kpis?.total_distance_traveled || 1, 1) * 1000,
+      unit: 'kWh',
+      color: colors.secondary
+    }
+  ];
+
+  // Prepare safety metrics data
+  const safetyData = [
+    {
+      metric: 'Safety Score',
+      value: analyticsData.kpis?.composite_safety_score || 0,
+      max: 100,
+      color: colors.secondary
+    },
+    {
+      metric: 'Collision Density',
+      value: analyticsData.kpis?.collision_density || 0,
+      max: 1.0,
+      color: colors.danger
+    },
+    {
+      metric: 'Emergency Stops',
+      value: analyticsData.kpis?.avg_emergency_stops || 0,
+      max: 10,
+      color: colors.accent
+    },
+    {
+      metric: 'High Decel Events',
+      value: analyticsData.kpis?.high_deceleration_events || 0,
+      max: 50,
+      color: colors.purple
+    }
+  ];
+
+  // Prepare network performance data
+  const networkData = [
+    {
+      metric: 'Avg Edge Occupancy',
+      value: (analyticsData.kpis?.avg_edge_occupancy || 0) * 100,
+      unit: '%',
+      color: colors.primary
+    },
+    {
+      metric: 'Max Edge Occupancy',
+      value: (analyticsData.kpis?.max_edge_occupancy || 0) * 100,
+      unit: '%',
+      color: colors.danger
+    },
+    {
+      metric: 'Network Efficiency',
+      value: (analyticsData.kpis?.network_efficiency_index || 0) * 100,
+      unit: '%',
+      color: colors.secondary
+    },
+    {
+      metric: 'Edge Utilization Variance',
+      value: analyticsData.kpis?.edge_utilization_variance || 0,
+      unit: '',
+      color: colors.purple
+    }
+  ];
+
+  // Prepare quality scores data
+  const qualityScores = [
+    {
+      category: 'Environmental',
+      score: analyticsData.kpis?.environmental_score || 0,
+      color: colors.secondary
+    },
+    {
+      category: 'Efficiency',
+      score: analyticsData.kpis?.efficiency_score || 0,
+      color: colors.primary
+    },
+    {
+      category: 'Safety',
+      score: analyticsData.kpis?.safety_score || 0,
+      color: colors.accent
+    },
+    {
+      category: 'Overall',
+      score: analyticsData.kpis?.overall_performance_score || 0,
+      color: colors.purple
+    }
+  ];
 
   const chartConfigs = {
     timeSeries: {
@@ -166,6 +279,26 @@ const AnalyticsCharts = ({ analyticsData, loading = false }) => {
       title: 'Route Distribution',
       icon: PieIcon,
       description: 'Distribution of route lengths'
+    },
+    emissions: {
+      title: 'Environmental Impact',
+      icon: TrendingUp,
+      description: 'CO2, NOx, and fuel consumption analysis'
+    },
+    safety: {
+      title: 'Safety Metrics',
+      icon: BarChart3,
+      description: 'Collision risk, emergency stops, and safety scores'
+    },
+    network: {
+      title: 'Network Performance',
+      icon: Users,
+      description: 'Edge occupancy, density, and flow analysis'
+    },
+    quality: {
+      title: 'Quality Scores',
+      icon: Gauge,
+      description: 'Environmental, efficiency, and safety scores'
     }
   };
 
@@ -312,6 +445,95 @@ const AnalyticsCharts = ({ analyticsData, loading = false }) => {
           </ResponsiveContainer>
         );
 
+      case 'emissions':
+        return (
+          <ResponsiveContainer width="100%" height={400}>
+            <BarChart data={emissionsData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="metric" />
+              <YAxis />
+              <Tooltip 
+                formatter={(value, name) => [
+                  `${value.toFixed(2)} ${emissionsData.find(d => d.metric === name)?.unit || ''}`,
+                  name
+                ]}
+              />
+              <Legend />
+              <Bar dataKey="value" name="Total" fill={colors.primary} />
+              <Bar dataKey="perKm" name="Per Km" fill={colors.secondary} />
+            </BarChart>
+          </ResponsiveContainer>
+        );
+
+      case 'safety':
+        return (
+          <ResponsiveContainer width="100%" height={400}>
+            <BarChart data={safetyData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="metric" />
+              <YAxis />
+              <Tooltip 
+                formatter={(value, name) => [
+                  `${value.toFixed(2)}${name === 'Safety Score' ? '/100' : ''}`,
+                  name
+                ]}
+              />
+              <Legend />
+              <Bar dataKey="value" name="Value">
+                {safetyData.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={entry.color} />
+                ))}
+              </Bar>
+            </BarChart>
+          </ResponsiveContainer>
+        );
+
+      case 'network':
+        return (
+          <ResponsiveContainer width="100%" height={400}>
+            <AreaChart data={networkData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="metric" />
+              <YAxis />
+              <Tooltip 
+                formatter={(value, name) => [
+                  `${value.toFixed(2)}${networkData.find(d => d.metric === name)?.unit || ''}`,
+                  name
+                ]}
+              />
+              <Legend />
+              <Area 
+                type="monotone" 
+                dataKey="value" 
+                stroke={colors.primary} 
+                fill={colors.primary} 
+                fillOpacity={0.6}
+                name="Network Performance"
+              />
+            </AreaChart>
+          </ResponsiveContainer>
+        );
+
+      case 'quality':
+        return (
+          <ResponsiveContainer width="100%" height={400}>
+            <BarChart data={qualityScores} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="category" />
+              <YAxis domain={[0, 100]} />
+              <Tooltip 
+                formatter={(value) => [`${value.toFixed(1)}/100`, 'Score']}
+              />
+              <Legend />
+              <Bar dataKey="score" name="Quality Score">
+                {qualityScores.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={entry.color} />
+                ))}
+              </Bar>
+            </BarChart>
+          </ResponsiveContainer>
+        );
+
       default:
         return null;
     }
@@ -327,10 +549,8 @@ const AnalyticsCharts = ({ analyticsData, loading = false }) => {
             <button
               key={key}
               onClick={() => setSelectedChart(key)}
-              className={`flex items-center px-4 py-2 rounded-lg border text-sm font-medium transition-colors ${
-                selectedChart === key
-                  ? 'bg-blue-50 border-blue-200 text-blue-700'
-                  : 'bg-white border-gray-200 text-gray-700 hover:bg-gray-50'
+              className={`btn ${
+                selectedChart === key ? 'btn-primary' : 'btn-outline'
               }`}
             >
               <Icon className="w-4 h-4 mr-2" />

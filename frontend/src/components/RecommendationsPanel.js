@@ -176,8 +176,7 @@ const RecommendationsPanel = ({ recommendations = [], loading = false }) => {
             <select
               value={selectedCategory}
               onChange={(e) => setSelectedCategory(e.target.value)}
-              className="form-control text-sm"
-              style={{ minWidth: '150px' }}
+              className="form-control text-sm recommendations-category-select"
             >
               {categories.map(category => (
                 <option key={category} value={category}>
@@ -191,8 +190,7 @@ const RecommendationsPanel = ({ recommendations = [], loading = false }) => {
           <select
             value={selectedPriority}
             onChange={(e) => setSelectedPriority(e.target.value)}
-            className="form-control text-sm"
-            style={{ minWidth: '120px' }}
+            className="form-control text-sm recommendations-priority-select"
           >
             {priorities.map(priority => (
               <option key={priority} value={priority}>
