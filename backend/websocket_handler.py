@@ -18,16 +18,14 @@ class WebSocketHandler:
     Handles WebSocket communication for real-time simulation data
     """
     
-    def __init__(self, socketio, sumo_controller):
+    def __init__(self, socketio):
         """
         Initialize WebSocket handler
         
         Args:
             socketio: Flask-SocketIO instance
-            sumo_controller: SumoController instance for data access
         """
         self.socketio = socketio
-        self.sumo_controller = sumo_controller
         self.connected_clients: Set[str] = set()
         self.last_broadcast_time = 0
         self.broadcast_interval = 0.1  # 100ms between broadcasts
