@@ -3285,8 +3285,19 @@ a:focus {
 .config-section {
   background: var(--bg-primary);
   border-radius: 0.5rem;
-  padding: 1.5rem;
+  padding: 2rem;
   box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+  height: fit-content;
+}
+
+/* Enhanced config section styling for simulation page */
+.simulation-sidebar .config-section {
+  padding: 1.75rem;
+  margin-bottom: 1rem;
+}
+
+.simulation-sidebar .config-section:last-child {
+  margin-bottom: 0;
 }
 
 .config-section-header {
@@ -3303,9 +3314,15 @@ a:focus {
 }
 
 .config-section-title {
-  font-size: 1.125rem;
+  font-size: 1.25rem;
   font-weight: 600;
   color: var(--text-primary);
+}
+
+/* Enhanced config section styling for simulation page */
+.simulation-sidebar .config-section-title {
+  font-size: 1.375rem;
+  margin-bottom: 0.5rem;
 }
 
 .config-form-group {
@@ -3982,16 +3999,57 @@ a:focus {
   align-items: center;
   justify-content: space-between;
   margin-bottom: 1.5rem;
-  padding: 1rem;
+  padding: 1.5rem;
   background: var(--bg-primary);
-  border-radius: 0.5rem;
-  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+  border-radius: 0.75rem;
+  box-shadow: 0 2px 8px 0 rgb(0 0 0 / 0.08);
+  border: 1px solid var(--border-color);
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+  min-height: 80px;
 }
 
 .simulation-title {
   font-size: 1.5rem;
   font-weight: bold;
   color: var(--color-gray-900);
+}
+
+/* Header controls layout */
+.simulation-header-controls {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+}
+
+.simulation-header-buttons {
+  display: flex;
+  gap: 0.75rem;
+}
+
+/* Responsive header layout */
+@media (max-width: 968px) {
+  .simulation-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1.5rem;
+  }
+  
+  .simulation-header-controls {
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+  }
+  
+  .simulation-header-buttons {
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  
+  .sumo-process-info {
+    margin-top: 0;
+  }
 }
 
 .simulation-status {
@@ -4026,7 +4084,7 @@ a:focus {
 
 .simulation-grid {
   display: grid;
-  grid-template-columns: 2fr 1fr;
+  grid-template-columns: 1fr 2fr;
   gap: 1.5rem;
   margin-bottom: 1.5rem;
 }
@@ -4034,6 +4092,10 @@ a:focus {
 @media (max-width: 1024px) {
   .simulation-grid {
     grid-template-columns: 1fr;
+  }
+  
+  .simulation-sidebar {
+    order: -1; /* Show sidebar first on mobile */
   }
 }
 
@@ -4047,6 +4109,68 @@ a:focus {
   display: flex;
   flex-direction: column;
   gap: 1rem;
+}
+
+/* Single-column content layout for simulation page - optimized for desktop */
+.simulation-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+/* Enhanced config sections for single-column layout */
+.simulation-content .config-section {
+  background: var(--bg-primary);
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px 0 rgb(0 0 0 / 0.08);
+  border: 1px solid var(--border-color);
+  transition: box-shadow 0.2s ease;
+}
+
+.simulation-content .config-section:hover {
+  box-shadow: 0 4px 12px 0 rgb(0 0 0 / 0.12);
+}
+
+
+
+/* Responsive adjustments */
+@media (max-width: 1024px) {
+  .simulation-content {
+    max-width: 900px;
+  }
+  
+  .config-content {
+    grid-template-columns: 1fr;
+  }
+  
+  .simulation-control-buttons {
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  .simulation-content {
+    max-width: 100%;
+    padding: 0 1rem;
+  }
+  
+  .simulation-content .config-section {
+    padding: 1rem;
+  }
+  
+  .action-buttons {
+    grid-template-columns: 1fr;
+  }
+  
+  .simulation-header {
+    flex-direction: column;
+    gap: 1rem;
+    text-align: center;
+  }
 }
 
 .simulation-map-container {
@@ -4089,28 +4213,12 @@ a:focus {
   background: var(--bg-secondary);
 }
 
-.simulation-controls {
-  background: var(--bg-primary);
-  border-radius: 0.5rem;
-  padding: 1rem;
-  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
-}
 
-.simulation-controls-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 1rem;
-}
-
-.simulation-controls-title {
-  font-weight: 600;
-  color: var(--color-gray-900);
-}
 
 .simulation-control-buttons {
-  display: flex !important;
-  gap: 0.5rem;
+  display: grid !important;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 1rem;
   opacity: 1 !important;
   visibility: visible !important;
 }
@@ -4118,18 +4226,20 @@ a:focus {
 .simulation-control-btn {
   display: flex !important;
   align-items: center;
+  justify-content: center;
   gap: 0.5rem;
-  padding: 0.5rem 1rem;
+  padding: 0.75rem 1.5rem;
   border: 1px solid var(--border-color);
-  border-radius: 0.375rem;
+  border-radius: 0.5rem;
   background: var(--bg-primary);
   color: var(--text-primary);
   font-size: 0.875rem;
-  font-weight: 500;
+  font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
   opacity: 1 !important;
   visibility: visible !important;
+  min-height: 44px;
 }
 
 .simulation-control-btn:hover {
@@ -4299,15 +4409,123 @@ a:focus {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1rem;
+  padding: 1.5rem;
   background: var(--bg-primary);
-  border-radius: 0.5rem;
-  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+  border-radius: 0.75rem;
+  box-shadow: 0 2px 8px 0 rgb(0 0 0 / 0.08);
+  border: 1px solid var(--border-color);
+  max-width: 1200px;
+  margin: 1.5rem auto 0;
 }
 
 .simulation-nav-buttons {
   display: flex;
   gap: 1rem;
+}
+
+/* Status and Connection Indicators */
+.status-indicator {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.connection-indicator {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+}
+
+.connection-indicator.connected {
+  background: var(--success-color);
+}
+
+.connection-indicator.disconnected {
+  background: var(--error-color);
+}
+
+.connection-indicator.no_socket {
+  background: var(--color-gray-400);
+}
+
+/* Config Content Styling */
+.config-content {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1rem;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.config-content > div {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+  padding: 1rem;
+  background: var(--bg-secondary);
+  border-radius: 0.5rem;
+  border: 1px solid var(--border-color);
+  transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+.config-content > div:hover {
+  background: var(--color-gray-50);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px 0 rgb(0 0 0 / 0.1);
+}
+
+
+
+.config-content .font-medium {
+  font-weight: 600;
+  color: var(--text-primary);
+  font-size: 1rem;
+}
+
+.config-content .text-xs {
+  font-size: 0.8125rem;
+  color: var(--color-gray-500);
+  margin-top: 0.25rem;
+}
+
+.config-content .code-block {
+  word-break: break-all;
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  font-size: 0.8125rem;
+}
+
+.config-description {
+  font-size: 0.8125rem;
+  color: var(--text-secondary);
+  font-style: italic;
+  margin-top: 0.25rem;
+  display: block;
+}
+
+/* Action Buttons Styling */
+.action-buttons {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.action-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  transition: all 0.2s ease;
+}
+
+/* Navigation Button Styling */
+.nav-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 /* Additional Styles for Enhanced Network Selection */
@@ -5500,27 +5718,7 @@ select option {
   gap: var(--spacing-lg);
 }
 
-.simulation-controls {
-  background: var(--bg-primary);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-lg);
-  padding: var(--spacing-lg);
-  box-shadow: var(--shadow-sm);
-}
 
-.simulation-controls-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: var(--spacing-lg);
-}
-
-.simulation-controls-title {
-  font-size: 1.125rem;
-  font-weight: 600;
-  color: var(--text-primary);
-  margin: 0;
-}
 
 .simulation-connection {
   display: flex;
@@ -7875,4 +8073,39 @@ html.dark .onboarding-icon-red {
 /* Background utilities */
 .bg-secondary {
   background-color: var(--bg-secondary);
+}
+
+/* Additional Tailwind utility classes */
+.py-12 {
+  padding-top: 3rem;
+  padding-bottom: 3rem;
+}
+
+.mb-4 {
+  margin-bottom: 1rem;
+}
+
+.mb-2 {
+  margin-bottom: 0.5rem;
+}
+
+.mb-6 {
+  margin-bottom: 1.5rem;
+}
+
+.text-xl {
+  font-size: 1.25rem;
+  line-height: 1.75rem;
+}
+
+.font-semibold {
+  font-weight: 600;
+}
+
+.text-primary {
+  color: var(--primary-color);
+}
+
+.text-danger {
+  color: var(--error-color);
 }

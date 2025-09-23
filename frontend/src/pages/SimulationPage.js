@@ -14,10 +14,6 @@ import {
   Play, 
   Square, 
   RotateCcw,
-  Activity,
-  Car,
-  Clock,
-  TrendingUp,
   AlertCircle,
   Settings,
   ArrowLeft,
@@ -41,21 +37,21 @@ const SimulationPage = ({ socket }) => {
   const [sumoProcess, setSumoProcess] = useState(null);
   const [sessionSaved, setSessionSaved] = useState(false);
   
-  // Live statistics
-  const [liveStats, setLiveStats] = useState({
-    simulationTime: 0,
-    totalVehicles: 0,
-    runningVehicles: 0,
-    waitingVehicles: 0,
-    averageSpeed: 0,
-    averageWaitingTime: 0,
-    throughput: 0,
-    emissions: {
-      co2: 0,
-      nox: 0,
-      fuel: 0
-    }
-  });
+  // Live statistics (removed - no longer used without TraCI)
+  // const [liveStats, setLiveStats] = useState({
+  //   simulationTime: 0,
+  //   totalVehicles: 0,
+  //   runningVehicles: 0,
+  //   waitingVehicles: 0,
+  //   averageSpeed: 0,
+  //   averageWaitingTime: 0,
+  //   throughput: 0,
+  //   emissions: {
+  //     co2: 0,
+  //     nox: 0,
+  //     fuel: 0
+  //   }
+  // });
   
   // Real-time tracking (separate from simulation time)
   const [realTimeStats, setRealTimeStats] = useState({
@@ -75,8 +71,9 @@ const SimulationPage = ({ socket }) => {
       console.log('Socket available, setting up listeners');
       setConnectionStatus(socket.connected ? 'connected' : 'disconnected');
       
-      socket.on('simulation_stats', handleStatsUpdate);
-      socket.on('simulation_data', handleStatsUpdate); // Also listen for simulation_data
+      // Live stats listeners removed - no longer used without TraCI
+      // socket.on('simulation_stats', handleStatsUpdate);
+      // socket.on('simulation_data', handleStatsUpdate); // Also listen for simulation_data
       socket.on('simulation_status', handleStatusUpdate);
       socket.on('session_completed', handleSessionCompleted);
       socket.on('connection_status', setConnectionStatus);
@@ -86,8 +83,9 @@ const SimulationPage = ({ socket }) => {
       // Zoom control event listeners removed - no longer using zoom controls
       
       return () => {
-        socket.off('simulation_stats', handleStatsUpdate);
-        socket.off('simulation_data', handleStatsUpdate);
+        // Live stats listeners removed - no longer used without TraCI
+        // socket.off('simulation_stats', handleStatsUpdate);
+        // socket.off('simulation_data', handleStatsUpdate);
         socket.off('simulation_status', handleStatusUpdate);
         socket.off('session_completed', handleSessionCompleted);
         socket.off('connection_status', setConnectionStatus);
@@ -159,37 +157,38 @@ const SimulationPage = ({ socket }) => {
     }
   };
 
-  const handleStatsUpdate = (stats) => {
-    console.log('Received stats update:', stats);
-    
-    // Handle different data formats
-    if (stats.data) {
-      // WebSocket format: {type: 'simulation_data', data: {...}}
-      const data = stats.data;
-      setLiveStats({
-        simulationTime: data.simulation_time || 0,
-        runningVehicles: data.active_vehicles || 0,
-        averageSpeed: data.avg_speed || 0,
-        throughput: data.throughput || 0
-      });
-      
-      // Zoom level updating removed - no longer using zoom controls
-    } else if (stats.simulation_time !== undefined) {
-      // Direct format from TraCI
-      setLiveStats({
-        simulationTime: stats.simulation_time || 0,
-        runningVehicles: stats.active_vehicles || 0,
-        averageSpeed: stats.avg_speed || 0,
-        throughput: stats.throughput || 0
-      });
-      
-      // Update zoom level if available
-      // Zoom level updating removed
-    } else {
-      // Legacy format
-      setLiveStats(stats);
-    }
-  };
+  // Removed handleStatsUpdate function - no longer used without TraCI live data
+  // const handleStatsUpdate = (stats) => {
+  //   console.log('Received stats update:', stats);
+  //   
+  //   // Handle different data formats
+  //   if (stats.data) {
+  //     // WebSocket format: {type: 'simulation_data', data: {...}}
+  //     const data = stats.data;
+  //     setLiveStats({
+  //       simulationTime: data.simulation_time || 0,
+  //       runningVehicles: data.active_vehicles || 0,
+  //       averageSpeed: data.avg_speed || 0,
+  //       throughput: data.throughput || 0
+  //     });
+  //     
+  //     // Zoom level updating removed - no longer using zoom controls
+  //   } else if (stats.simulation_time !== undefined) {
+  //     // Direct format from TraCI
+  //     setLiveStats({
+  //       simulationTime: stats.simulation_time || 0,
+  //       runningVehicles: stats.active_vehicles || 0,
+  //       averageSpeed: stats.avg_speed || 0,
+  //       throughput: stats.throughput || 0
+  //     });
+  //     
+  //     // Update zoom level if available
+  //     // Zoom level updating removed
+  //   } else {
+  //     // Legacy format
+  //     setLiveStats(stats);
+  //   }
+  // };
 
   const handleStatusUpdate = (status) => {
     console.log('Status update received:', status);
@@ -258,8 +257,9 @@ const SimulationPage = ({ socket }) => {
         if (sumoProcess?.processId) {
           const response = await apiClient.get(`/api/simulation/stats/${sumoProcess.processId}`);
           if (response.data.success && response.data.stats) {
-            // Only update if we actually got stats (not just WebSocket message)
-            setLiveStats(response.data.stats);
+            // Live stats updates removed - no longer used without TraCI
+            // setLiveStats(response.data.stats);
+            console.log('Stats available but not displayed without TraCI');
           }
         }
       } catch (err) {
@@ -395,16 +395,17 @@ const SimulationPage = ({ socket }) => {
 
   // Zoom polling removed - no longer using zoom controls
 
-  const formatTime = (seconds) => {
-    const hours = Math.floor(seconds / 3600);
-    const mins = Math.floor((seconds % 3600) / 60);
-    const secs = Math.floor(seconds % 60);
-    
-    if (hours > 0) {
-      return `${hours}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-    }
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
-  };
+  // Removed formatTime function - no longer used without TraCI live data
+  // const formatTime = (seconds) => {
+  //   const hours = Math.floor(seconds / 3600);
+  //   const mins = Math.floor((seconds % 3600) / 60);
+  //   const secs = Math.floor(seconds % 60);
+  //   
+  //   if (hours > 0) {
+  //     return `${hours}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  //   }
+  //   return `${mins}:${secs.toString().padStart(2, '0')}`;
+  // };
 
   const formatRealTime = (milliseconds) => {
     const totalSeconds = Math.floor(milliseconds / 1000);
@@ -467,24 +468,6 @@ const SimulationPage = ({ socket }) => {
     );
   }
 
-  const getConnectionStatusText = () => {
-    switch (connectionStatus) {
-      case 'connected': return 'Connected';
-      case 'disconnected': return 'Disconnected';
-      case 'no_socket': return 'No WebSocket';
-      default: return 'Unknown';
-    }
-  };
-
-  const getConnectionStatusClass = () => {
-    switch (connectionStatus) {
-      case 'connected': return 'text-primary';
-      case 'disconnected': return 'text-danger';
-      case 'no_socket': return 'text-muted';
-      default: return 'text-muted';
-    }
-  };
-
   return (
     <div className="simulation-page">
       <div className="simulation-container">
@@ -500,126 +483,93 @@ const SimulationPage = ({ socket }) => {
             </p>
           </div>
           
-          <div className={`simulation-status ${simulationState}`}>
-            <div className="w-2 h-2 rounded-full bg-current"></div>
-            <span className={getStatusColor()}>{getStatusText()}</span>
+          <div className="simulation-header-controls">
+            <div className={`simulation-status ${simulationState}`}>
+              <div className="status-indicator"></div>
+              <span className={getStatusColor()}>{getStatusText()}</span>
+            </div>
+            
+            {/* Control buttons moved from simulation-controls */}
+            <div className="simulation-header-buttons">
+              {simulationState === 'ready' && sessionData?.sessionId && config && (
+                <button
+                  onClick={handleLaunchSimulation}
+                  className="simulation-control-btn primary"
+                >
+                  <Play className="w-4 h-4" />
+                  Launch SUMO
+                </button>
+              )}
+              
+              {simulationState === 'running' && (
+                <button
+                  onClick={handleStopSimulation}
+                  className="simulation-control-btn secondary"
+                  title="Force stop simulation"
+                >
+                  <Square className="w-4 h-4" />
+                  Stop
+                </button>
+              )}
+              
+              {(simulationState === 'stopped' || simulationState === 'error') && (
+                <button
+                  onClick={handleLaunchSimulation}
+                  className="simulation-control-btn primary"
+                >
+                  <RotateCcw className="w-4 h-4" />
+                  Restart
+                </button>
+              )}
+
+              {simulationState === 'finished' && sessionData?.sessionId && (
+                <>
+                  {sessionSaved || sessionData?.can_analyze ? (
+                    <Link
+                      to={`/analytics?session=${sessionData.sessionId}`}
+                      className="simulation-control-btn primary"
+                    >
+                      <BarChart3 className="w-4 h-4" />
+                      View Results
+                    </Link>
+                  ) : (
+                    <button
+                      onClick={handleSaveSession}
+                      className="simulation-control-btn primary"
+                    >
+                      <Save className="w-4 h-4" />
+                      Save Session
+                    </button>
+                  )}
+                  <button
+                    onClick={handleLaunchSimulation}
+                    className="simulation-control-btn"
+                  >
+                    <RotateCcw className="w-4 h-4" />
+                    Run Again
+                  </button>
+                </>
+              )}
+            </div>
           </div>
         </div>
 
         {/* Error Display */}
         {error && (
-          <div className="alert alert-error mb-6">
-            <AlertCircle className="w-5 h-5" />
+          <div className="alert alert-error error-display">
+            <AlertCircle className="error-icon" />
             <span>{error}</span>
           </div>
         )}
 
-        <div className="simulation-grid">
-          {/* Main Control Panel */}
-          <div className="simulation-main">
-            
-            {/* Control Panel */}
-            <div className="simulation-controls">
-              <div className="simulation-controls-header">
-                <h2 className="simulation-controls-title">Simulation Controls</h2>
-                <div className={`simulation-connection ${connectionStatus}`}>
-                  <div className={`w-2 h-2 rounded-full ${getConnectionStatusClass()}`}></div>
-                  <span className={getConnectionStatusClass()}>{getConnectionStatusText()}</span>
-                </div>
-              </div>
-              
-              <div className="simulation-control-buttons">
-                {/* Launch button - force visibility */}
-                {simulationState === 'ready' && sessionData?.sessionId && config && (
-                  <button
-                    onClick={handleLaunchSimulation}
-                    className="simulation-control-btn primary"
-                  >
-                    <Play className="w-4 h-4" />
-                    Launch SUMO
-                  </button>
-                )}
-                
-                {simulationState === 'running' && (
-                  <button
-                    onClick={handleStopSimulation}
-                    className="simulation-control-btn secondary"
-                    title="Force stop simulation"
-                  >
-                    <Square className="w-4 h-4" />
-                    Stop
-                  </button>
-                )}
-                
-                {(simulationState === 'stopped' || simulationState === 'error') && (
-                  <button
-                    onClick={handleLaunchSimulation}
-                    className="simulation-control-btn primary"
-                  >
-                    <RotateCcw className="w-4 h-4" />
-                    Restart
-                  </button>
-                )}
-                
-                {simulationState === 'finished' && sessionData?.sessionId && (
-                  <>
-                    {sessionSaved || sessionData?.can_analyze ? (
-                      <Link
-                        to={`/analytics?session=${sessionData.sessionId}`}
-                        className="simulation-control-btn primary"
-                      >
-                        <BarChart3 className="w-4 h-4" />
-                        View Results
-                      </Link>
-                    ) : (
-                      <button
-                        onClick={handleSaveSession}
-                        className="simulation-control-btn primary"
-                      >
-                        <Save className="w-4 h-4" />
-                        Save Session
-                      </button>
-                    )}
-                    <button
-                      onClick={handleLaunchSimulation}
-                      className="simulation-control-btn"
-                    >
-                      <RotateCcw className="w-4 h-4" />
-                      Run Again
-                    </button>
-                  </>
-                )}
-              </div>
-              
-              {/* Zoom controls removed - zoom is now hardcoded to 225 in backend configuration */}
-              
-          
-              
-              {sumoProcess && (
-                <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded">
-                  <div className="text-sm">
-                    <div className="font-medium text-blue-900">SUMO Process</div>
-                    <div className="text-blue-700">
-                      PID: {sumoProcess.processId} | Port: {sumoProcess.port || 'N/A'}
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
-
-
-          </div>
-
-          {/* Sidebar */}
-          <div className="simulation-sidebar">
-            
-            {/* Configuration Summary */}
+        <div className="simulation-content">
+          {/* Configuration Summary */}
             <div className="config-section">
               <div className="config-section-header">
                 <Settings className="config-section-icon" />
                 <h3 className="config-section-title">Configuration</h3>
               </div>
-              <div className="space-y-2 text-sm">
+              <div className="config-content">
                 <div>
                   <span className="font-medium">Simulation Duration:</span>
                   {" "}
@@ -627,14 +577,14 @@ const SimulationPage = ({ socket }) => {
                     ? Math.floor(((config.config.sumo_end || 0) - (config.config.sumo_begin || 0)) / 60)
                     : Math.floor((config.config.duration || 0) / 60)
                   } min
-                  <span className="text-xs text-gray-500 block">Simulated time to cover</span>
+                  <span className="config-description">Simulated time to cover</span>
                 </div>
                 {simulationState === 'running' && realTimeStats.startTime && (
                   <div>
                     <span className="font-medium">Real-time Elapsed:</span>
                     {" "}
                     {formatRealTime(realTimeStats.elapsedRealTime)}
-                    <span className="text-xs text-gray-500 block">Actual time spent (affected by delay)</span>
+                    <span className="config-description">Actual time spent (affected by delay)</span>
                   </div>
                 )}
                 <div>
@@ -684,13 +634,12 @@ const SimulationPage = ({ socket }) => {
                 <Monitor className="config-section-icon" />
                 <h3 className="config-section-title">Session Info</h3>
               </div>
-              <div className="space-y-2 text-sm">
+              <div className="config-content">
                 <div>
                   <span className="font-medium">Network:</span> {sessionData.networkName}
                 </div>
                 <div>
                   <span className="font-medium">Session ID:</span>
-                  <br />
                   <code className="code-block">{sessionData.sessionId}</code>
                 </div>
                 <div>
@@ -699,33 +648,32 @@ const SimulationPage = ({ socket }) => {
               </div>
             </div>
 
-            {/* Actions */}
-            <div className="config-section">
-              <div className="config-section-header">
-                <Zap className="config-section-icon" />
-                <h3 className="config-section-title">Actions</h3>
+            {/* Actions - Only show after simulation is completed */}
+            {(simulationState === 'finished' || simulationState === 'stopped' || simulationState === 'error') && (
+              <div className="config-section">
+                <div className="config-section-header">
+                  <Zap className="config-section-icon" />
+                  <h3 className="config-section-title">Actions</h3>
+                </div>
+                <div className="action-buttons">
+                  <button
+                    onClick={handleViewResults}
+                    className="btn btn-outline action-btn"
+                  >
+                    <BarChart3 className="w-4 h-4" />
+                    <span>View Results</span>
+                  </button>
+                  
+                  <button
+                    onClick={() => window.open('/api/simulation/download-results/' + sessionData.sessionId)}
+                    className="btn btn-outline action-btn"
+                  >
+                    <Download className="w-4 h-4" />
+                    <span>Download Data</span>
+                  </button>
+                </div>
               </div>
-              <div className="space-y-2">
-                <button
-                  onClick={handleViewResults}
-                  className="btn btn-outline w-full flex items-center justify-center space-x-2"
-                  disabled={simulationState === 'ready' || simulationState === 'launching'}
-                >
-                  <BarChart3 className="w-4 h-4" />
-                  <span>View Results</span>
-                </button>
-                
-                <button
-                  onClick={() => window.open('/api/simulation/download-results/' + sessionData.sessionId)}
-                  className="btn btn-outline w-full flex items-center justify-center space-x-2"
-                  disabled={simulationState === 'ready' || simulationState === 'launching'}
-                >
-                  <Download className="w-4 h-4" />
-                  <span>Download Data</span>
-                </button>
-              </div>
-            </div>
-          </div>
+            )}
         </div>
 
         {/* Navigation */}
@@ -733,14 +681,14 @@ const SimulationPage = ({ socket }) => {
           <div className="simulation-nav-buttons">
             <Link 
               to="/network-selection" 
-              className="btn btn-secondary flex items-center space-x-2"
+              className="btn btn-secondary nav-btn"
             >
               <ArrowLeft className="w-4 h-4" />
               <span>Back to Networks</span>
             </Link>
           </div>
           
-          <div className="text-sm text-muted">
+          <div className="simulation-nav-status">
             {simulationState === 'running' ? (
               <span className="text-primary font-medium">Simulation is running in SUMO GUI</span>
             ) : simulationState === 'ready' ? (
