@@ -29,13 +29,8 @@ from pathlib import Path
 from typing import Dict, Any, List, Optional
 import xml.etree.ElementTree as ET
 
-# Import SUMO libraries for TraCI communication
-try:
-    import traci
-    TRACI_AVAILABLE = True
-except ImportError:
-    print("Warning: TraCI not available. Live data collection will be disabled.")
-    TRACI_AVAILABLE = False
+# TraCI functionality has been removed to prevent configuration conflicts with SUMO GUI
+# The system now operates in pure GUI mode for better user control
 
 def find_network_file(directory: Path, network_id: str) -> Optional[Path]:
     """
@@ -2404,7 +2399,7 @@ class SimulationManager:
 <configuration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/guiConfiguration.xsd">
 
     <gui>
-        <viewport zoom="50.0" x="300.0" y="300.0" angle="0.0"/>
+        <viewport zoom="225.0" x="300.0" y="300.0" angle="0.0"/>
     </gui>
 
     <delay value="200"/>
@@ -2617,22 +2612,9 @@ class SimulationManager:
                 "paused": False  # Initialize as not paused
             }
             
-            # Start data collection thread if live data is enabled
-            if enable_live_data and TRACI_AVAILABLE and self.websocket_handler:
-                print(f"Starting delayed data collection thread for session {session_id}")
-                def start_data_collection():
-                    print(f"Data collection thread starting, waiting 10 seconds for SUMO to fully initialize...")
-                    time.sleep(10)  # Wait longer for SUMO to fully start and begin simulation
-                    self._start_data_collection_thread(session_id, 8813, config)
-                
-                threading.Thread(target=start_data_collection, daemon=True).start()
-            else:
-                if not enable_live_data:
-                    print("Live data collection disabled")
-                elif not TRACI_AVAILABLE:
-                    print("TraCI not available")
-                elif not self.websocket_handler:
-                    print("WebSocket handler not available")
+            # Live data collection has been disabled to prevent TraCI configuration conflicts
+            # The system now operates in pure GUI mode for better user control
+            print("Live data collection disabled - using pure GUI mode")
             
             return {
                 "success": True,
@@ -2949,290 +2931,17 @@ class SimulationManager:
                 "message": f"Failed to stop simulation: {str(e)}"
             }
     
-    def pause_simulation(self, process_id: int) -> Dict[str, Any]:
-        """
-        Pause running simulation via TraCI
-        
-        Args:
-            process_id: Process identifier
-            
-        Returns:
-            Result dictionary with success status
-        """
-        print(f"DEBUG: SimulationManager.pause_simulation called with process_id: {process_id}")
-        try:
-            # Find the session with this process ID
-            session_id = None
-            for sid, session_data in self.active_processes.items():
-                if session_data["info"]["processId"] == process_id:
-                    session_id = sid
-                    break
-            
-            print(f"DEBUG: Found session_id: {session_id}")
-            print(f"DEBUG: Active processes: {list(self.active_processes.keys())}")
-            
-            if session_id and TRACI_AVAILABLE:
-                # Use TraCI to directly pause the simulation
-                try:
-                    # Connect to TraCI if not already connected
-                    port = 8813  # Default TraCI port
-                    try:
-                        # Test if TraCI is already connected
-                        traci.simulation.getTime()
-                    except:
-                        # Connect to TraCI
-                        traci.init(port)
-                    
-                    # Pause the simulation using TraCI
-                    # Note: SUMO doesn't have a direct pause command via TraCI
-                    # We'll use the pause functionality through GUI if available
-                    if hasattr(traci.gui, 'pauseSimulation'):
-                        traci.gui.pauseSimulation()
-                    else:
-                        # Alternative: Set extremely high delay to effectively pause
-                        traci.gui.setDelay("View #0", 99999)
-                    
-                    self.active_processes[session_id]["paused"] = True
-                    print(f"DEBUG: Paused simulation via TraCI for session {session_id}")
-                    
-                    return {
-                        "success": True,
-                        "message": "Simulation paused successfully",
-                        "processId": process_id
-                    }
-                except Exception as traci_e:
-                    print(f"DEBUG: TraCI pause failed: {traci_e}")
-                    return {
-                        "success": False,
-                        "message": f"Failed to pause via TraCI: {str(traci_e)}",
-                        "processId": process_id
-                    }
-            
-            return {
-                "success": False,
-                "message": "Simulation process not found or TraCI not available"
-            }
-            
-        except Exception as e:
-            print(f"DEBUG: Exception in pause_simulation: {e}")
-            return {
-                "success": False,
-                "message": f"Failed to pause simulation: {str(e)}"
-            }
+    # Pause/Resume functionality removed - use SUMO GUI controls directly
+    # This prevents configuration conflicts with TraCI
     
-    def resume_simulation(self, process_id: int) -> Dict[str, Any]:
-        """
-        Resume paused simulation via TraCI
-        
-        Args:
-            process_id: Process identifier
-            
-        Returns:
-            Result dictionary with success status
-        """
-        print(f"DEBUG: SimulationManager.resume_simulation called with process_id: {process_id}")
-        try:
-            # Find the session with this process ID
-            session_id = None
-            for sid, session_data in self.active_processes.items():
-                if session_data["info"]["processId"] == process_id:
-                    session_id = sid
-                    break
-            
-            print(f"DEBUG: Found session_id: {session_id}")
-            
-            if session_id and TRACI_AVAILABLE:
-                # Use TraCI to directly resume the simulation
-                try:
-                    # Connect to TraCI if not already connected
-                    port = 8813  # Default TraCI port
-                    try:
-                        # Test if TraCI is already connected
-                        traci.simulation.getTime()
-                    except:
-                        # Connect to TraCI
-                        traci.init(port)
-                    
-                    # Resume the simulation using TraCI
-                    if hasattr(traci.gui, 'resumeSimulation'):
-                        traci.gui.resumeSimulation()
-                    else:
-                        # Alternative: Reset delay to normal speed
-                        previous_delay = self.active_processes[session_id].get("previous_delay", 100)
-                        traci.gui.setDelay("View #0", previous_delay)
-                    
-                    self.active_processes[session_id]["paused"] = False
-                    print(f"DEBUG: Resumed simulation via TraCI for session {session_id}")
-                    
-                    return {
-                        "success": True,
-                        "message": "Simulation resumed successfully",
-                        "processId": process_id
-                    }
-                except Exception as traci_e:
-                    print(f"DEBUG: TraCI resume failed: {traci_e}")
-                    return {
-                        "success": False,
-                        "message": f"Failed to resume via TraCI: {str(traci_e)}",
-                        "processId": process_id
-                    }
-            
-            return {
-                "success": False,
-                "message": "Simulation process not found or TraCI not available"
-            }
-            
-        except Exception as e:
-            print(f"DEBUG: Exception in resume_simulation: {e}")
-            return {
-                "success": False,
-                "message": f"Failed to resume simulation: {str(e)}"
-            }
 
-    def get_zoom_level(self, process_id: int) -> Dict[str, Any]:
-        """
-        Get current zoom level from SUMO GUI via TraCI
-        
-        Args:
-            process_id: Process identifier
-            
-        Returns:
-            Result dictionary with current zoom level
-        """
-        try:
-            # Find the session with this process ID
-            session_id = None
-            for sid, session_data in self.active_processes.items():
-                if session_data["info"]["processId"] == process_id:
-                    session_id = sid
-                    break
-            
-            if session_id and TRACI_AVAILABLE:
-                try:
-                    # Get zoom level from first view (View #0)
-                    zoom_level = traci.gui.getZoom("View #0")
-                    return {
-                        "success": True,
-                        "zoomLevel": round(zoom_level, 2),
-                        "processId": process_id
-                    }
-                except Exception as traci_e:
-                    print(f"DEBUG: TraCI zoom retrieval error: {traci_e}")
-                    return {
-                        "success": False,
-                        "message": f"Failed to get zoom level: {str(traci_e)}"
-                    }
-            
-            return {
-                "success": False,
-                "message": "Simulation process not found or TraCI not available"
-            }
-            
-        except Exception as e:
-            print(f"DEBUG: Exception in get_zoom_level: {e}")
-            return {
-                "success": False,
-                "message": f"Failed to get zoom level: {str(e)}"
-            }
 
-    def set_zoom_level(self, process_id: int, zoom_level: float) -> Dict[str, Any]:
-        """
-        Set zoom level in SUMO GUI via TraCI
-        
-        Args:
-            process_id: Process identifier
-            zoom_level: New zoom level (percentage, e.g., 100.0 for 100%)
-            
-        Returns:
-            Result dictionary with success status
-        """
-        try:
-            # Find the session with this process ID
-            session_id = None
-            for sid, session_data in self.active_processes.items():
-                if session_data["info"]["processId"] == process_id:
-                    session_id = sid
-                    break
-            
-            if session_id and TRACI_AVAILABLE:
-                try:
-                    # Set zoom level for first view (View #0)
-                    traci.gui.setZoom("View #0", zoom_level)
-                    return {
-                        "success": True,
-                        "zoomLevel": zoom_level,
-                        "processId": process_id
-                    }
-                except Exception as traci_e:
-                    print(f"DEBUG: TraCI zoom setting error: {traci_e}")
-                    return {
-                        "success": False,
-                        "message": f"Failed to set zoom level: {str(traci_e)}"
-                    }
-            
-            return {
-                "success": False,
-                "message": "Simulation process not found or TraCI not available"
-            }
-            
-        except Exception as e:
-            print(f"DEBUG: Exception in set_zoom_level: {e}")
-            return {
-                "success": False,
-                "message": f"Failed to set zoom level: {str(e)}"
-            }
+    # Zoom controls removed - use SUMO GUI controls directly
+    # Zoom is now hardcoded to 225 in the GUI settings file
 
-    def center_view(self, process_id: int) -> Dict[str, Any]:
-        """
-        Center the view to show the entire network
-        
-        Args:
-            process_id: Process identifier
-            
-        Returns:
-            Result dictionary with success status
-        """
-        try:
-            # Find the session with this process ID
-            session_id = None
-            for sid, session_data in self.active_processes.items():
-                if session_data["info"]["processId"] == process_id:
-                    session_id = sid
-                    break
-            
-            if session_id and TRACI_AVAILABLE:
-                try:
-                    # Get network boundary and set view to show the entire network
-                    boundary = traci.gui.getBoundary("View #0")
-                    traci.gui.setBoundary("View #0", boundary[0], boundary[1], boundary[2], boundary[3])
-                    
-                    # Also get the new zoom level to return it
-                    zoom_level = traci.gui.getZoom("View #0")
-                    
-                    return {
-                        "success": True,
-                        "message": "View centered successfully",
-                        "zoomLevel": round(zoom_level, 2),
-                        "processId": process_id
-                    }
-                except Exception as traci_e:
-                    print(f"DEBUG: TraCI center view error: {traci_e}")
-                    return {
-                        "success": False,
-                        "message": f"Failed to center view: {str(traci_e)}"
-                    }
-            
-            return {
-                "success": False,
-                "message": "Simulation process not found or TraCI not available"
-            }
-            
-        except Exception as e:
-            print(f"DEBUG: Exception in center_view: {e}")
-            return {
-                "success": False,
-                "message": f"Failed to center view: {str(e)}"
-            }
+
+
+    # Center view functionality removed - no longer using TraCI
 
     def cleanup_session(self, session_id: str) -> Dict[str, Any]:
         """
@@ -3268,255 +2977,17 @@ class SimulationManager:
     
     def _start_data_collection_thread(self, session_id: str, port: int, config: Dict[str, Any]):
         """
-        Start a background thread to collect live data from SUMO via TraCI
+        TraCI data collection has been disabled - method kept for compatibility
         
         Args:
-            session_id: Session identifier
+            session_id: Session identifier  
             port: TraCI port number
             config: Session configuration containing stepLength and other settings
         """
-        def collect_data():
-            try:
-                # Extract configuration settings
-                step_length = config.get('stepLength', 1.0)  # Default to 1 second
-                gui_delay = config.get('sumo_gui_delay', 0)  # Get GUI delay in milliseconds
-                
-                # HYBRID APPROACH: TraCI polling frequency (independent of SUMO GUI timing)
-                # Since we're not controlling simulation steps, we just need to poll for data
-                # Use a reasonable polling interval that provides smooth live updates
-                traci_polling_interval = 0.1  # Poll every 100ms for live data
-                data_collection_frequency = 1  # Collect data every poll since we're not stepping
-                
-                print(f"DEBUG: HYBRID MODE - TraCI polling every {traci_polling_interval}s")
-                print(f"DEBUG: SUMO GUI delay setting: {gui_delay}ms (controlled by SUMO GUI, not TraCI)")
-                print(f"DEBUG: TraCI will collect data without interfering with GUI timing")
-                
-                # Extract duration using the same logic as in launch_simulation
-                duration_seconds = None
-                if 'sumo_end' in config and 'sumo_begin' in config and config.get('sumo_end') is not None and config.get('sumo_begin') is not None:
-                    # Frontend sends sumo_begin and sumo_end
-                    begin_time = config.get('sumo_begin', 0)
-                    end_time = config.get('sumo_end', 60)
-                    duration_seconds = end_time - begin_time
-                    print(f"DEBUG: Data thread using sumo_end-sumo_begin: {end_time} - {begin_time} = {duration_seconds} seconds")
-                elif 'duration' in config and config.get('duration') is not None:
-                    # Direct duration field
-                    duration_seconds = config.get('duration')
-                    print(f"DEBUG: Data thread using direct duration: {duration_seconds} seconds")
-                elif 'endTime' in config and config.get('endTime') is not None:
-                    # Frontend sends endTime - beginTime as duration
-                    begin_time = config.get('beginTime', 0)
-                    end_time = config.get('endTime', 60)
-                    duration_seconds = end_time - begin_time
-                    print(f"DEBUG: Data thread using endTime-beginTime: {end_time} - {begin_time} = {duration_seconds} seconds")
-                else:
-                    # Default fallback
-                    duration_seconds = 60  # 1 minute default to match frontend default
-                    print(f"DEBUG: Data thread using default duration: {duration_seconds} seconds")
-                
-                print(f"Starting data collection for session {session_id}")
-                print(f"Step length: {step_length}s, Duration: {duration_seconds}s")
-                
-                # Connect to SUMO TraCI
-                print(f"Connecting to SUMO TraCI on port {port} for session {session_id}")
-                
-                # Try to connect with multiple attempts
-                max_attempts = 10
-                connected = False
-                for attempt in range(max_attempts):
-                    try:
-                        traci.init(port)
-                        print(f"Successfully connected to TraCI on port {port}")
-                        connected = True
-                        break
-                    except Exception as e:
-                        if attempt < max_attempts - 1:
-                            print(f"TraCI connection attempt {attempt + 1} failed, retrying in 2 seconds...")
-                            time.sleep(2)
-                        else:
-                            print(f"Failed to connect to TraCI after {max_attempts} attempts: {e}")
-                            return
-                
-                if not connected:
-                    return
-                
-                # PASSIVE DATA COLLECTION with INITIAL START: Start simulation then let GUI control timing
-                print(f"PASSIVE MODE: TraCI connected - starting simulation then switching to passive data collection")
-                
-                # Wait for SUMO GUI to initialize
-                print("Waiting for SUMO GUI to initialize completely...")
-                time.sleep(2)  # Give SUMO GUI time to start (already waited 10s before calling this function)
-                
-                try:
-                    # CRITICAL: Send one simulationStep to actually start the simulation
-                    # After this, we switch to passive data collection to preserve user delay control
-                    print("Sending initial simulation step to start the simulation...")
-                    traci.simulationStep()
-                    
-                    # Now check the simulation time to confirm it started
-                    current_time = traci.simulation.getTime()
-                    print(f"SUCCESS: Simulation started! Initial time: {current_time}")
-                    print("Switching to PASSIVE data collection mode - SUMO GUI now controls all timing")
-                    
-                except Exception as e:
-                    print(f"Warning: Could not start simulation: {e}")
-                    print("SUMO GUI may still be starting up - continuing with data collection")
-                
-                # Initialize simulation time tracking
-                last_sim_time = 0
-                start_time = time.time()
-                step_count = 0
-                
-                while session_id in self.active_processes:
-                    try:
-                        # Check if process is still running
-                        process_data = self.active_processes[session_id]
-                        if process_data["process"].poll() is not None:
-                            print(f"SUMO process ended for session {session_id}")
-                            break
-                        
-                        # Check if simulation is paused
-                        if process_data.get("paused", False):
-                            print(f"DEBUG: Simulation paused for session {session_id}, waiting...")
-                            time.sleep(0.5)  # Check every half second if still paused
-                            continue
-                        
-                        # PASSIVE DATA COLLECTION: Don't step the simulation - let SUMO GUI control timing
-                        # Just read the current simulation state without interfering with user delay settings
-                        try:
-                            sim_time = traci.simulation.getTime()
-                        except traci.exceptions.FatalTraCIError:
-                            # Simulation may have ended or disconnected
-                            print(f"TraCI connection lost or simulation ended for session {session_id}")
-                            break
-                        
-                        # In passive mode, simulation time might not advance if SUMO GUI is paused
-                        # This is normal behavior - SUMO GUI controls the timing completely
-                        if sim_time != last_sim_time:
-                            # Simulation is progressing
-                            last_sim_time = sim_time
-                        elif sim_time == 0:
-                            # Simulation hasn't started yet, which is normal
-                            pass
-                        else:
-                            # Simulation might be paused in GUI, which is fine
-                            # Only warn if we haven't seen progress for a very long time
-                            pass
-                        
-                        # Check if simulation has reached configured duration
-                        if sim_time >= duration_seconds:
-                            print(f"Simulation reached configured duration ({duration_seconds}s) for session {session_id}")
-                            # Properly stop the simulation
-                            self._handle_simulation_completion(session_id, "Duration reached")
-                            break
-                        
-                        # Check if simulation is running
-                        min_expected_vehicles = traci.simulation.getMinExpectedNumber()
-                        if min_expected_vehicles == 0 and sim_time > 60:  # Allow some time for vehicles to spawn
-                            print(f"No more vehicles expected, simulation ending for session {session_id}")
-                            # Properly stop the simulation
-                            self._handle_simulation_completion(session_id, "All vehicles completed")
-                            break
-                        
-                        # Log progress based on step length
-                        if int(sim_time) % (step_length * 30) == 0 and int(sim_time) > 0:
-                            print(f"Simulation time: {sim_time}s for session {session_id}")
-                        
-                        # Only collect expensive data based on frequency (optimize for fast delays)
-                        step_count += 1
-                        should_collect_data = (step_count % data_collection_frequency == 0)
-                        
-                        if should_collect_data:
-                            # Get vehicle data (expensive operation)
-                            vehicle_ids = traci.vehicle.getIDList()
-                            total_vehicles = len(vehicle_ids)
-                            
-                            # Calculate average speed (expensive - queries each vehicle)
-                            total_speed = 0
-                            if total_vehicles > 0:
-                                for veh_id in vehicle_ids:
-                                    try:
-                                        speed = traci.vehicle.getSpeed(veh_id)
-                                        total_speed += speed
-                                    except:
-                                        pass
-                                avg_speed = total_speed / total_vehicles
-                            else:
-                                avg_speed = 0
-                            
-                            # Get throughput (vehicles per hour)
-                            throughput = total_vehicles * 3600 / max(sim_time, 1)
-                        else:
-                            # Use cached values for non-collection steps
-                            total_vehicles = getattr(self, '_last_vehicle_count', 0)
-                            avg_speed = getattr(self, '_last_avg_speed', 0)
-                            throughput = getattr(self, '_last_throughput', 0)
-                        
-                        # Always prepare live statistics data (but with potentially cached values)
-                        live_data = {
-                            'simulation_time': int(sim_time),
-                            'active_vehicles': total_vehicles,
-                            'avg_speed': round(avg_speed * 3.6, 1),  # Convert m/s to km/h
-                            'throughput': round(throughput, 0),
-                            'timestamp': time.time(),
-                            'session_id': session_id
-                        }
-                        
-                        # Cache values for next iteration
-                        if should_collect_data:
-                            self._last_vehicle_count = total_vehicles
-                            self._last_avg_speed = avg_speed
-                            self._last_throughput = throughput
-                        
-                        # Add zoom level only when collecting full data (expensive GUI query)
-                        if should_collect_data:
-                            try:
-                                zoom_level = traci.gui.getZoom("View #0")
-                                live_data['zoom_level'] = round(zoom_level, 2)
-                            except Exception:
-                                # Zoom might not be available in headless mode
-                                pass
-                        
-                        # Debug: Print data every few steps
-                        if step_count % 5 == 0:  # Print every 5 steps
-                            print(f"Step {step_count}: sim_time={sim_time}s, vehicles={total_vehicles}, avg_speed={avg_speed:.1f}m/s")
-                        
-                        # Save to database less frequently for fast delays
-                        db_save_frequency = max(10, data_collection_frequency * 2)  # At least every 10 steps
-                        if self.db_service and step_count % db_save_frequency == 0:
-                            try:
-                                self.db_service.save_live_data(session_id, live_data)
-                            except Exception as db_error:
-                                print(f"Warning: Failed to save live data to database: {db_error}")
-                        
-                        # Broadcast WebSocket data only when we collect new data (reduce network overhead)
-                        if should_collect_data and self.websocket_handler:
-                            self.websocket_handler.broadcast_simulation_data(live_data)
-                        elif not self.websocket_handler and should_collect_data:
-                            print("Warning: No WebSocket handler available for broadcasting")
-                        
-                        # Sleep for the TraCI polling interval (independent of SUMO GUI timing)
-                        time.sleep(traci_polling_interval)  # Poll every 100ms for live data
-                        
-                    except Exception as e:
-                        print(f"Error collecting data for session {session_id}: {e}")
-                        time.sleep(traci_polling_interval)  # Use polling interval for error recovery
-                
-                print(f"Data collection ended for session {session_id}")
-                print(f"Final simulation time: {traci.simulation.getTime()}s")
-                
-            except Exception as e:
-                print(f"Failed to connect to TraCI for session {session_id}: {e}")
-            finally:
-                try:
-                    traci.close()
-                    print(f"TraCI connection closed for session {session_id}")
-                except:
-                    pass
-        
-        # Start the data collection thread
-        data_thread = threading.Thread(target=collect_data, daemon=True)
-        data_thread.start()
+        # TraCI data collection disabled - simulation now runs in pure GUI mode
+        print(f"Data collection disabled for session {session_id} - using pure GUI mode")
+        return
+
 
     def _handle_simulation_completion(self, session_id: str, reason: str):
         """
@@ -3541,15 +3012,8 @@ class SimulationManager:
                 if process.poll() is None:  # Process is still running
                     print(f"Gracefully stopping SUMO process {process_id} for session {session_id}")
                     
-                    # Try to close TraCI connection first to signal SUMO to finish writing files
-                    try:
-                        import traci
-                        if traci.isLoaded():
-                            print("Closing TraCI connection to allow SUMO to finish writing files...")
-                            traci.close()
-                            time.sleep(2)  # Give SUMO time to flush files
-                    except Exception as e:
-                        print(f"Error closing TraCI: {e}")
+                    # Give SUMO time to finish writing files
+                    time.sleep(2)
                     
                     # Send SIGTERM first (graceful shutdown)
                     process.terminate()

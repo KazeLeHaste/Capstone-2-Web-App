@@ -622,103 +622,11 @@ def stop_simulation_by_process_id(process_id):
             'message': f'Error stopping simulation: {str(e)}'
         }), 500
 
-@app.route('/api/simulation/pause/<int:process_id>', methods=['POST'])
-def pause_simulation(process_id):
-    """
-    Pause running simulation
-    """
-    print(f"DEBUG: Pause simulation called for process ID: {process_id}")
-    try:
-        # Call the simulation manager to pause the simulation
-        result = sim_manager.pause_simulation(process_id)
-        print(f"DEBUG: Pause result: {result}")
-        
-        if result["success"]:
-            socketio.emit('simulation_paused', {
-                'processId': process_id,
-                'timestamp': datetime.now().isoformat()
-            })
-        
-        return jsonify(result)
-        
-    except Exception as e:
-        return jsonify({
-            'success': False,
-            'message': f'Error pausing simulation: {str(e)}'
-        }), 500
+# Pause functionality removed - use SUMO GUI controls directly
 
-@app.route('/api/simulation/resume/<int:process_id>', methods=['POST'])
-def resume_simulation(process_id):
-    """
-    Resume paused simulation
-    """
-    print(f"DEBUG: Resume simulation called for process ID: {process_id}")
-    try:
-        # Call the simulation manager to resume the simulation
-        result = sim_manager.resume_simulation(process_id)
-        print(f"DEBUG: Resume result: {result}")
-        
-        if result["success"]:
-            socketio.emit('simulation_resumed', {
-                'processId': process_id,
-                'timestamp': datetime.now().isoformat()
-            })
-        
-        return jsonify(result)
-        
-    except Exception as e:
-        return jsonify({
-            'success': False,
-            'message': f'Error resuming simulation: {str(e)}'
-        }), 500
+# Resume functionality removed - use SUMO GUI controls directly
 
-@app.route('/api/simulation/zoom/<int:process_id>', methods=['GET'])
-def get_zoom_level(process_id):
-    """
-    Get current zoom level from SUMO GUI
-    """
-    try:
-        result = sim_manager.get_zoom_level(process_id)
-        return jsonify(result)
-        
-    except Exception as e:
-        return jsonify({
-            'success': False,
-            'message': f'Error getting zoom level: {str(e)}'
-        }), 500
-
-@app.route('/api/simulation/zoom/<int:process_id>', methods=['POST'])
-def set_zoom_level(process_id):
-    """
-    Set zoom level in SUMO GUI
-    """
-    try:
-        data = request.json
-        zoom_level = data.get('zoomLevel', 100.0)
-        
-        # Validate zoom level (reasonable range)
-        if not 1.0 <= zoom_level <= 10000.0:
-            return jsonify({
-                'success': False,
-                'message': 'Zoom level must be between 1% and 10000%'
-            }), 400
-        
-        result = sim_manager.set_zoom_level(process_id, zoom_level)
-        
-        if result["success"]:
-            socketio.emit('zoom_changed', {
-                'processId': process_id,
-                'zoomLevel': zoom_level,
-                'timestamp': datetime.now().isoformat()
-            })
-        
-        return jsonify(result)
-        
-    except Exception as e:
-        return jsonify({
-            'success': False,
-            'message': f'Error setting zoom level: {str(e)}'
-        }), 500
+# Zoom control endpoints removed - zoom is now hardcoded to 225 in GUI settings
 
 @app.route('/api/simulation/center-view/<int:process_id>', methods=['POST'])
 def center_view(process_id):

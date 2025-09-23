@@ -219,13 +219,7 @@ class EnhancedSessionManager:
                 session_info['status'] = 'stopping'  # Signal thread to stop
                 session_info['data_thread'].join(timeout=2)
             
-            # Close TraCI connection properly
-            try:
-                import traci
-                traci.close()
-                print(f"TraCI connection closed for session {session_id}")
-            except Exception as traci_error:
-                print(f"Warning: Could not close TraCI connection for session {session_id}: {traci_error}")
+            # TraCI connection cleanup removed - no longer using TraCI
             
             # Stop SUMO process forcefully if needed
             if session_info['process'] and session_info['process'].poll() is None:
@@ -435,103 +429,9 @@ class EnhancedSessionManager:
         return cmd
     
     def _collect_live_data(self, session_id: str):
-        """Collect live data from SUMO via TraCI"""
-        if session_id not in self.active_sessions:
-            return
-        
-        session_info = self.active_sessions[session_id]
-        traci_port = session_info['traci_port']
-        
-        try:
-            import traci
-            import time
-            
-            # Connect to TraCI
-            traci.init(port=traci_port)
-            print(f"Connected to TraCI for session {session_id} on port {traci_port}")
-            
-            # CRITICAL: Send one simulationStep to actually start the simulation
-            # After this, we switch to passive data collection to preserve user delay control
-            print(f"Sending initial simulation step to start simulation for session {session_id}")
-            try:
-                traci.simulationStep()
-                initial_time = traci.simulation.getTime()
-                print(f"SUCCESS: Simulation started for session {session_id}! Initial time: {initial_time}")
-                print("Switching to PASSIVE data collection mode - SUMO GUI controls timing")
-            except Exception as e:
-                print(f"Warning: Could not start simulation for session {session_id}: {e}")
-            
-            last_collected_time = 0
-            last_collection_timestamp = time.time()
-            collection_interval = 1.0  # Collect data every 1 second
-            
-            while session_info['status'] in ['running'] and session_info['process'].poll() is None:
-                try:
-                    # Passive data collection - don't step the simulation
-                    current_time = traci.simulation.getTime()
-                    current_timestamp = time.time()
-                    
-                    # Only collect data if simulation time has advanced or enough real time has passed
-                    should_collect = (
-                        current_time > last_collected_time or 
-                        (current_timestamp - last_collection_timestamp) >= collection_interval
-                    )
-                    
-                    if should_collect:
-                        # Get vehicle data
-                        vehicle_ids = traci.vehicle.getIDList()
-                        vehicle_count = len(vehicle_ids)
-                        
-                        # Get edge data
-                        edge_ids = traci.edge.getIDList()
-                        total_waiting_time = sum(traci.edge.getWaitingTime(edge_id) for edge_id in edge_ids)
-                        
-                        # Prepare live data
-                        live_data = {
-                            'timestamp': current_time,
-                            'vehicle_count': vehicle_count,
-                            'total_waiting_time': total_waiting_time,
-                            'simulation_time': current_time
-                        }
-                        
-                        # Save to database
-                        if self.db_service:
-                            try:
-                                self.db_service.save_live_data(session_id, live_data)
-                            except Exception as db_error:
-                                print(f"Warning: Failed to save live data to database: {db_error}")
-                        
-                        # Broadcast via WebSocket
-                        if self.websocket_handler:
-                            live_data['session_id'] = session_id
-                            self.websocket_handler.broadcast_simulation_data(live_data)
-                        
-                        last_collected_time = current_time
-                        last_collection_timestamp = current_timestamp
-                    
-                    time.sleep(0.1)  # Check every 100ms without stepping
-                    
-                except traci.TraCIException as e:
-                    if "connection closed" in str(e).lower():
-                        print(f"TraCI connection closed for session {session_id}")
-                        break
-                    else:
-                        print(f"TraCI error for session {session_id}: {e}")
-                        time.sleep(0.1)
-                except Exception as e:
-                    print(f"Error collecting data for session {session_id}: {e}")
-                    time.sleep(0.1)
-            
-            print(f"Data collection ended for session {session_id}")
-            
-        except Exception as e:
-            print(f"Failed to connect to TraCI for session {session_id}: {e}")
-        finally:
-            try:
-                traci.close()
-                print(f"TraCI connection closed for session {session_id}")
-            except:
-                pass
+        """TraCI data collection has been disabled - method kept for compatibility"""
+        print(f"Live data collection disabled for session {session_id} - running in pure GUI mode")
+        return
     
     def _start_cleanup_thread(self):
         """Start background thread for session cleanup"""

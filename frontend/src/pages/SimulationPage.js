@@ -12,7 +12,6 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { 
   Play, 
-  Pause, 
   Square, 
   RotateCcw,
   Activity,
@@ -26,8 +25,6 @@ import {
   Zap,
   BarChart3,
   Monitor,
-  ZoomIn,
-  ZoomOut,
   Save
 } from 'lucide-react';
 import { apiClient } from '../utils/apiClient';
@@ -68,9 +65,7 @@ const SimulationPage = ({ socket }) => {
   
   const [connectionStatus, setConnectionStatus] = useState('disconnected');
   
-  // Zoom control state
-  const [currentZoom, setCurrentZoom] = useState(100.0);
-  const [isZoomLoading, setIsZoomLoading] = useState(false);
+  // Zoom control removed - now hardcoded to 225 in backend configuration
 
   useEffect(() => {
     loadSessionData();
@@ -88,18 +83,7 @@ const SimulationPage = ({ socket }) => {
       socket.on('connect', () => setConnectionStatus('connected'));
       socket.on('disconnect', () => setConnectionStatus('disconnected'));
       
-      // Zoom control event listeners
-      socket.on('zoom_changed', (data) => {
-        if (data.processId === sumoProcess?.processId) {
-          setCurrentZoom(data.zoomLevel);
-        }
-      });
-      
-      socket.on('view_centered', (data) => {
-        if (data.processId === sumoProcess?.processId && data.zoomLevel) {
-          setCurrentZoom(data.zoomLevel);
-        }
-      });
+      // Zoom control event listeners removed - no longer using zoom controls
       
       return () => {
         socket.off('simulation_stats', handleStatsUpdate);
@@ -109,8 +93,7 @@ const SimulationPage = ({ socket }) => {
         socket.off('connection_status', setConnectionStatus);
         socket.off('connect');
         socket.off('disconnect');
-        socket.off('zoom_changed');
-        socket.off('view_centered');
+        // zoom event listeners removed
       };
     } else {
       console.log('No socket available');
@@ -190,10 +173,7 @@ const SimulationPage = ({ socket }) => {
         throughput: data.throughput || 0
       });
       
-      // Update zoom level if available
-      if (data.zoom_level !== undefined) {
-        setCurrentZoom(data.zoom_level);
-      }
+      // Zoom level updating removed - no longer using zoom controls
     } else if (stats.simulation_time !== undefined) {
       // Direct format from TraCI
       setLiveStats({
@@ -204,9 +184,7 @@ const SimulationPage = ({ socket }) => {
       });
       
       // Update zoom level if available
-      if (stats.zoom_level !== undefined) {
-        setCurrentZoom(stats.zoom_level);
-      }
+      // Zoom level updating removed
     } else {
       // Legacy format
       setLiveStats(stats);
@@ -348,41 +326,7 @@ const SimulationPage = ({ socket }) => {
     }
   };
 
-  const handlePauseSimulation = async () => {
-    if (!sumoProcess?.processId) return;
-    
-    console.log('DEBUG: Pausing simulation, processId:', sumoProcess.processId);
-
-    try {
-      const response = await apiClient.post(`/api/simulation/pause/${sumoProcess.processId}`);
-      console.log('DEBUG: Pause response:', response.data);
-      if (response.data.success) {
-        setSimulationState('paused');
-        console.log('DEBUG: Simulation state set to paused');
-      }
-    } catch (err) {
-      console.error('Error pausing simulation:', err);
-      setError('Failed to pause simulation');
-    }
-  };
-
-  const handleResumeSimulation = async () => {
-    if (!sumoProcess?.processId) return;
-    
-    console.log('DEBUG: Resuming simulation, processId:', sumoProcess.processId);
-
-    try {
-      const response = await apiClient.post(`/api/simulation/resume/${sumoProcess.processId}`);
-      console.log('DEBUG: Resume response:', response.data);
-      if (response.data.success) {
-        setSimulationState('running');
-        console.log('DEBUG: Simulation state set to running');
-      }
-    } catch (err) {
-      console.error('Error resuming simulation:', err);
-      setError('Failed to resume simulation');
-    }
-  };
+  // Pause and resume functions removed - use SUMO GUI controls directly
 
   const handleStopSimulation = async () => {
     if (!sumoProcess?.processId) return;
@@ -446,72 +390,10 @@ const SimulationPage = ({ socket }) => {
     }
   };
 
-  // Zoom control functions
-  const fetchCurrentZoom = async () => {
-    if (!sumoProcess?.processId) return;
-    
-    try {
-      const response = await apiClient.get(`/api/simulation/zoom/${sumoProcess.processId}`);
-      if (response.data.success) {
-        setCurrentZoom(response.data.zoomLevel);
-      }
-    } catch (error) {
-      console.warn('Failed to fetch zoom level:', error);
-    }
-  };
-
-  const handleZoomIn = async () => {
-    if (!sumoProcess?.processId || isZoomLoading) return;
-    
-    setIsZoomLoading(true);
-    try {
-      const newZoom = currentZoom * 1.2; // 20% increase, no max limit
-      const response = await apiClient.post(`/api/simulation/zoom/${sumoProcess.processId}`, {
-        zoomLevel: newZoom
-      });
-      
-      if (response.data.success) {
-        setCurrentZoom(newZoom);
-      }
-    } catch (error) {
-      console.error('Failed to zoom in:', error);
-    } finally {
-      setIsZoomLoading(false);
-    }
-  };
-
-  const handleZoomOut = async () => {
-    if (!sumoProcess?.processId || isZoomLoading) return;
-    
-    setIsZoomLoading(true);
-    try {
-      const newZoom = currentZoom / 1.2; // 20% decrease, no min limit
-      const response = await apiClient.post(`/api/simulation/zoom/${sumoProcess.processId}`, {
-        zoomLevel: newZoom
-      });
-      
-      if (response.data.success) {
-        setCurrentZoom(newZoom);
-      }
-    } catch (error) {
-      console.error('Failed to zoom out:', error);
-    } finally {
-      setIsZoomLoading(false);
-    }
-  };
+  // Zoom control functions removed - zoom is now hardcoded to 225 in backend
 
 
-  // Poll zoom level periodically when simulation is running
-  useEffect(() => {
-    if (simulationState === 'running' && sumoProcess?.processId) {
-      const zoomInterval = setInterval(fetchCurrentZoom, 2000); // Check every 2 seconds
-      
-      // Fetch initial zoom level
-      fetchCurrentZoom();
-      
-      return () => clearInterval(zoomInterval);
-    }
-  }, [simulationState, sumoProcess?.processId]);
+  // Zoom polling removed - no longer using zoom controls
 
   const formatTime = (seconds) => {
     const hours = Math.floor(seconds / 3600);
@@ -659,45 +541,14 @@ const SimulationPage = ({ socket }) => {
                 )}
                 
                 {simulationState === 'running' && (
-                  <>
-                    <button
-                      disabled
-                      className="simulation-control-btn disabled"
-                      title="Controls disabled - use SUMO GUI directly"
-                    >
-                      <Pause className="w-4 h-4" />
-                      Pause
-                    </button>
-                    <button
-                      disabled
-                      className="simulation-control-btn disabled"
-                      title="Controls disabled - use SUMO GUI directly"
-                    >
-                      <Square className="w-4 h-4" />
-                      Stop
-                    </button>
-                  </>
-                )}
-                
-                {simulationState === 'paused' && (
-                  <>
-                    <button
-                      disabled
-                      className="simulation-control-btn disabled"
-                      title="Controls disabled - use SUMO GUI directly"
-                    >
-                      <Play className="w-4 h-4" />
-                      Resume
-                    </button>
-                    <button
-                      disabled
-                      className="simulation-control-btn disabled"
-                      title="Controls disabled - use SUMO GUI directly"
-                    >
-                      <Square className="w-4 h-4" />
-                      Stop
-                    </button>
-                  </>
+                  <button
+                    onClick={handleStopSimulation}
+                    className="simulation-control-btn secondary"
+                    title="Force stop simulation"
+                  >
+                    <Square className="w-4 h-4" />
+                    Stop
+                  </button>
                 )}
                 
                 {(simulationState === 'stopped' || simulationState === 'error') && (
@@ -740,42 +591,7 @@ const SimulationPage = ({ socket }) => {
                 )}
               </div>
               
-              {/* Zoom Controls */}
-              {(simulationState === 'running' || simulationState === 'paused') && sumoProcess?.processId && (
-                <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="font-medium text-blue-900">View Controls</div>
-                  </div>
-                  
-                  <div className="flex items-center justify-center gap-3">
-                    <button
-                      onClick={handleZoomOut}
-                      disabled={isZoomLoading}
-                      className="simulation-control-btn secondary"
-                      title="Zoom Out (20%)"
-                    >
-                      <ZoomOut className="w-4 h-4" />
-                    </button>
-                    
-                    <div className="px-4 py-2 bg-primary border border-primary rounded-md min-w-[100px] text-center">
-                      <span className="text-sm font-medium text-primary">
-                        {currentZoom.toFixed(1)}%
-                      </span>
-                    </div>
-                    
-                    <button
-                      onClick={handleZoomIn}
-                      disabled={isZoomLoading}
-                      className="simulation-control-btn secondary"
-                      title="Zoom In (20%)"
-                    >
-                      <ZoomIn className="w-4 h-4" />
-                    </button>
-                    
-                    
-                  </div>
-                </div>
-              )}
+              {/* Zoom controls removed - zoom is now hardcoded to 225 in backend configuration */}
               
           
               
