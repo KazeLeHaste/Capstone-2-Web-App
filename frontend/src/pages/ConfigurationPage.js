@@ -73,14 +73,12 @@ const ConfigurationPage = ({ socket }) => {
     
     // Vehicle Types Configuration - Controls which vehicle types are included in simulation
     vehicleTypes: {
-      passenger: { enabled: true, name: 'Passenger Cars' },
-      bus: { enabled: true, name: 'Buses' },
+      passenger: { enabled: true, name: 'Private Vehicles' },
+      bus: { enabled: true, name: 'Buses/Jeepneys' },
       truck: { enabled: true, name: 'Trucks' },
       motorcycle: { enabled: true, name: 'Motorcycles' }
     },
     
-    // Future extensibility placeholders (commented out for now)
-    // trafficDensity: 1.0, // For OSM scenarios - multiply existing vehicle counts
   });
 
   useEffect(() => {
@@ -212,7 +210,7 @@ const ConfigurationPage = ({ socket }) => {
         maxSpeed: '27.8 m/s (100 km/h)',
         length: '12.0 m',
         access: 'Roads + bus lanes',
-        description: 'Urban line traffic - larger vehicles with access to dedicated bus lanes and stops'
+        description: 'Urban line traffic - larger public utility vehicles'
       },
       truck: {
         maxSpeed: '25.0 m/s (90 km/h)',
