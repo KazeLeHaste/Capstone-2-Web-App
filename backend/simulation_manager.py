@@ -519,25 +519,35 @@ class SimulationManager:
                     # Fallback to uncompressed format
                     net_input.set('value', f"{network_id}.net.xml")
             
-            # Update route files based on enabled vehicles - prioritize .trips.xml for realistic patterns
+            # Update route files based on enabled vehicles - prioritize enhanced.rou.xml, then .trips.xml for realistic patterns
             enabled_vehicles = config.get('enabledVehicles', ['passenger', 'bus', 'truck', 'motorcycle'])
             route_files = []
-            for vehicle_type in enabled_vehicles:
-                # Check for trips file first (better realism), then route file as fallback
-                trips_file = f"routes/osm.{vehicle_type}.trips.xml"
-                route_file = f"routes/osm.{vehicle_type}.rou.xml"
-                
-                trips_path = dest_config.parent / trips_file
-                route_path = dest_config.parent / route_file
-                
-                if trips_path.exists():
-                    route_files.append(trips_file)
-                    print(f"Including trips file in config: {trips_file}")
-                elif route_path.exists():
-                    route_files.append(route_file)
-                    print(f"Including route file in config: {route_file}")
-                else:
-                    print(f"No route or trips file found for {vehicle_type}, skipping")
+            
+            # Check for enhanced route file first (best option with our improvements)
+            enhanced_route_file = "routes/osm.enhanced.rou.xml"
+            enhanced_route_path = dest_config.parent / enhanced_route_file
+            
+            if enhanced_route_path.exists():
+                route_files.append(enhanced_route_file)
+                print(f"🌟 Including enhanced route file in config: {enhanced_route_file}")
+            else:
+                # Fall back to individual vehicle type files
+                for vehicle_type in enabled_vehicles:
+                    # Check for trips file first (better realism), then route file as fallback
+                    trips_file = f"routes/osm.{vehicle_type}.trips.xml"
+                    route_file = f"routes/osm.{vehicle_type}.rou.xml"
+                    
+                    trips_path = dest_config.parent / trips_file
+                    route_path = dest_config.parent / route_file
+                    
+                    if trips_path.exists():
+                        route_files.append(trips_file)
+                        print(f"Including trips file in config: {trips_file}")
+                    elif route_path.exists():
+                        route_files.append(route_file)
+                        print(f"Including route file in config: {route_file}")
+                    else:
+                        print(f"No route or trips file found for {vehicle_type}, skipping")
             
             route_input = root.find('.//route-files')
             if route_input is not None:
@@ -765,6 +775,8 @@ class SimulationManager:
                 print("🌟 Preserving OSM Web Wizard route variety...")
                 self._preserve_osm_route_variety(source_dir, dest_dir, enabled_vehicles, config)
                 return
+            else:
+                print("DEBUG: Not treated as OSM scenario - using fallback route generation")
             
             # For non-OSM scenarios, check if we should generate diverse routes
             generate_diverse = config.get('generate_diverse_routes', True)  # Default to True for better analytics
@@ -812,8 +824,9 @@ class SimulationManager:
                     if vehicle_type:
                         print(f"Skipped route file for disabled vehicle type: {vehicle_type}")
             
-            # Copy trip files as well - only for enabled vehicles
-            for trip_file in source_dir.glob("*.trips.xml"):
+            # Copy trip files as well - only for enabled vehicles (support compressed and uncompressed)
+            trip_files = list(source_dir.glob("*.trips.xml")) + list(source_dir.glob("*.trips.xml.gz"))
+            for trip_file in trip_files:
                 vehicle_type = None
                 for vtype in ['passenger', 'bus', 'truck', 'motorcycle']:
                     if vtype in trip_file.name.lower():
@@ -821,9 +834,23 @@ class SimulationManager:
                         break
                 
                 if vehicle_type and vehicle_type in enabled_vehicles:
-                    dest_file = dest_dir / trip_file.name
-                    shutil.copy2(trip_file, dest_file)
-                    print(f"Copied trip file for enabled vehicle type: {vehicle_type}")
+                    if trip_file.name.endswith('.gz'):
+                        # Decompress .gz trip files
+                        import gzip
+                        dest_file = dest_dir / trip_file.name.replace('.gz', '')
+                        try:
+                            with gzip.open(trip_file, 'rt', encoding='utf-8') as f_in:
+                                with open(dest_file, 'w', encoding='utf-8') as f_out:
+                                    f_out.write(f_in.read())
+                            print(f"Decompressed and copied trip file for enabled vehicle type: {vehicle_type}")
+                        except Exception as e:
+                            print(f"Failed to decompress {trip_file}: {e}, copying as-is")
+                            dest_file = dest_dir / trip_file.name
+                            shutil.copy2(trip_file, dest_file)
+                    else:
+                        dest_file = dest_dir / trip_file.name
+                        shutil.copy2(trip_file, dest_file)
+                        print(f"Copied trip file for enabled vehicle type: {vehicle_type}")
         
         except Exception as e:
             print(f"Error filtering routes: {e}")
@@ -1082,9 +1109,26 @@ class SimulationManager:
             
             print(f"📊 Processing OSM routes for {len(enabled_vehicles)} enabled vehicle types...")
             
-            # Process trip files first for enabled vehicle types (better realism)
+            # PRIORITY 1: Check for enhanced route file first (best option with our improvements)
+            enhanced_route_file = source_dir / "osm.enhanced.rou.xml"
+            if enhanced_route_file.exists():
+                print("🌟 Found enhanced route file - using improved routes with better distribution!")
+                dest_file = dest_dir / "osm.enhanced.rou.xml"
+                
+                if traffic_density != 1.0:
+                    self._scale_route_file(enhanced_route_file, dest_file, traffic_density)
+                else:
+                    shutil.copy2(enhanced_route_file, dest_file)
+                
+                print(f"✅ Copied enhanced route file with all vehicle types: {dest_file.name}")
+                return  # We're done - enhanced route file contains everything
+            else:
+                print("DEBUG: Enhanced route file not found, falling back to trip files")
+            
+            # FALLBACK: Process trip files first for enabled vehicle types (better realism) - support compressed files
             copied_types = set()
-            for trip_file in source_dir.glob("*.trips.xml"):
+            trip_files = list(source_dir.glob("*.trips.xml")) + list(source_dir.glob("*.trips.xml.gz"))
+            for trip_file in trip_files:
                 # Determine vehicle type from filename
                 vehicle_type = None
                 for vtype in ['passenger', 'bus', 'truck', 'motorcycle']:
@@ -1093,15 +1137,36 @@ class SimulationManager:
                         break
                 
                 if vehicle_type and vehicle_type in enabled_vehicles:
-                    dest_file = dest_dir / trip_file.name
-                    # For trip files, preserve them directly for realistic patterns
-                    if traffic_density != 1.0:
-                        self._scale_route_file(trip_file, dest_file, traffic_density)
+                    # Handle compressed trip files - decompress during copy
+                    if trip_file.name.endswith('.gz'):
+                        import gzip
+                        dest_file = dest_dir / trip_file.name.replace('.gz', '')
+                        try:
+                            with gzip.open(trip_file, 'rt', encoding='utf-8') as f_in:
+                                if traffic_density != 1.0:
+                                    # Create temporary uncompressed file for scaling
+                                    temp_file = dest_file.with_suffix('.temp.xml')
+                                    temp_file.write_text(f_in.read(), encoding='utf-8')
+                                    self._scale_route_file(temp_file, dest_file, traffic_density)
+                                    temp_file.unlink()
+                                else:
+                                    with open(dest_file, 'w', encoding='utf-8') as f_out:
+                                        f_out.write(f_in.read())
+                            print(f"✅ Decompressed and preserved {vehicle_type} trip file (realistic patterns): {dest_file.name}")
+                        except Exception as e:
+                            print(f"Failed to decompress {trip_file}: {e}, copying as-is")
+                            dest_file = dest_dir / trip_file.name
+                            shutil.copy2(trip_file, dest_file)
                     else:
-                        shutil.copy2(trip_file, dest_file)
+                        dest_file = dest_dir / trip_file.name
+                        # For trip files, preserve them directly for realistic patterns
+                        if traffic_density != 1.0:
+                            self._scale_route_file(trip_file, dest_file, traffic_density)
+                        else:
+                            shutil.copy2(trip_file, dest_file)
+                        print(f"✅ Preserved {vehicle_type} trip file (realistic patterns): {trip_file.name}")
                     
                     copied_types.add(vehicle_type)
-                    print(f"✅ Preserved {vehicle_type} trip file (realistic patterns): {trip_file.name}")
                 elif vehicle_type:
                     print(f"⏭️  Skipped disabled vehicle type: {vehicle_type}")
             
@@ -1360,8 +1425,9 @@ class SimulationManager:
         traffic_density = config.get('trafficDensity', 1.0)
         copied_types = set()
         
-        # Copy trip files first - prioritize for realistic patterns
-        for trip_file in source_dir.glob("*.trips.xml"):
+        # Copy trip files first - prioritize for realistic patterns (support compressed files)
+        trip_files = list(source_dir.glob("*.trips.xml")) + list(source_dir.glob("*.trips.xml.gz"))
+        for trip_file in trip_files:
             # Determine vehicle type from filename
             vehicle_type = None
             for vtype in ['passenger', 'bus', 'truck', 'motorcycle']:
@@ -1370,15 +1436,37 @@ class SimulationManager:
                     break
             
             if vehicle_type and vehicle_type in enabled_vehicles:
-                dest_file = dest_dir / trip_file.name
-                if traffic_density != 1.0:
-                    # Apply traffic density scaling
-                    self._scale_route_file(trip_file, dest_file, traffic_density)
+                # Handle compressed trip files - decompress during copy
+                if trip_file.name.endswith('.gz'):
+                    import gzip
+                    dest_file = dest_dir / trip_file.name.replace('.gz', '')
+                    try:
+                        with gzip.open(trip_file, 'rt', encoding='utf-8') as f_in:
+                            if traffic_density != 1.0:
+                                # Create temporary uncompressed file for scaling
+                                temp_file = dest_file.with_suffix('.temp.xml')
+                                temp_file.write_text(f_in.read(), encoding='utf-8')
+                                self._scale_route_file(temp_file, dest_file, traffic_density)
+                                temp_file.unlink()
+                            else:
+                                with open(dest_file, 'w', encoding='utf-8') as f_out:
+                                    f_out.write(f_in.read())
+                        print(f"Decompressed and copied trip file for enabled vehicle type: {vehicle_type}")
+                    except Exception as e:
+                        print(f"Failed to decompress {trip_file}: {e}, copying as-is")
+                        dest_file = dest_dir / trip_file.name
+                        shutil.copy2(trip_file, dest_file)
                 else:
-                    # Just copy the file
-                    shutil.copy2(trip_file, dest_file)
+                    dest_file = dest_dir / trip_file.name
+                    if traffic_density != 1.0:
+                        # Apply traffic density scaling
+                        self._scale_route_file(trip_file, dest_file, traffic_density)
+                    else:
+                        # Just copy the file
+                        shutil.copy2(trip_file, dest_file)
+                    print(f"Copied trip file for enabled vehicle type: {vehicle_type}")
+                
                 copied_types.add(vehicle_type)
-                print(f"Copied trip file for enabled vehicle type: {vehicle_type}")
         
         # Copy route files as fallback - only for types not covered by trip files
         for route_file in source_dir.glob("*.rou.xml"):

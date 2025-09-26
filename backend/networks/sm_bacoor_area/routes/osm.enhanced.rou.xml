@@ -1,0 +1,970 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- generated on 2025-09-26 19:56:46 by Eclipse SUMO duarouter Version 1.24.0
+<duarouterConfiguration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/duarouterConfiguration.xsd">
+
+    <input>
+        <net-file value="C:/Users/kgaqu/OneDrive/Documents/4th Year/Capstone 2/v10/backend/networks/sm_bacoor_area/sm_bacoor_area.net.xml"/>
+        <route-files value="C:/Users/kgaqu/AppData/Local/Temp/tmpz1qmdcs7.trips.xml"/>
+    </input>
+
+    <output>
+        <output-file value="C:/Users/kgaqu/OneDrive/Documents/4th Year/Capstone 2/v10/backend/networks/sm_bacoor_area/routes/osm.enhanced.rou.xml"/>
+    </output>
+
+    <processing>
+        <max-alternatives value="3"/>
+        <remove-loops value="true"/>
+        <weights.random-factor value="1.2"/>
+        <route-choice-method value="gawron"/>
+    </processing>
+
+    <report>
+        <ignore-errors value="true"/>
+    </report>
+
+</duarouterConfiguration>
+-->
+
+<routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/routes_file.xsd">
+    <vType id="veh_passenger" maxSpeed="55.56" vClass="passenger" guiShape="passenger" color="grey" accel="2.6" decel="4.5"/>
+    <vehicle id="vehicle_36" type="veh_passenger" depart="1.20" departLane="best" departPos="random" departSpeed="max" color="255,20,147" speedFactor="0.8900">
+        <route edges="587063904 1252226326 1252226316"/>
+    </vehicle>
+    <vType id="truck_truck" length="10.00" maxSpeed="25.00" vClass="truck" guiShape="truck" color="white"/>
+    <vehicle id="vehicle_188" type="truck_truck" depart="3.85" departLane="best" departPos="random" departSpeed="max" color="white" speedFactor="0.8600">
+        <route edges="-587063887#5 1252226318#0 421085682"/>
+    </vehicle>
+    <vehicle id="vehicle_189" type="truck_truck" depart="8.46" departLane="best" departPos="random" departSpeed="max" color="0,128,0" speedFactor="0.8500">
+        <route edges="1296098177 1287697069 1252226323 421085682"/>
+    </vehicle>
+    <vType id="bus_bus" length="12.00" maxSpeed="27.78" vClass="bus" guiShape="bus" color="yellow"/>
+    <vehicle id="vehicle_107" type="bus_bus" depart="8.57" departLane="best" departPos="random" departSpeed="max" color="blue" speedFactor="0.8700">
+        <route edges="1252226326 1252226316 587063887#0"/>
+    </vehicle>
+    <vType id="motorcycle_motorcycle" length="2.50" maxSpeed="50.00" vClass="motorcycle" guiShape="motorcycle" color="red"/>
+    <vehicle id="vehicle_253" type="motorcycle_motorcycle" depart="8.57" departLane="best" departPos="random" departSpeed="max" color="white" speedFactor="0.9000">
+        <route edges="1287697069 1252226323 1252226316"/>
+    </vehicle>
+    <vehicle id="vehicle_190" type="truck_truck" depart="12.06" departLane="best" departPos="random" departSpeed="max" color="black" speedFactor="1.0000">
+        <route edges="587063900#0 -1252226314 -1293084433"/>
+    </vehicle>
+    <vehicle id="vehicle_33" type="veh_passenger" depart="16.07" departLane="best" departPos="random" departSpeed="max" color="cyan" speedFactor="1.1200">
+        <route edges="1252226323 421085682"/>
+    </vehicle>
+    <vehicle id="vehicle_20" type="veh_passenger" depart="87.42" departLane="best" departSpeed="max">
+        <route edges="-587063887#5 1252226318#0 587063900#0 -1252226314"/>
+    </vehicle>
+    <vehicle id="vehicle_187" type="truck_truck" depart="131.12" departLane="best" departSpeed="max">
+        <route edges="587063904 1252226326 587063900#0 -1252226314 -1293084433"/>
+    </vehicle>
+    <vehicle id="vehicle_108" type="bus_bus" depart="163.36" departLane="best" departPos="random" departSpeed="max" color="red" speedFactor="0.9700">
+        <route edges="1296098177 1287697069 1252226323"/>
+    </vehicle>
+    <vehicle id="vehicle_254" type="motorcycle_motorcycle" depart="163.36" departLane="best" departPos="random" departSpeed="max" color="yellow" speedFactor="0.8600">
+        <route edges="1252226316 587063887#0"/>
+    </vehicle>
+    <vehicle id="vehicle_12" type="veh_passenger" depart="174.83" departLane="best" departSpeed="max">
+        <route edges="-587063887#5 1252226318#0 587063900#0 -1252226314"/>
+    </vehicle>
+    <vehicle id="vehicle_191" type="truck_truck" depart="176.95" departLane="best" departPos="random" departSpeed="max" color="grey" speedFactor="1.0700">
+        <route edges="1252226318#0 587063900#0 -1252226314 -1293084433"/>
+    </vehicle>
+    <vehicle id="vehicle_37" type="veh_passenger" depart="183.33" departLane="best" departPos="random" departSpeed="max" color="192,192,192" speedFactor="0.9000">
+        <route edges="587063904 1252226326 1252226316"/>
+    </vehicle>
+    <vehicle id="vehicle_109" type="bus_bus" depart="228.93" departLane="best" departPos="random" departSpeed="max" color="grey" speedFactor="1.1000">
+        <route edges="-587063887#5 1252226318#0 587063900#0 -1252226314 -1293084433"/>
+    </vehicle>
+    <vehicle id="vehicle_255" type="motorcycle_motorcycle" depart="228.93" departLane="best" departPos="random" departSpeed="max" color="128,0,128" speedFactor="1.0100">
+        <route edges="1296098177 1287697069 1252226323 1252226316"/>
+    </vehicle>
+    <vehicle id="vehicle_38" type="veh_passenger" depart="238.27" departLane="best" departPos="random" departSpeed="max" color="128,0,128" speedFactor="0.9700">
+        <route edges="1296098177 1287697069 1252226323 1252226316"/>
+    </vehicle>
+    <vehicle id="vehicle_192" type="truck_truck" depart="243.12" departLane="best" departPos="random" departSpeed="max" color="white" speedFactor="1.0200">
+        <route edges="1296098177 1287697069 1252226323 421085682 -333292211#2"/>
+    </vehicle>
+    <vehicle id="vehicle_110" type="bus_bus" depart="246.26" departLane="best" departPos="random" departSpeed="max" color="blue" speedFactor="0.9900">
+        <route edges="1296098177 1287697069 1252226323 421085682"/>
+    </vehicle>
+    <vehicle id="vehicle_256" type="motorcycle_motorcycle" depart="246.26" departLane="best" departPos="random" departSpeed="max" color="black" speedFactor="0.9900">
+        <route edges="1287697069 1252226323 421085682"/>
+    </vehicle>
+    <vehicle id="vehicle_193" type="truck_truck" depart="254.80" departLane="best" departPos="random" departSpeed="max" color="blue" speedFactor="1.1400">
+        <route edges="1252226318#0 587063900#0 -1252226314 -1293084433"/>
+    </vehicle>
+    <vehicle id="vehicle_39" type="veh_passenger" depart="259.22" departLane="best" departPos="random" departSpeed="max" color="cyan" speedFactor="1.0400">
+        <route edges="587063904 1252226326 587063900#0"/>
+    </vehicle>
+    <vehicle id="vehicle_101" type="bus_bus" depart="262.25" departLane="best" departSpeed="max">
+        <route edges="587063904 1252226326 587063900#0 -1252226314 -1293084433"/>
+    </vehicle>
+    <vehicle id="vehicle_175" type="truck_truck" depart="262.25" departLane="best" departSpeed="max">
+        <route edges="587063904 1252226326 587063900#0 -1252226314 -1293084433"/>
+    </vehicle>
+    <vehicle id="vehicle_249" type="motorcycle_motorcycle" depart="262.25" departLane="best" departSpeed="max">
+        <route edges="1296098177 1287697069 1252226323 1252226316 587063887#0"/>
+    </vehicle>
+    <vehicle id="vehicle_34" type="veh_passenger" depart="303.30" departLane="best" departPos="random" departSpeed="max" color="255,165,0" speedFactor="1.0900">
+        <route edges="1296098177 1287697069"/>
+    </vehicle>
+    <vehicle id="vehicle_111" type="bus_bus" depart="322.58" departLane="best" departPos="random" departSpeed="max" color="yellow" speedFactor="0.9900">
+        <route edges="1287697069 1252226323 1252226316 587063887#0"/>
+    </vehicle>
+    <vehicle id="vehicle_257" type="motorcycle_motorcycle" depart="322.58" departLane="best" departPos="random" departSpeed="max" color="128,0,128" speedFactor="0.9600">
+        <route edges="-587063887#5 1252226318#0 587063900#0 -1252226314"/>
+    </vehicle>
+    <vehicle id="vehicle_194" type="truck_truck" depart="330.99" departLane="best" departPos="random" departSpeed="max" color="black" speedFactor="0.9800">
+        <route edges="587063904 1252226326 587063900#0 -1252226314 -1293084433"/>
+    </vehicle>
+    <vehicle id="vehicle_40" type="veh_passenger" depart="346.65" departLane="best" departPos="random" departSpeed="max" color="red" speedFactor="0.9000">
+        <route edges="-587063887#5 1252226318#0 587063900#0"/>
+    </vehicle>
+    <vehicle id="vehicle_27" type="veh_passenger" depart="349.67" departLane="best" departSpeed="max">
+        <route edges="-587063887#5 1252226318#0 587063900#0 -1252226314 -1293084433"/>
+    </vehicle>
+    <vehicle id="vehicle_170" type="truck_truck" depart="393.37" departLane="best" departSpeed="max">
+        <route edges="-587063887#5 1252226318#0 587063900#0 -1252226314 -1293084433"/>
+    </vehicle>
+    <vehicle id="vehicle_112" type="bus_bus" depart="432.84" departLane="best" departPos="random" departSpeed="max" color="red" speedFactor="1.0100">
+        <route edges="1287697069 1252226323 421085682"/>
+    </vehicle>
+    <vehicle id="vehicle_258" type="motorcycle_motorcycle" depart="432.84" departLane="best" departPos="random" departSpeed="max" color="blue" speedFactor="1.0500">
+        <route edges="1252226323 1252226316 587063887#0"/>
+    </vehicle>
+    <vehicle id="vehicle_3" type="veh_passenger" depart="437.08" departLane="best" departSpeed="max">
+        <route edges="587063904 1252226326 587063900#0 -1252226314 -1293084433"/>
+    </vehicle>
+    <vehicle id="vehicle_113" type="bus_bus" depart="444.96" departLane="best" departPos="random" departSpeed="max" color="255,165,0" speedFactor="0.8900">
+        <route edges="1296098177 1287697069 1252226323 1252226316"/>
+    </vehicle>
+    <vehicle id="vehicle_259" type="motorcycle_motorcycle" depart="444.96" departLane="best" departPos="random" departSpeed="max" color="yellow" speedFactor="0.8900">
+        <route edges="1296098177 1287697069 1252226323"/>
+    </vehicle>
+    <vehicle id="vehicle_195" type="truck_truck" depart="453.70" departLane="best" departPos="random" departSpeed="max" color="0,128,0" speedFactor="0.8800">
+        <route edges="1287697069 1252226323 1252226316 587063887#0"/>
+    </vehicle>
+    <vehicle id="vehicle_41" type="veh_passenger" depart="455.82" departLane="best" departPos="random" departSpeed="max" color="blue" speedFactor="0.8600">
+        <route edges="1252226318#0 587063900#0"/>
+    </vehicle>
+    <vehicle id="vehicle_42" type="veh_passenger" depart="458.84" departLane="best" departPos="random" departSpeed="max" color="128,0,128" speedFactor="1.0100">
+        <route edges="1287697069 1252226323 421085682 -333292211#2"/>
+    </vehicle>
+    <vehicle id="vehicle_114" type="bus_bus" depart="492.87" departLane="best" departPos="random" departSpeed="max" color="255,165,0" speedFactor="1.0000">
+        <route edges="1287697069 1252226323 1252226316"/>
+    </vehicle>
+    <vehicle id="vehicle_260" type="motorcycle_motorcycle" depart="492.87" departLane="best" departPos="random" departSpeed="max" color="blue" speedFactor="0.9000">
+        <route edges="1287697069 1252226323 1252226316 587063887#0"/>
+    </vehicle>
+    <vehicle id="vehicle_196" type="truck_truck" depart="512.00" departLane="best" departPos="random" departSpeed="max" color="yellow" speedFactor="0.9200">
+        <route edges="587063904 1252226326 587063900#0 -1252226314 -1293084433"/>
+    </vehicle>
+    <vehicle id="vehicle_115" type="bus_bus" depart="512.03" departLane="best" departPos="random" departSpeed="max" color="0,128,0" speedFactor="0.8700">
+        <route edges="1287697069 1252226323"/>
+    </vehicle>
+    <vehicle id="vehicle_261" type="motorcycle_motorcycle" depart="512.03" departLane="best" departPos="random" departSpeed="max" color="255,165,0" speedFactor="0.9500">
+        <route edges="1252226326 587063900#0 -1252226314 -1293084433"/>
+    </vehicle>
+    <vehicle id="vehicle_43" type="veh_passenger" depart="514.39" departLane="best" departPos="random" departSpeed="max" color="50,205,50" speedFactor="0.8900">
+        <route edges="1252226318#0 421085682 -333292211#2"/>
+    </vehicle>
+    <vehicle id="vehicle_44" type="veh_passenger" depart="518.78" departLane="best" departPos="random" departSpeed="max" color="50,205,50" speedFactor="1.0000">
+        <route edges="1252226326"/>
+    </vehicle>
+    <vehicle id="vehicle_197" type="truck_truck" depart="523.77" departLane="best" departPos="random" departSpeed="max" color="0,128,0" speedFactor="1.1100">
+        <route edges="-587063887#5 1252226318#0 587063900#0 -1252226314 -1293084433"/>
+    </vehicle>
+    <vehicle id="vehicle_4" type="veh_passenger" depart="524.50" departLane="best" departSpeed="max">
+        <route edges="1296098177 1287697069 1252226323"/>
+    </vehicle>
+    <vehicle id="vehicle_93" type="bus_bus" depart="524.50" departLane="best" departSpeed="max">
+        <route edges="1296098177 1287697069 1252226323 1252226316 587063887#0"/>
+    </vehicle>
+    <vehicle id="vehicle_176" type="truck_truck" depart="524.50" departLane="best" departSpeed="max">
+        <route edges="-587063887#5 1252226318#0 421085682 -333292211#2"/>
+    </vehicle>
+    <vehicle id="vehicle_247" type="motorcycle_motorcycle" depart="524.50" departLane="best">
+        <route edges="1252226326 1252226316"/>
+    </vehicle>
+    <vehicle id="vehicle_35" type="veh_passenger" depart="593.01" departLane="best" departPos="random" departSpeed="max" color="139,69,19" speedFactor="1.0200">
+        <route edges="587063904 1252226326 587063900#0 -1252226314 -1293084433"/>
+    </vehicle>
+    <vehicle id="vehicle_171" type="truck_truck" depart="655.62" departLane="best" departSpeed="max">
+        <route edges="-587063887#5 1252226318#0 421085682 -333292211#2"/>
+    </vehicle>
+    <vehicle id="vehicle_116" type="bus_bus" depart="676.84" departLane="best" departPos="random" departSpeed="max" color="red" speedFactor="1.0400">
+        <route edges="1252226326 587063900#0 -1252226314"/>
+    </vehicle>
+    <vehicle id="vehicle_262" type="motorcycle_motorcycle" depart="676.84" departLane="best" departPos="random" departSpeed="max" color="black" speedFactor="1.1100">
+        <route edges="1252226323 421085682 -333292211#2"/>
+    </vehicle>
+    <vehicle id="vehicle_117" type="bus_bus" depart="678.37" departLane="best" departPos="random" departSpeed="max" color="yellow" speedFactor="0.8700">
+        <route edges="-587063887#5 1252226318#0 587063900#0 -1252226314"/>
+    </vehicle>
+    <vehicle id="vehicle_263" type="motorcycle_motorcycle" depart="678.37" departLane="best" departPos="random" departSpeed="max" color="yellow" speedFactor="0.9000">
+        <route edges="1296098177 1287697069 1252226323 1252226316 587063887#0"/>
+    </vehicle>
+    <vehicle id="vehicle_198" type="truck_truck" depart="691.10" departLane="best" departPos="random" departSpeed="max" color="blue" speedFactor="1.1100">
+        <route edges="1252226318#0 587063900#0 -1252226314 -1293084433"/>
+    </vehicle>
+    <vehicle id="vehicle_9" type="veh_passenger" depart="699.33" departLane="best" departSpeed="max">
+        <route edges="-587063887#5 1252226318#0 421085682 -333292211#2"/>
+    </vehicle>
+    <vehicle id="vehicle_199" type="truck_truck" depart="700.66" departLane="best" departPos="random" departSpeed="max" color="black" speedFactor="1.0600">
+        <route edges="-587063887#5 1252226318#0 587063900#0 -1252226314 -1293084433"/>
+    </vehicle>
+    <vehicle id="vehicle_45" type="veh_passenger" depart="712.37" departLane="best" departPos="random" departSpeed="max" color="255,165,0" speedFactor="0.8700">
+        <route edges="1252226318#0 421085682 -333292211#2"/>
+    </vehicle>
+    <vehicle id="vehicle_46" type="veh_passenger" depart="714.29" departLane="best" departPos="random" departSpeed="max" color="128,0,128" speedFactor="1.0400">
+        <route edges="1252226318#0 587063900#0 -1252226314"/>
+    </vehicle>
+    <vehicle id="vehicle_118" type="bus_bus" depart="743.98" departLane="best" departPos="random" departSpeed="max" color="grey" speedFactor="0.8800">
+        <route edges="-587063887#5 1252226318#0 587063900#0 -1252226314"/>
+    </vehicle>
+    <vehicle id="vehicle_264" type="motorcycle_motorcycle" depart="743.98" departLane="best" departPos="random" departSpeed="max" color="red" speedFactor="1.1100">
+        <route edges="587063904 1252226326 1252226316"/>
+    </vehicle>
+    <vehicle id="vehicle_47" type="veh_passenger" depart="782.85" departLane="best" departPos="random" departSpeed="max" color="grey" speedFactor="0.8700">
+        <route edges="1252226318#0 421085682"/>
+    </vehicle>
+    <vehicle id="vehicle_200" type="truck_truck" depart="786.74" departLane="best" departPos="random" departSpeed="max" color="white" speedFactor="1.0100">
+        <route edges="-587063887#5 1252226318#0 421085682 -333292211#2"/>
+    </vehicle>
+    <vehicle id="vehicle_5" type="veh_passenger" depart="786.75" departLane="best" departSpeed="max">
+        <route edges="-587063887#5 1252226318#0 587063900#0 -1252226314 -1293084433"/>
+    </vehicle>
+    <vehicle id="vehicle_95" type="bus_bus" depart="786.75" departLane="best" departSpeed="max">
+        <route edges="1296098177 1287697069 1252226323 1252226316 587063887#0"/>
+    </vehicle>
+    <vehicle id="vehicle_244" type="motorcycle_motorcycle" depart="786.75" departLane="best">
+        <route edges="1252226323 1252226316 587063887#0"/>
+    </vehicle>
+    <vehicle id="vehicle_119" type="bus_bus" depart="837.84" departLane="best" departPos="random" departSpeed="max" color="white" speedFactor="1.0800">
+        <route edges="1296098177 1287697069 1252226323 1252226316 587063887#0"/>
+    </vehicle>
+    <vehicle id="vehicle_265" type="motorcycle_motorcycle" depart="837.84" departLane="best" departPos="random" departSpeed="max" color="red" speedFactor="0.9600">
+        <route edges="587063904 1252226326 1252226316"/>
+    </vehicle>
+    <vehicle id="vehicle_120" type="bus_bus" depart="862.91" departLane="best" departPos="random" departSpeed="max" color="red" speedFactor="0.9500">
+        <route edges="1296098177 1287697069 1252226323"/>
+    </vehicle>
+    <vehicle id="vehicle_266" type="motorcycle_motorcycle" depart="862.91" departLane="best" departPos="random" departSpeed="max" color="black" speedFactor="0.9100">
+        <route edges="1252226323 1252226316"/>
+    </vehicle>
+    <vehicle id="vehicle_201" type="truck_truck" depart="865.00" departLane="best" departPos="random" departSpeed="max" color="0,128,0" speedFactor="1.0400">
+        <route edges="-587063887#5 1252226318#0 587063900#0 -1252226314 -1293084433"/>
+    </vehicle>
+    <vehicle id="vehicle_48" type="veh_passenger" depart="886.98" departLane="best" departPos="random" departSpeed="max" color="139,69,19" speedFactor="0.8800">
+        <route edges="1287697069 1252226323 421085682"/>
+    </vehicle>
+    <vehicle id="vehicle_49" type="veh_passenger" depart="887.23" departLane="best" departPos="random" departSpeed="max" color="blue" speedFactor="1.0800">
+        <route edges="1296098177 1287697069 1252226323 1252226316 587063887#0"/>
+    </vehicle>
+    <vehicle id="vehicle_99" type="bus_bus" depart="905.67" departLane="best" departSpeed="max">
+        <route edges="587063904 1252226326 1252226316 587063887#0"/>
+    </vehicle>
+    <vehicle id="vehicle_121" type="bus_bus" depart="907.97" departLane="best" departPos="random" departSpeed="max" color="blue" speedFactor="1.1100">
+        <route edges="1296098177 1287697069 1252226323"/>
+    </vehicle>
+    <vehicle id="vehicle_267" type="motorcycle_motorcycle" depart="907.97" departLane="best" departPos="random" departSpeed="max" color="blue" speedFactor="0.8800">
+        <route edges="1252226318#0 587063900#0"/>
+    </vehicle>
+    <vehicle id="vehicle_167" type="truck_truck" depart="917.87" departLane="best" departSpeed="max">
+        <route edges="587063904 1252226326 1252226316 587063887#0"/>
+    </vehicle>
+    <vehicle id="vehicle_202" type="truck_truck" depart="928.07" departLane="best" departPos="random" departSpeed="max" color="red" speedFactor="1.0900">
+        <route edges="1296098177 1287697069 1252226323 1252226316 587063887#0"/>
+    </vehicle>
+    <vehicle id="vehicle_50" type="veh_passenger" depart="941.87" departLane="best" departPos="random" departSpeed="max" color="0,128,0" speedFactor="0.9500">
+        <route edges="1296098177 1287697069 1252226323 1252226316"/>
+    </vehicle>
+    <vehicle id="vehicle_8" type="veh_passenger" depart="961.58" departLane="best">
+        <route edges="1252226326 587063900#0 -1252226314 -1293084433"/>
+    </vehicle>
+    <vehicle id="vehicle_122" type="bus_bus" depart="992.84" departLane="best" departPos="random" departSpeed="max" color="white" speedFactor="0.9000">
+        <route edges="1296098177 1287697069 1252226323 421085682"/>
+    </vehicle>
+    <vehicle id="vehicle_268" type="motorcycle_motorcycle" depart="992.84" departLane="best" departPos="random" departSpeed="max" color="red" speedFactor="0.9800">
+        <route edges="1252226318#0 587063900#0 -1252226314 -1293084433"/>
+    </vehicle>
+    <vehicle id="vehicle_123" type="bus_bus" depart="1002.82" departLane="best" departPos="random" departSpeed="max" color="grey" speedFactor="1.0600">
+        <route edges="1296098177 1287697069 1252226323 421085682"/>
+    </vehicle>
+    <vehicle id="vehicle_269" type="motorcycle_motorcycle" depart="1002.82" departLane="best" departPos="random" departSpeed="max" color="black" speedFactor="0.9900">
+        <route edges="1252226326 587063900#0 -1252226314 -1293084433"/>
+    </vehicle>
+    <vehicle id="vehicle_203" type="truck_truck" depart="1023.01" departLane="best" departPos="random" departSpeed="max" color="blue" speedFactor="1.0300">
+        <route edges="1296098177 1287697069 1252226323 1252226316 587063887#0"/>
+    </vehicle>
+    <vehicle id="vehicle_11" type="veh_passenger" depart="1049.00" departLane="best" departSpeed="max">
+        <route edges="1296098177 1287697069 1252226323 421085682 -333292211#2"/>
+    </vehicle>
+    <vehicle id="vehicle_102" type="bus_bus" depart="1049.00" departLane="best" departSpeed="max">
+        <route edges="-587063887#5 1252226318#0 587063900#0 -1252226314 -1293084433"/>
+    </vehicle>
+    <vehicle id="vehicle_242" type="motorcycle_motorcycle" depart="1049.00" departLane="best">
+        <route edges="1287697069 1252226323 421085682"/>
+    </vehicle>
+    <vehicle id="vehicle_51" type="veh_passenger" depart="1054.64" departLane="best" departPos="random" departSpeed="max" color="black" speedFactor="1.1100">
+        <route edges="-587063887#5 1252226318#0 421085682"/>
+    </vehicle>
+    <vehicle id="vehicle_52" type="veh_passenger" depart="1055.22" departLane="best" departPos="random" departSpeed="max" color="blue" speedFactor="0.9000">
+        <route edges="587063904 1252226326"/>
+    </vehicle>
+    <vehicle id="vehicle_204" type="truck_truck" depart="1057.29" departLane="best" departPos="random" departSpeed="max" color="white" speedFactor="1.0000">
+        <route edges="-587063887#5 1252226318#0 587063900#0 -1252226314 -1293084433"/>
+    </vehicle>
+    <vehicle id="vehicle_124" type="bus_bus" depart="1115.89" departLane="best" departPos="random" departSpeed="max" color="yellow" speedFactor="1.1100">
+        <route edges="1296098177 1287697069 1252226323 421085682"/>
+    </vehicle>
+    <vehicle id="vehicle_270" type="motorcycle_motorcycle" depart="1115.89" departLane="best" departPos="random" departSpeed="max" color="red" speedFactor="0.9000">
+        <route edges="1287697069 1252226323 1252226316"/>
+    </vehicle>
+    <vehicle id="vehicle_10" type="veh_passenger" depart="1136.42" departLane="best" departSpeed="max">
+        <route edges="1296098177 1287697069 1252226323 1252226316"/>
+    </vehicle>
+    <vehicle id="vehicle_125" type="bus_bus" depart="1148.95" departLane="best" departPos="random" departSpeed="max" color="grey" speedFactor="0.8600">
+        <route edges="587063904 1252226326 587063900#0 -1252226314 -1293084433"/>
+    </vehicle>
+    <vehicle id="vehicle_271" type="motorcycle_motorcycle" depart="1148.95" departLane="best" departPos="random" departSpeed="max" color="black" speedFactor="1.0800">
+        <route edges="-1252226314 -1293084433"/>
+    </vehicle>
+    <vehicle id="vehicle_205" type="truck_truck" depart="1160.07" departLane="best" departPos="random" departSpeed="max" color="red" speedFactor="1.0700">
+        <route edges="1296098177 1287697069 1252226323 1252226316 587063887#0"/>
+    </vehicle>
+    <vehicle id="vehicle_53" type="veh_passenger" depart="1185.31" departLane="best" departPos="random" departSpeed="max" color="139,69,19" speedFactor="1.0600">
+        <route edges="1252226326 1252226316"/>
+    </vehicle>
+    <vehicle id="vehicle_206" type="truck_truck" depart="1207.91" departLane="best" departPos="random" departSpeed="max" color="0,128,0" speedFactor="0.9100">
+        <route edges="-587063887#5 1252226318#0 587063900#0 -1252226314 -1293084433"/>
+    </vehicle>
+    <vehicle id="vehicle_104" type="bus_bus" depart="1210.17" departLane="best" departPos="random" departSpeed="max" color="255,165,0" speedFactor="1.1100">
+        <route edges="1252226326 587063900#0 -1252226314"/>
+    </vehicle>
+    <vehicle id="vehicle_54" type="veh_passenger" depart="1218.76" departLane="best" departPos="random" departSpeed="max" color="white" speedFactor="1.1100">
+        <route edges="421085682 -333292211#2"/>
+    </vehicle>
+    <vehicle id="vehicle_126" type="bus_bus" depart="1248.18" departLane="best" departPos="random" departSpeed="max" color="grey" speedFactor="0.8900">
+        <route edges="1296098177 1287697069 1252226323 421085682"/>
+    </vehicle>
+    <vehicle id="vehicle_272" type="motorcycle_motorcycle" depart="1248.18" departLane="best" departPos="random" departSpeed="max" color="255,165,0" speedFactor="0.8800">
+        <route edges="587063904 1252226326 587063900#0"/>
+    </vehicle>
+    <vehicle id="vehicle_127" type="bus_bus" depart="1287.98" departLane="best" departPos="random" departSpeed="max" color="0,128,0" speedFactor="0.8800">
+        <route edges="587063900#0 -1252226314 -1293084433"/>
+    </vehicle>
+    <vehicle id="vehicle_273" type="motorcycle_motorcycle" depart="1287.98" departLane="best" departPos="random" departSpeed="max" color="white" speedFactor="1.0500">
+        <route edges="1287697069 1252226323 1252226316"/>
+    </vehicle>
+    <vehicle id="vehicle_13" type="veh_passenger" depart="1311.25" departLane="best" departSpeed="max">
+        <route edges="587063904 1252226326 587063900#0 -1252226314 -1293084433"/>
+    </vehicle>
+    <vehicle id="vehicle_173" type="truck_truck" depart="1311.25" departLane="best" departSpeed="max">
+        <route edges="-587063887#5 1252226318#0 587063900#0 -1252226314 -1293084433"/>
+    </vehicle>
+    <vehicle id="vehicle_245" type="motorcycle_motorcycle" depart="1311.25" departLane="best">
+        <route edges="1252226326 587063900#0 -1252226314 -1293084433"/>
+    </vehicle>
+    <vehicle id="vehicle_55" type="veh_passenger" depart="1312.96" departLane="best" departPos="random" departSpeed="max" color="139,69,19" speedFactor="0.8600">
+        <route edges="-587063887#5 1252226318#0 587063900#0 -1252226314 -1293084433"/>
+    </vehicle>
+    <vehicle id="vehicle_207" type="truck_truck" depart="1322.32" departLane="best" departPos="random" departSpeed="max" color="red" speedFactor="0.9300">
+        <route edges="-587063887#5 1252226318#0 587063900#0 -1252226314 -1293084433"/>
+    </vehicle>
+    <vehicle id="vehicle_128" type="bus_bus" depart="1339.22" departLane="best" departPos="random" departSpeed="max" color="grey" speedFactor="0.8700">
+        <route edges="1252226318#0 587063900#0 -1252226314 -1293084433"/>
+    </vehicle>
+    <vehicle id="vehicle_274" type="motorcycle_motorcycle" depart="1339.22" departLane="best" departPos="random" departSpeed="max" color="128,0,128" speedFactor="1.0900">
+        <route edges="1296098177 1287697069 1252226323 421085682"/>
+    </vehicle>
+    <vehicle id="vehicle_56" type="veh_passenger" depart="1349.40" departLane="best" departPos="random" departSpeed="max" color="139,69,19" speedFactor="0.8900">
+        <route edges="1252226326 587063900#0 -1252226314 -1293084433"/>
+    </vehicle>
+    <vehicle id="vehicle_129" type="bus_bus" depart="1354.80" departLane="best" departPos="random" departSpeed="max" color="yellow" speedFactor="1.0900">
+        <route edges="1296098177 1287697069 1252226323 1252226316 587063887#0"/>
+    </vehicle>
+    <vehicle id="vehicle_275" type="motorcycle_motorcycle" depart="1354.80" departLane="best" departPos="random" departSpeed="max" color="black" speedFactor="0.9500">
+        <route edges="1252226323 1252226316"/>
+    </vehicle>
+    <vehicle id="vehicle_57" type="veh_passenger" depart="1383.39" departLane="best" departPos="random" departSpeed="max" color="192,192,192" speedFactor="0.8800">
+        <route edges="-587063887#5 1252226318#0 587063900#0 -1252226314 -1293084433"/>
+    </vehicle>
+    <vehicle id="vehicle_208" type="truck_truck" depart="1388.94" departLane="best" departPos="random" departSpeed="max" color="red" speedFactor="1.1500">
+        <route edges="-587063887#5 1252226318#0 587063900#0 -1252226314 -1293084433"/>
+    </vehicle>
+    <vehicle id="vehicle_19" type="veh_passenger" depart="1398.67" departLane="best" departSpeed="max">
+        <route edges="-587063887#5 1252226318#0 587063900#0 -1252226314 -1293084433"/>
+    </vehicle>
+    <vehicle id="vehicle_209" type="truck_truck" depart="1411.07" departLane="best" departPos="random" departSpeed="max" color="blue" speedFactor="0.9200">
+        <route edges="-587063887#5 1252226318#0 587063900#0 -1252226314 -1293084433"/>
+    </vehicle>
+    <vehicle id="vehicle_58" type="veh_passenger" depart="1428.00" departLane="best" departPos="random" departSpeed="max" color="139,69,19" speedFactor="0.8700">
+        <route edges="1287697069 1252226323 1252226316"/>
+    </vehicle>
+    <vehicle id="vehicle_186" type="truck_truck" depart="1442.37" departLane="best" departSpeed="max">
+        <route edges="587063904 1252226326 587063900#0 -1252226314 -1293084433"/>
+    </vehicle>
+    <vehicle id="vehicle_32" type="veh_passenger" depart="1486.08" departLane="best" departSpeed="max">
+        <route edges="1296098177 1287697069 1252226323 1252226316"/>
+    </vehicle>
+    <vehicle id="vehicle_105" type="bus_bus" depart="1488.59" departLane="best" departPos="random" departSpeed="max" color="0,128,0" speedFactor="1.0000">
+        <route edges="1296098177 1287697069 1252226323 421085682"/>
+    </vehicle>
+    <vehicle id="vehicle_130" type="bus_bus" depart="1499.65" departLane="best" departPos="random" departSpeed="max" color="blue" speedFactor="0.9900">
+        <route edges="1296098177 1287697069 1252226323 421085682 -333292211#2"/>
+    </vehicle>
+    <vehicle id="vehicle_276" type="motorcycle_motorcycle" depart="1499.65" departLane="best" departPos="random" departSpeed="max" color="black" speedFactor="1.1200">
+        <route edges="1252226326"/>
+    </vehicle>
+    <vehicle id="vehicle_131" type="bus_bus" depart="1505.97" departLane="best" departPos="random" departSpeed="max" color="0,128,0" speedFactor="0.8600">
+        <route edges="1296098177 1287697069 1252226323 421085682 -333292211#2"/>
+    </vehicle>
+    <vehicle id="vehicle_277" type="motorcycle_motorcycle" depart="1505.97" departLane="best" departPos="random" departSpeed="max" color="0,128,0" speedFactor="0.9000">
+        <route edges="1252226323 421085682 -333292211#2"/>
+    </vehicle>
+    <vehicle id="vehicle_210" type="truck_truck" depart="1556.14" departLane="best" departPos="random" departSpeed="max" color="grey" speedFactor="0.9900">
+        <route edges="-587063887#5 1252226318#0 587063900#0 -1252226314 -1293084433"/>
+    </vehicle>
+    <vehicle id="vehicle_25" type="veh_passenger" depart="1573.50" departLane="best" departSpeed="max">
+        <route edges="-587063887#5 1252226318#0 587063900#0 -1252226314 -1293084433"/>
+    </vehicle>
+    <vehicle id="vehicle_97" type="bus_bus" depart="1573.50" departLane="best" departSpeed="max">
+        <route edges="1296098177 1287697069 1252226323 1252226316 587063887#0"/>
+    </vehicle>
+    <vehicle id="vehicle_168" type="truck_truck" depart="1573.50" departLane="best" departSpeed="max">
+        <route edges="1296098177 1287697069 1252226323 1252226316 587063887#0"/>
+    </vehicle>
+    <vehicle id="vehicle_248" type="motorcycle_motorcycle" depart="1573.50" departLane="best">
+        <route edges="587063900#0 -1252226314 -1293084433"/>
+    </vehicle>
+    <vehicle id="vehicle_211" type="truck_truck" depart="1575.89" departLane="best" departPos="random" departSpeed="max" color="red" speedFactor="0.9600">
+        <route edges="-587063887#5 1252226318#0 587063900#0 -1252226314 -1293084433"/>
+    </vehicle>
+    <vehicle id="vehicle_132" type="bus_bus" depart="1581.73" departLane="best" departPos="random" departSpeed="max" color="blue" speedFactor="0.9100">
+        <route edges="1296098177 1287697069 1252226323"/>
+    </vehicle>
+    <vehicle id="vehicle_278" type="motorcycle_motorcycle" depart="1581.73" departLane="best" departPos="random" departSpeed="max" color="red" speedFactor="1.0700">
+        <route edges="1252226323 1252226316"/>
+    </vehicle>
+    <vehicle id="vehicle_59" type="veh_passenger" depart="1582.19" departLane="best" departPos="random" departSpeed="max" color="white" speedFactor="1.0900">
+        <route edges="1252226326 587063900#0 -1252226314"/>
+    </vehicle>
+    <vehicle id="vehicle_60" type="veh_passenger" depart="1583.70" departLane="best" departPos="random" departSpeed="max" color="black" speedFactor="0.9900">
+        <route edges="-587063887#5 1252226318#0 421085682"/>
+    </vehicle>
+    <vehicle id="vehicle_212" type="truck_truck" depart="1626.95" departLane="best" departPos="random" departSpeed="max" color="white" speedFactor="1.0500">
+        <route edges="1296098177 1287697069 1252226323 1252226316 587063887#0"/>
+    </vehicle>
+    <vehicle id="vehicle_61" type="veh_passenger" depart="1647.47" departLane="best" departPos="random" departSpeed="max" color="255,165,0" speedFactor="0.8600">
+        <route edges="1252226318#0 421085682 -333292211#2"/>
+    </vehicle>
+    <vehicle id="vehicle_0" type="veh_passenger" depart="1660.92" departLane="best">
+        <route edges="1252226326 587063900#0 -1252226314 -1293084433"/>
+    </vehicle>
+    <vehicle id="vehicle_133" type="bus_bus" depart="1669.01" departLane="best" departPos="random" departSpeed="max" color="grey" speedFactor="1.0200">
+        <route edges="1296098177 1287697069 1252226323 421085682 -333292211#2"/>
+    </vehicle>
+    <vehicle id="vehicle_279" type="motorcycle_motorcycle" depart="1669.01" departLane="best" departPos="random" departSpeed="max" color="0,128,0" speedFactor="1.0800">
+        <route edges="1252226326 587063900#0 -1252226314"/>
+    </vehicle>
+    <vehicle id="vehicle_169" type="truck_truck" depart="1704.62" departLane="best" departSpeed="max">
+        <route edges="1296098177 1287697069 1252226323 421085682 -333292211#2"/>
+    </vehicle>
+    <vehicle id="vehicle_134" type="bus_bus" depart="1715.70" departLane="best" departPos="random" departSpeed="max" color="yellow" speedFactor="1.1200">
+        <route edges="587063904 1252226326 1252226316 587063887#0"/>
+    </vehicle>
+    <vehicle id="vehicle_280" type="motorcycle_motorcycle" depart="1715.70" departLane="best" departPos="random" departSpeed="max" color="255,165,0" speedFactor="0.8600">
+        <route edges="421085682 -333292211#2"/>
+    </vehicle>
+    <vehicle id="vehicle_213" type="truck_truck" depart="1723.82" departLane="best" departPos="random" departSpeed="max" color="yellow" speedFactor="0.9300">
+        <route edges="1296098177 1287697069 1252226323 1252226316 587063887#0"/>
+    </vehicle>
+    <vehicle id="vehicle_23" type="veh_passenger" depart="1748.33" departLane="best" departSpeed="max">
+        <route edges="587063904 1252226326 1252226316 587063887#0"/>
+    </vehicle>
+    <vehicle id="vehicle_135" type="bus_bus" depart="1754.09" departLane="best" departPos="random" departSpeed="max" color="grey" speedFactor="1.1100">
+        <route edges="1296098177 1287697069 1252226323 1252226316 587063887#0"/>
+    </vehicle>
+    <vehicle id="vehicle_281" type="motorcycle_motorcycle" depart="1754.09" departLane="best" departPos="random" departSpeed="max" color="black" speedFactor="1.0500">
+        <route edges="1296098177 1287697069 1252226323"/>
+    </vehicle>
+    <vehicle id="vehicle_62" type="veh_passenger" depart="1758.23" departLane="best" departPos="random" departSpeed="max" color="red" speedFactor="0.9100">
+        <route edges="-587063887#5 1252226318#0 587063900#0 -1252226314 -1293084433"/>
+    </vehicle>
+    <vehicle id="vehicle_106" type="bus_bus" depart="1771.96" departLane="best" departPos="random" departSpeed="max" color="yellow" speedFactor="1.0200">
+        <route edges="1296098177 1287697069 1252226323 421085682"/>
+    </vehicle>
+    <vehicle id="vehicle_63" type="veh_passenger" depart="1801.28" departLane="best" departPos="random" departSpeed="max" color="139,69,19" speedFactor="1.0200">
+        <route edges="587063904 1252226326"/>
+    </vehicle>
+    <vehicle id="vehicle_136" type="bus_bus" depart="1812.78" departLane="best" departPos="random" departSpeed="max" color="red" speedFactor="1.0900">
+        <route edges="587063904 1252226326 587063900#0 -1252226314 -1293084433"/>
+    </vehicle>
+    <vehicle id="vehicle_282" type="motorcycle_motorcycle" depart="1812.78" departLane="best" departPos="random" departSpeed="max" color="blue" speedFactor="0.9700">
+        <route edges="-1252226314 -1293084433"/>
+    </vehicle>
+    <vehicle id="vehicle_137" type="bus_bus" depart="1835.22" departLane="best" departPos="random" departSpeed="max" color="255,165,0" speedFactor="1.0300">
+        <route edges="1296098177 1287697069 1252226323 421085682 -333292211#2"/>
+    </vehicle>
+    <vehicle id="vehicle_283" type="motorcycle_motorcycle" depart="1835.22" departLane="best" departPos="random" departSpeed="max" color="128,0,128" speedFactor="0.9700">
+        <route edges="1252226318#0 587063900#0 -1252226314"/>
+    </vehicle>
+    <vehicle id="vehicle_15" type="veh_passenger" depart="1835.75" departLane="best">
+        <route edges="1252226318#0 587063900#0 -1252226314 -1293084433"/>
+    </vehicle>
+    <vehicle id="vehicle_103" type="bus_bus" depart="1835.75" departLane="best" departSpeed="max">
+        <route edges="-587063887#5 1252226318#0 421085682 -333292211#2"/>
+    </vehicle>
+    <vehicle id="vehicle_178" type="truck_truck" depart="1835.75" departLane="best" departSpeed="max">
+        <route edges="-587063887#5 1252226318#0 421085682 -333292211#2"/>
+    </vehicle>
+    <vehicle id="vehicle_214" type="truck_truck" depart="1836.24" departLane="best" departPos="random" departSpeed="max" color="white" speedFactor="1.0200">
+        <route edges="-587063887#5 1252226318#0 587063900#0 -1252226314 -1293084433"/>
+    </vehicle>
+    <vehicle id="vehicle_64" type="veh_passenger" depart="1844.78" departLane="best" departPos="random" departSpeed="max" color="grey" speedFactor="1.1200">
+        <route edges="-587063887#5 1252226318#0 421085682"/>
+    </vehicle>
+    <vehicle id="vehicle_215" type="truck_truck" depart="1867.25" departLane="best" departPos="random" departSpeed="max" color="white" speedFactor="0.9000">
+        <route edges="-587063887#5 1252226318#0 587063900#0 -1252226314 -1293084433"/>
+    </vehicle>
+    <vehicle id="vehicle_65" type="veh_passenger" depart="1897.94" departLane="best" departPos="random" departSpeed="max" color="139,69,19" speedFactor="1.1100">
+        <route edges="1252226326 1252226316 587063887#0"/>
+    </vehicle>
+    <vehicle id="vehicle_216" type="truck_truck" depart="1908.92" departLane="best" departPos="random" departSpeed="max" color="0,128,0" speedFactor="1.1500">
+        <route edges="1296098177 1287697069 1252226323 1252226316 587063887#0"/>
+    </vehicle>
+    <vehicle id="vehicle_7" type="veh_passenger" depart="1923.17" departLane="best" departSpeed="max">
+        <route edges="1296098177 1287697069 1252226323 1252226316 587063887#0"/>
+    </vehicle>
+    <vehicle id="vehicle_66" type="veh_passenger" depart="1929.02" departLane="best" departPos="random" departSpeed="max" color="128,0,128" speedFactor="1.0900">
+        <route edges="1296098177 1287697069 1252226323"/>
+    </vehicle>
+    <vehicle id="vehicle_180" type="truck_truck" depart="1966.87" departLane="best" departSpeed="max">
+        <route edges="1296098177 1287697069 1252226323 1252226316 587063887#0"/>
+    </vehicle>
+    <vehicle id="vehicle_138" type="bus_bus" depart="1995.99" departLane="best" departPos="random" departSpeed="max" color="white" speedFactor="1.0900">
+        <route edges="1296098177 1287697069 1252226323 1252226316"/>
+    </vehicle>
+    <vehicle id="vehicle_284" type="motorcycle_motorcycle" depart="1995.99" departLane="best" departPos="random" departSpeed="max" color="white" speedFactor="1.1100">
+        <route edges="1287697069 1252226323 421085682"/>
+    </vehicle>
+    <vehicle id="vehicle_139" type="bus_bus" depart="2008.38" departLane="best" departPos="random" departSpeed="max" color="blue" speedFactor="1.1200">
+        <route edges="-587063887#5 1252226318#0 421085682 -333292211#2"/>
+    </vehicle>
+    <vehicle id="vehicle_285" type="motorcycle_motorcycle" depart="2008.38" departLane="best" departPos="random" departSpeed="max" color="red" speedFactor="0.9700">
+        <route edges="1296098177 1287697069 1252226323 421085682 -333292211#2"/>
+    </vehicle>
+    <vehicle id="vehicle_28" type="veh_passenger" depart="2010.58" departLane="best" departSpeed="max">
+        <route edges="1296098177 1287697069 1252226323 1252226316"/>
+    </vehicle>
+    <vehicle id="vehicle_140" type="bus_bus" depart="2020.74" departLane="best" departPos="random" departSpeed="max" color="255,165,0" speedFactor="1.1400">
+        <route edges="1252226318#0 587063900#0 -1252226314 -1293084433"/>
+    </vehicle>
+    <vehicle id="vehicle_286" type="motorcycle_motorcycle" depart="2020.74" departLane="best" departPos="random" departSpeed="max" color="128,0,128" speedFactor="0.9700">
+        <route edges="-587063887#5 1252226318#0 421085682 -333292211#2"/>
+    </vehicle>
+    <vehicle id="vehicle_217" type="truck_truck" depart="2083.21" departLane="best" departPos="random" departSpeed="max" color="black" speedFactor="0.9900">
+        <route edges="-587063887#5 1252226318#0 587063900#0 -1252226314 -1293084433"/>
+    </vehicle>
+    <vehicle id="vehicle_218" type="truck_truck" depart="2089.01" departLane="best" departPos="random" departSpeed="max" color="0,128,0" speedFactor="0.8600">
+        <route edges="1296098177 1287697069 1252226323 1252226316 587063887#0"/>
+    </vehicle>
+    <vehicle id="vehicle_174" type="truck_truck" depart="2096.12" departLane="best" departSpeed="max">
+        <route edges="1296098177 1287697069 1252226323 1252226316 587063887#0"/>
+    </vehicle>
+    <vehicle id="vehicle_94" type="bus_bus" depart="2098.00" departLane="best" departSpeed="max">
+        <route edges="587063904 1252226326 1252226316 587063887#0"/>
+    </vehicle>
+    <vehicle id="vehicle_166" type="truck_truck" depart="2098.00" departLane="best" departSpeed="max">
+        <route edges="-587063887#5 1252226318#0 587063900#0 -1252226314 -1293084433"/>
+    </vehicle>
+    <vehicle id="vehicle_241" type="motorcycle_motorcycle" depart="2098.00" departLane="best">
+        <route edges="421085682 -333292211#2 587063904 1252226326"/>
+    </vehicle>
+    <vehicle id="vehicle_219" type="truck_truck" depart="2100.04" departLane="best" departPos="random" departSpeed="max" color="grey" speedFactor="1.1000">
+        <route edges="1296098177 1287697069 1252226323 1252226316 587063887#0"/>
+    </vehicle>
+    <vehicle id="vehicle_67" type="veh_passenger" depart="2103.76" departLane="best" departPos="random" departSpeed="max" color="255,20,147" speedFactor="1.0300">
+        <route edges="587063900#0 -1252226314 -1293084433"/>
+    </vehicle>
+    <vehicle id="vehicle_68" type="veh_passenger" depart="2112.02" departLane="best" departPos="random" departSpeed="max" color="yellow" speedFactor="1.0900">
+        <route edges="587063904 1252226326 587063900#0 -1252226314 -1293084433"/>
+    </vehicle>
+    <vehicle id="vehicle_141" type="bus_bus" depart="2120.87" departLane="best" departPos="random" departSpeed="max" color="0,128,0" speedFactor="0.9600">
+        <route edges="-587063887#5 1252226318#0 587063900#0 -1252226314 -1293084433"/>
+    </vehicle>
+    <vehicle id="vehicle_287" type="motorcycle_motorcycle" depart="2120.87" departLane="best" departPos="random" departSpeed="max" color="yellow" speedFactor="0.9600">
+        <route edges="1296098177 1287697069 1252226323 421085682"/>
+    </vehicle>
+    <vehicle id="vehicle_69" type="veh_passenger" depart="2136.42" departLane="best" departPos="random" departSpeed="max" color="black" speedFactor="1.1200">
+        <route edges="1252226326 587063900#0 -1252226314"/>
+    </vehicle>
+    <vehicle id="vehicle_142" type="bus_bus" depart="2172.81" departLane="best" departPos="random" departSpeed="max" color="yellow" speedFactor="1.0600">
+        <route edges="1296098177 1287697069 1252226323 1252226316 587063887#0"/>
+    </vehicle>
+    <vehicle id="vehicle_288" type="motorcycle_motorcycle" depart="2172.81" departLane="best" departPos="random" departSpeed="max" color="255,165,0" speedFactor="0.8700">
+        <route edges="587063904 1252226326 587063900#0"/>
+    </vehicle>
+    <vehicle id="vehicle_1" type="veh_passenger" depart="2185.42" departLane="best">
+        <route edges="1252226318#0 421085682 -333292211#2"/>
+    </vehicle>
+    <vehicle id="vehicle_184" type="truck_truck" depart="2229.12" departLane="best" departSpeed="max">
+        <route edges="587063904 1252226326 1252226316 587063887#0"/>
+    </vehicle>
+    <vehicle id="vehicle_143" type="bus_bus" depart="2242.66" departLane="best" departPos="random" departSpeed="max" color="grey" speedFactor="1.0900">
+        <route edges="1296098177 1287697069 1252226323 1252226316 587063887#0"/>
+    </vehicle>
+    <vehicle id="vehicle_289" type="motorcycle_motorcycle" depart="2242.66" departLane="best" departPos="random" departSpeed="max" color="128,0,128" speedFactor="0.8800">
+        <route edges="587063904 1252226326 587063900#0 -1252226314 -1293084433"/>
+    </vehicle>
+    <vehicle id="vehicle_220" type="truck_truck" depart="2249.61" departLane="best" departPos="random" departSpeed="max" color="yellow" speedFactor="1.1400">
+        <route edges="1296098177 1287697069 1252226323 1252226316 587063887#0"/>
+    </vehicle>
+    <vehicle id="vehicle_70" type="veh_passenger" depart="2250.36" departLane="best" departPos="random" departSpeed="max" color="50,205,50" speedFactor="1.1400">
+        <route edges="-1252226314 -1293084433"/>
+    </vehicle>
+    <vehicle id="vehicle_144" type="bus_bus" depart="2271.77" departLane="best" departPos="random" departSpeed="max" color="255,165,0" speedFactor="1.1000">
+        <route edges="-587063887#5 1252226318#0 587063900#0 -1252226314 -1293084433"/>
+    </vehicle>
+    <vehicle id="vehicle_290" type="motorcycle_motorcycle" depart="2271.77" departLane="best" departPos="random" departSpeed="max" color="0,128,0" speedFactor="0.9000">
+        <route edges="1252226318#0 421085682 -333292211#2"/>
+    </vehicle>
+    <vehicle id="vehicle_6" type="veh_passenger" depart="2272.83" departLane="best" departSpeed="max">
+        <route edges="1296098177 1287697069 1252226323 1252226316 587063887#0"/>
+    </vehicle>
+    <vehicle id="vehicle_71" type="veh_passenger" depart="2275.43" departLane="best" departPos="random" departSpeed="max" color="192,192,192" speedFactor="0.9600">
+        <route edges="1296098177 1287697069 1252226323 421085682"/>
+    </vehicle>
+    <vehicle id="vehicle_221" type="truck_truck" depart="2327.78" departLane="best" departPos="random" departSpeed="max" color="0,128,0" speedFactor="0.9200">
+        <route edges="1296098177 1287697069 1252226323 1252226316 587063887#0"/>
+    </vehicle>
+    <vehicle id="vehicle_145" type="bus_bus" depart="2333.67" departLane="best" departPos="random" departSpeed="max" color="yellow" speedFactor="0.9600">
+        <route edges="1296098177 1287697069 1252226323 1252226316 587063887#0"/>
+    </vehicle>
+    <vehicle id="vehicle_291" type="motorcycle_motorcycle" depart="2333.67" departLane="best" departPos="random" departSpeed="max" color="red" speedFactor="0.8900">
+        <route edges="-587063887#5 1252226318#0 587063900#0"/>
+    </vehicle>
+    <vehicle id="vehicle_222" type="truck_truck" depart="2347.50" departLane="best" departPos="random" departSpeed="max" color="white" speedFactor="0.9600">
+        <route edges="-587063887#5 1252226318#0 587063900#0 -1252226314 -1293084433"/>
+    </vehicle>
+    <vehicle id="vehicle_100" type="bus_bus" depart="2360.25" departLane="best" departSpeed="max">
+        <route edges="1296098177 1287697069 1252226323 1252226316 587063887#0"/>
+    </vehicle>
+    <vehicle id="vehicle_183" type="truck_truck" depart="2360.25" departLane="best" departSpeed="max">
+        <route edges="587063904 1252226326 1252226316 587063887#0"/>
+    </vehicle>
+    <vehicle id="vehicle_72" type="veh_passenger" depart="2379.02" departLane="best" departPos="random" departSpeed="max" color="grey" speedFactor="1.0600">
+        <route edges="-587063887#5 1252226318#0 587063900#0"/>
+    </vehicle>
+    <vehicle id="vehicle_73" type="veh_passenger" depart="2388.37" departLane="best" departPos="random" departSpeed="max" color="cyan" speedFactor="1.0900">
+        <route edges="1296098177 1287697069 1252226323"/>
+    </vehicle>
+    <vehicle id="vehicle_239" type="motorcycle_motorcycle" depart="2412.41" departLane="best" departSpeed="max">
+        <route edges="-587063887#5 1252226318#0"/>
+    </vehicle>
+    <vehicle id="vehicle_223" type="truck_truck" depart="2419.50" departLane="best" departPos="random" departSpeed="max" color="yellow" speedFactor="0.8900">
+        <route edges="1296098177 1287697069 1252226323 1252226316 587063887#0"/>
+    </vehicle>
+    <vehicle id="vehicle_74" type="veh_passenger" depart="2458.40" departLane="best" departPos="random" departSpeed="max" color="255,20,147" speedFactor="1.1000">
+        <route edges="587063900#0 -1252226314 -1293084433"/>
+    </vehicle>
+    <vehicle id="vehicle_146" type="bus_bus" depart="2472.79" departLane="best" departPos="random" departSpeed="max" color="blue" speedFactor="1.0500">
+        <route edges="-587063887#5 1252226318#0 587063900#0 -1252226314 -1293084433"/>
+    </vehicle>
+    <vehicle id="vehicle_292" type="motorcycle_motorcycle" depart="2472.79" departLane="best" departPos="random" departSpeed="max" color="blue" speedFactor="0.8800">
+        <route edges="587063904 1252226326 1252226316 587063887#0"/>
+    </vehicle>
+    <vehicle id="vehicle_147" type="bus_bus" depart="2495.15" departLane="best" departPos="random" departSpeed="max" color="yellow" speedFactor="0.9700">
+        <route edges="-587063887#5 1252226318#0 587063900#0 -1252226314 -1293084433"/>
+    </vehicle>
+    <vehicle id="vehicle_293" type="motorcycle_motorcycle" depart="2495.15" departLane="best" departPos="random" departSpeed="max" color="255,165,0" speedFactor="1.0000">
+        <route edges="1287697069 1252226323"/>
+    </vehicle>
+    <vehicle id="vehicle_148" type="bus_bus" depart="2534.71" departLane="best" departPos="random" departSpeed="max" color="0,128,0" speedFactor="1.0500">
+        <route edges="-587063887#5 1252226318#0 587063900#0 -1252226314 -1293084433"/>
+    </vehicle>
+    <vehicle id="vehicle_294" type="motorcycle_motorcycle" depart="2534.71" departLane="best" departPos="random" departSpeed="max" color="yellow" speedFactor="1.0500">
+        <route edges="1252226326 587063900#0 -1252226314"/>
+    </vehicle>
+    <vehicle id="vehicle_26" type="veh_passenger" depart="2535.08" departLane="best" departSpeed="max">
+        <route edges="1296098177 1287697069 1252226323 1252226316 587063887#0"/>
+    </vehicle>
+    <vehicle id="vehicle_149" type="bus_bus" depart="2543.63" departLane="best" departPos="random" departSpeed="max" color="255,165,0" speedFactor="1.0300">
+        <route edges="-587063887#5 1252226318#0 587063900#0 -1252226314 -1293084433"/>
+    </vehicle>
+    <vehicle id="vehicle_295" type="motorcycle_motorcycle" depart="2543.63" departLane="best" departPos="random" departSpeed="max" color="blue" speedFactor="1.0700">
+        <route edges="1296098177 1287697069 1252226323 1252226316"/>
+    </vehicle>
+    <vehicle id="vehicle_224" type="truck_truck" depart="2567.34" departLane="best" departPos="random" departSpeed="max" color="blue" speedFactor="0.8800">
+        <route edges="-587063887#5 1252226318#0 587063900#0 -1252226314 -1293084433"/>
+    </vehicle>
+    <vehicle id="vehicle_225" type="truck_truck" depart="2576.53" departLane="best" departPos="random" departSpeed="max" color="yellow" speedFactor="0.8700">
+        <route edges="1296098177 1287697069 1252226323 421085682 -333292211#2 587063904 1252226326 1252226316 587063887#0"/>
+    </vehicle>
+    <vehicle id="vehicle_75" type="veh_passenger" depart="2598.54" departLane="best" departPos="random" departSpeed="max" color="white" speedFactor="0.9600">
+        <route edges="1252226318#0 587063900#0 -1252226314 -1293084433"/>
+    </vehicle>
+    <vehicle id="vehicle_226" type="truck_truck" depart="2616.68" departLane="best" departPos="random" departSpeed="max" color="white" speedFactor="1.0900">
+        <route edges="1296098177 1287697069 1252226323 421085682 -333292211#2 587063904 1252226326 587063900#0 -1252226314 -1293084433"/>
+    </vehicle>
+    <vehicle id="vehicle_29" type="veh_passenger" depart="2622.50" departLane="best" departSpeed="max">
+        <route edges="1296098177 1287697069 1252226323 1252226316 587063887#0"/>
+    </vehicle>
+    <vehicle id="vehicle_98" type="bus_bus" depart="2622.50" departLane="best" departSpeed="max">
+        <route edges="-587063887#5 1252226318#0 421085682 -333292211#2"/>
+    </vehicle>
+    <vehicle id="vehicle_182" type="truck_truck" depart="2622.50" departLane="best" departSpeed="max">
+        <route edges="1296098177 1287697069 1252226323 1252226316 587063887#0"/>
+    </vehicle>
+    <vehicle id="vehicle_240" type="motorcycle_motorcycle" depart="2622.50" departLane="best">
+        <route edges="587063900#0 -1252226314"/>
+    </vehicle>
+    <vehicle id="vehicle_76" type="veh_passenger" depart="2622.58" departLane="best" departPos="random" departSpeed="max" color="black" speedFactor="1.0500">
+        <route edges="-587063887#5 1252226318#0 421085682 -333292211#2"/>
+    </vehicle>
+    <vehicle id="vehicle_77" type="veh_passenger" depart="2664.26" departLane="best" departPos="random" departSpeed="max" color="grey" speedFactor="0.9700">
+        <route edges="1296098177 1287697069 1252226323 421085682"/>
+    </vehicle>
+    <vehicle id="vehicle_150" type="bus_bus" depart="2674.10" departLane="best" departPos="random" departSpeed="max" color="red" speedFactor="0.9900">
+        <route edges="-587063887#5 1252226318#0 587063900#0 -1252226314 -1293084433"/>
+    </vehicle>
+    <vehicle id="vehicle_296" type="motorcycle_motorcycle" depart="2674.10" departLane="best" departPos="random" departSpeed="max" color="0,128,0" speedFactor="1.1500">
+        <route edges="1296098177 1287697069"/>
+    </vehicle>
+    <vehicle id="vehicle_78" type="veh_passenger" depart="2677.34" departLane="best" departPos="random" departSpeed="max" color="255,165,0" speedFactor="1.0500">
+        <route edges="1287697069 1252226323 421085682"/>
+    </vehicle>
+    <vehicle id="vehicle_151" type="bus_bus" depart="2700.21" departLane="best" departPos="random" departSpeed="max" color="255,165,0" speedFactor="1.0200">
+        <route edges="-587063887#5 1252226318#0 587063900#0 -1252226314 -1293084433"/>
+    </vehicle>
+    <vehicle id="vehicle_297" type="motorcycle_motorcycle" depart="2700.21" departLane="best" departPos="random" departSpeed="max" color="yellow" speedFactor="1.0900">
+        <route edges="587063904 1252226326 1252226316"/>
+    </vehicle>
+    <vehicle id="vehicle_17" type="veh_passenger" depart="2709.92" departLane="best" departSpeed="max">
+        <route edges="1296098177 1287697069 1252226323 1252226316"/>
+    </vehicle>
+    <vehicle id="vehicle_250" type="motorcycle_motorcycle" depart="2717.31" departLane="best" departPos="random" departSpeed="max" color="128,0,128" speedFactor="1.0900">
+        <route edges="1252226326 587063900#0 -1252226314 -1293084433"/>
+    </vehicle>
+    <vehicle id="vehicle_227" type="truck_truck" depart="2767.16" departLane="best" departPos="random" departSpeed="max" color="grey" speedFactor="0.9900">
+        <route edges="1252226323 1252226316 587063887#0 -587063887#5 1252226318#0 587063900#0 -1252226314 -1293084433"/>
+    </vehicle>
+    <vehicle id="vehicle_152" type="bus_bus" depart="2773.15" departLane="best" departPos="random" departSpeed="max" color="yellow" speedFactor="0.9700">
+        <route edges="1296098177 1287697069 1252226323 1252226316 587063887#0"/>
+    </vehicle>
+    <vehicle id="vehicle_298" type="motorcycle_motorcycle" depart="2773.15" departLane="best" departPos="random" departSpeed="max" color="black" speedFactor="0.8700">
+        <route edges="1296098177 1287697069 1252226323 1252226316"/>
+    </vehicle>
+    <vehicle id="vehicle_228" type="truck_truck" depart="2796.76" departLane="best" departPos="random" departSpeed="max" color="blue" speedFactor="0.8600">
+        <route edges="1287697069 1252226323 421085682 -333292211#2 587063904 1252226326 1252226316 587063887#0"/>
+    </vehicle>
+    <vehicle id="vehicle_16" type="veh_passenger" depart="2797.33" departLane="best">
+        <route edges="1252226318#0 421085682 -333292211#2"/>
+    </vehicle>
+    <vehicle id="vehicle_79" type="veh_passenger" depart="2797.79" departLane="best" departPos="random" departSpeed="max" color="50,205,50" speedFactor="1.0300">
+        <route edges="1296098177 1287697069 1252226323 1252226316"/>
+    </vehicle>
+    <vehicle id="vehicle_153" type="bus_bus" depart="2824.94" departLane="best" departPos="random" departSpeed="max" color="red" speedFactor="0.9700">
+        <route edges="-587063887#5 1252226318#0 587063900#0 -1252226314 -1293084433"/>
+    </vehicle>
+    <vehicle id="vehicle_299" type="motorcycle_motorcycle" depart="2824.94" departLane="best" departPos="random" departSpeed="max" color="128,0,128" speedFactor="0.9100">
+        <route edges="1296098177 1287697069 1252226323"/>
+    </vehicle>
+    <vehicle id="vehicle_80" type="veh_passenger" depart="2832.01" departLane="best" departPos="random" departSpeed="max" color="0,128,0" speedFactor="0.9900">
+        <route edges="-587063887#5 1252226318#0 421085682 -333292211#2"/>
+    </vehicle>
+    <vehicle id="vehicle_24" type="veh_passenger" depart="2884.75" departLane="best">
+        <route edges="1287697069 1252226323 1252226316 587063887#0"/>
+    </vehicle>
+    <vehicle id="vehicle_96" type="bus_bus" depart="2884.75" departLane="best" departSpeed="max">
+        <route edges="587063904 1252226326 587063900#0 -1252226314 -1293084433"/>
+    </vehicle>
+    <vehicle id="vehicle_172" type="truck_truck" depart="2884.75" departLane="best" departSpeed="max">
+        <route edges="-587063887#5 1252226318#0 587063900#0 -1252226314 -1293084433"/>
+    </vehicle>
+    <vehicle id="vehicle_229" type="truck_truck" depart="2884.77" departLane="best" departPos="random" departSpeed="max" color="grey" speedFactor="0.9100">
+        <route edges="1296098177 1287697069 1252226323 587063900#0 -1252226314"/>
+    </vehicle>
+    <vehicle id="vehicle_81" type="veh_passenger" depart="2915.66" departLane="best" departPos="random" departSpeed="max" color="50,205,50" speedFactor="1.0200">
+        <route edges="1252226326 587063900#0 -1252226314"/>
+    </vehicle>
+    <vehicle id="vehicle_230" type="truck_truck" depart="2923.49" departLane="best" departPos="random" departSpeed="max" color="yellow" speedFactor="1.0200">
+        <route edges="-587063887#5 1252226318#0 421085682 -333292211#2 587063904 1252226326 587063900#0 -1252226314 -1293084433"/>
+    </vehicle>
+    <vehicle id="vehicle_154" type="bus_bus" depart="2940.06" departLane="best" departPos="random" departSpeed="max" color="white" speedFactor="0.9600">
+        <route edges="-587063887#5 1252226318#0 587063900#0 -1252226314 -1293084433"/>
+    </vehicle>
+    <vehicle id="vehicle_300" type="motorcycle_motorcycle" depart="2940.06" departLane="best" departPos="random" departSpeed="max" color="128,0,128" speedFactor="1.0500">
+        <route edges="1252226318#0 587063900#0 -1252226314"/>
+    </vehicle>
+    <vehicle id="vehicle_155" type="bus_bus" depart="2964.18" departLane="best" departPos="random" departSpeed="max" color="0,128,0" speedFactor="0.9700">
+        <route edges="1296098177 1287697069 1252226323 1252226316 587063887#0"/>
+    </vehicle>
+    <vehicle id="vehicle_301" type="motorcycle_motorcycle" depart="2964.18" departLane="best" departPos="random" departSpeed="max" color="128,0,128" speedFactor="0.9800">
+        <route edges="-587063887#5 1252226318#0 421085682"/>
+    </vehicle>
+    <vehicle id="vehicle_30" type="veh_passenger" depart="2972.17" departLane="best" departSpeed="max">
+        <route edges="1296098177 1287697069 1252226323 421085682 -333292211#2"/>
+    </vehicle>
+    <vehicle id="vehicle_82" type="veh_passenger" depart="2985.26" departLane="best" departPos="random" departSpeed="max" color="white" speedFactor="0.9700">
+        <route edges="1296098177 1287697069 1252226323 421085682"/>
+    </vehicle>
+    <vehicle id="vehicle_251" type="motorcycle_motorcycle" depart="2989.19" departLane="best" departPos="random" departSpeed="max" color="black" speedFactor="0.8700">
+        <route edges="1252226326 587063900#0 -1252226314 -1293084433"/>
+    </vehicle>
+    <vehicle id="vehicle_156" type="bus_bus" depart="3003.54" departLane="best" departPos="random" departSpeed="max" color="255,165,0" speedFactor="0.9800">
+        <route edges="1296098177 1287697069 1252226323 1252226316 587063887#0"/>
+    </vehicle>
+    <vehicle id="vehicle_302" type="motorcycle_motorcycle" depart="3003.54" departLane="best" departPos="random" departSpeed="max" color="yellow" speedFactor="0.9600">
+        <route edges="1252226326 1252226316 587063887#0"/>
+    </vehicle>
+    <vehicle id="vehicle_177" type="truck_truck" depart="3015.87" departLane="best" departSpeed="max">
+        <route edges="587063904 1252226326 1252226316 587063887#0"/>
+    </vehicle>
+    <vehicle id="vehicle_157" type="bus_bus" depart="3018.03" departLane="best" departPos="random" departSpeed="max" color="grey" speedFactor="0.9500">
+        <route edges="1296098177 1287697069 1252226323 1252226316 587063887#0 -587063887#5 1252226318#0 587063900#0 -1252226314 -1293084433"/>
+    </vehicle>
+    <vehicle id="vehicle_303" type="motorcycle_motorcycle" depart="3018.03" departLane="best" departPos="random" departSpeed="max" color="0,128,0" speedFactor="1.0100">
+        <route edges="-587063887#5 1252226318#0 587063900#0 -1252226314 -1293084433"/>
+    </vehicle>
+    <vehicle id="vehicle_231" type="truck_truck" depart="3036.65" departLane="best" departPos="random" departSpeed="max" color="white" speedFactor="1.1200">
+        <route edges="1287697069 1252226323 421085682 -333292211#2 587063904 1252226326 1252226316 587063887#0"/>
+    </vehicle>
+    <vehicle id="vehicle_22" type="veh_passenger" depart="3059.58" departLane="best" departSpeed="max">
+        <route edges="-587063887#5 1252226318#0 587063900#0 -1252226314 -1293084433"/>
+    </vehicle>
+    <vehicle id="vehicle_83" type="veh_passenger" depart="3073.70" departLane="best" departPos="random" departSpeed="max" color="128,0,128" speedFactor="0.9700">
+        <route edges="1296098177 1287697069 1252226323 421085682 -333292211#2"/>
+    </vehicle>
+    <vehicle id="vehicle_232" type="truck_truck" depart="3100.50" departLane="best" departPos="random" departSpeed="max" color="yellow" speedFactor="1.1100">
+        <route edges="1296098177 1287697069 1252226323 421085682 -333292211#2 587063904 1252226326 587063900#0 -1252226314 -1293084433"/>
+    </vehicle>
+    <vehicle id="vehicle_84" type="veh_passenger" depart="3121.93" departLane="best" departPos="random" departSpeed="max" color="blue" speedFactor="0.9600">
+        <route edges="587063904 1252226326 587063900#0 -1252226314 -1293084433"/>
+    </vehicle>
+    <vehicle id="vehicle_85" type="veh_passenger" depart="3144.62" departLane="best" departPos="random" departSpeed="max" color="255,165,0" speedFactor="0.9700">
+        <route edges="-587063887#5 1252226318#0 421085682 -333292211#2"/>
+    </vehicle>
+    <vehicle id="vehicle_2" type="veh_passenger" depart="3147.00" departLane="best" departSpeed="max">
+        <route edges="-587063887#5 1252226318#0 587063900#0 -1252226314"/>
+    </vehicle>
+    <vehicle id="vehicle_185" type="truck_truck" depart="3147.00" departLane="best" departSpeed="max">
+        <route edges="587063904 1252226326 1252226316 587063887#0"/>
+    </vehicle>
+    <vehicle id="vehicle_243" type="motorcycle_motorcycle" depart="3147.00" departLane="best" departSpeed="max">
+        <route edges="1296098177 1287697069 1252226323"/>
+    </vehicle>
+    <vehicle id="vehicle_158" type="bus_bus" depart="3151.39" departLane="best" departPos="random" departSpeed="max" color="yellow" speedFactor="1.1400">
+        <route edges="1296098177 1287697069 1252226323 587063900#0 -1252226314 -1293084433"/>
+    </vehicle>
+    <vehicle id="vehicle_304" type="motorcycle_motorcycle" depart="3151.39" departLane="best" departPos="random" departSpeed="max" color="black" speedFactor="0.9400">
+        <route edges="-587063887#5 1252226318#0 587063900#0 -1252226314 -1293084433"/>
+    </vehicle>
+    <vehicle id="vehicle_233" type="truck_truck" depart="3152.78" departLane="best" departPos="random" departSpeed="max" color="red" speedFactor="1.0900">
+        <route edges="1287697069 1252226323 421085682 -333292211#2 587063904 1252226326 587063900#0 -1252226314 -1293084433"/>
+    </vehicle>
+    <vehicle id="vehicle_159" type="bus_bus" depart="3171.54" departLane="best" departPos="random" departSpeed="max" color="yellow" speedFactor="0.8900">
+        <route edges="1296098177 1287697069 1252226323 1252226316 587063887#0 -587063887#5 1252226318#0 587063900#0 -1252226314 -1293084433"/>
+    </vehicle>
+    <vehicle id="vehicle_305" type="motorcycle_motorcycle" depart="3171.54" departLane="best" departPos="random" departSpeed="max" color="red" speedFactor="0.8600">
+        <route edges="1296098177 1287697069 1252226323 421085682"/>
+    </vehicle>
+    <vehicle id="vehicle_86" type="veh_passenger" depart="3173.49" departLane="best" departPos="random" departSpeed="max" color="255,20,147" speedFactor="0.9800">
+        <route edges="1252226318#0 587063900#0 -1252226314 -1293084433"/>
+    </vehicle>
+    <vehicle id="vehicle_14" type="veh_passenger" depart="3234.42" departLane="best" departSpeed="max">
+        <route edges="-587063887#5 1252226318#0 421085682 -333292211#2"/>
+    </vehicle>
+    <vehicle id="vehicle_234" type="truck_truck" depart="3271.84" departLane="best" departPos="random" departSpeed="max" color="0,128,0" speedFactor="1.0300">
+        <route edges="1296098177 1287697069 1252226323 421085682 -333292211#2 587063904 1252226326 1252226316 587063887#0"/>
+    </vehicle>
+    <vehicle id="vehicle_252" type="motorcycle_motorcycle" depart="3275.36" departLane="best" departPos="random" departSpeed="max" color="255,165,0" speedFactor="0.9700">
+        <route edges="1252226326"/>
+    </vehicle>
+    <vehicle id="vehicle_179" type="truck_truck" depart="3278.12" departLane="best" departSpeed="max">
+        <route edges="587063904 1252226326 1252226316 587063887#0"/>
+    </vehicle>
+    <vehicle id="vehicle_235" type="truck_truck" depart="3283.42" departLane="best" departPos="random" departSpeed="max" color="black" speedFactor="1.0900">
+        <route edges="1296098177 1287697069 1252226323 421085682 -333292211#2 587063904 1252226326 1252226316 587063887#0"/>
+    </vehicle>
+    <vehicle id="vehicle_160" type="bus_bus" depart="3295.16" departLane="best" departPos="random" departSpeed="max" color="yellow" speedFactor="0.8800">
+        <route edges="1296098177 1287697069 1252226323 1252226316 587063887#0 -587063887#5 1252226318#0 587063900#0 -1252226314 -1293084433"/>
+    </vehicle>
+    <vehicle id="vehicle_306" type="motorcycle_motorcycle" depart="3295.16" departLane="best" departPos="random" departSpeed="max" color="255,165,0" speedFactor="0.9900">
+        <route edges="-587063887#5 1252226318#0 421085682 -333292211#2"/>
+    </vehicle>
+    <vehicle id="vehicle_87" type="veh_passenger" depart="3312.68" departLane="best" departPos="random" departSpeed="max" color="139,69,19" speedFactor="0.9500">
+        <route edges="1252226318#0 587063900#0 -1252226314 -1293084433"/>
+    </vehicle>
+    <vehicle id="vehicle_161" type="bus_bus" depart="3325.98" departLane="best" departPos="random" departSpeed="max" color="red" speedFactor="1.0000">
+        <route edges="1296098177 1287697069 1252226323 1252226316 587063887#0 -587063887#5 1252226318#0 587063900#0 -1252226314 -1293084433"/>
+    </vehicle>
+    <vehicle id="vehicle_307" type="motorcycle_motorcycle" depart="3325.98" departLane="best" departPos="random" departSpeed="max" color="blue" speedFactor="1.0000">
+        <route edges="1252226318#0 587063900#0 -1252226314 -1293084433"/>
+    </vehicle>
+    <vehicle id="vehicle_88" type="veh_passenger" depart="3331.76" departLane="best" departPos="random" departSpeed="max" color="white" speedFactor="1.1400">
+        <route edges="-587063887#5 1252226318#0 421085682 -333292211#2"/>
+    </vehicle>
+    <vehicle id="vehicle_162" type="bus_bus" depart="3388.60" departLane="best" departPos="random" departSpeed="max" color="white" speedFactor="1.0500">
+        <route edges="1296098177 1287697069 1252226323 421085682 -333292211#2 587063904 1252226326 587063900#0 -1252226314 -1293084433"/>
+    </vehicle>
+    <vehicle id="vehicle_308" type="motorcycle_motorcycle" depart="3388.60" departLane="best" departPos="random" departSpeed="max" color="255,165,0" speedFactor="1.0700">
+        <route edges="-587063887#5 1252226318#0 421085682 -333292211#2"/>
+    </vehicle>
+    <vehicle id="vehicle_163" type="bus_bus" depart="3390.03" departLane="best" departPos="random" departSpeed="max" color="yellow" speedFactor="1.0700">
+        <route edges="1296098177 1287697069 1252226323 421085682 -333292211#2 587063904 1252226326 587063900#0 -1252226314 -1293084433"/>
+    </vehicle>
+    <vehicle id="vehicle_309" type="motorcycle_motorcycle" depart="3390.03" departLane="best" departPos="random" departSpeed="max" color="blue" speedFactor="0.9400">
+        <route edges="-587063887#5 1252226318#0 587063900#0 -1252226314"/>
+    </vehicle>
+    <vehicle id="vehicle_236" type="truck_truck" depart="3409.16" departLane="best" departPos="random" departSpeed="max" color="grey" speedFactor="1.1200">
+        <route edges="1296098177 1287697069 1252226323 1252226316 587063887#0 -587063887#5 1252226318#0 587063900#0 -1252226314 -1293084433"/>
+    </vehicle>
+    <vehicle id="vehicle_18" type="veh_passenger" depart="3409.25" departLane="best">
+        <route edges="1252226318#0 587063900#0 -1252226314 -1293084433"/>
+    </vehicle>
+    <vehicle id="vehicle_181" type="truck_truck" depart="3409.25" departLane="best" departSpeed="max">
+        <route edges="-587063887#5 1252226318#0 587063900#0 -1252226314 -1293084433"/>
+    </vehicle>
+    <vehicle id="vehicle_246" type="motorcycle_motorcycle" depart="3409.25" departLane="best" departSpeed="max">
+        <route edges="1296098177 1287697069 1252226323 587063900#0 -1252226314 -1293084433"/>
+    </vehicle>
+    <vehicle id="vehicle_237" type="truck_truck" depart="3449.75" departLane="best" departPos="random" departSpeed="max" color="0,128,0" speedFactor="1.1400">
+        <route edges="-587063887#5 1252226318#0 421085682 -333292211#2 587063904 1252226326 587063900#0 -1252226314 -1293084433"/>
+    </vehicle>
+    <vehicle id="vehicle_89" type="veh_passenger" depart="3463.58" departLane="best" departPos="random" departSpeed="max" color="white" speedFactor="0.8900">
+        <route edges="1296098177 1287697069 1252226323 1252226316 587063887#0"/>
+    </vehicle>
+    <vehicle id="vehicle_164" type="bus_bus" depart="3492.39" departLane="best" departPos="random" departSpeed="max" color="white" speedFactor="1.1500">
+        <route edges="1296098177 1287697069 1252226323 587063900#0 -1252226314 -1293084433"/>
+    </vehicle>
+    <vehicle id="vehicle_310" type="motorcycle_motorcycle" depart="3492.39" departLane="best" departPos="random" departSpeed="max" color="255,165,0" speedFactor="1.0400">
+        <route edges="1296098177 1287697069 1252226323 421085682"/>
+    </vehicle>
+    <vehicle id="vehicle_21" type="veh_passenger" depart="3496.67" departLane="best" departSpeed="max">
+        <route edges="1296098177 1287697069"/>
+    </vehicle>
+    <vehicle id="vehicle_90" type="veh_passenger" depart="3508.28" departLane="best" departPos="random" departSpeed="max" color="grey" speedFactor="0.8800">
+        <route edges="587063904 1252226326 1252226316 587063887#0"/>
+    </vehicle>
+    <vehicle id="vehicle_238" type="truck_truck" depart="3524.39" departLane="best" departPos="random" departSpeed="max" color="blue" speedFactor="0.9600">
+        <route edges="1296098177 1287697069 1252226323 1252226316 587063887#0 -587063887#5 1252226318#0 421085682 -333292211#2"/>
+    </vehicle>
+    <vehicle id="vehicle_165" type="bus_bus" depart="3531.50" departLane="best" departPos="random" departSpeed="max" color="white" speedFactor="1.0900">
+        <route edges="1296098177 1287697069 1252226323 421085682 -333292211#2 587063904 1252226326 587063900#0 -1252226314 -1293084433"/>
+    </vehicle>
+    <vehicle id="vehicle_311" type="motorcycle_motorcycle" depart="3531.50" departLane="best" departPos="random" departSpeed="max" color="0,128,0" speedFactor="0.9600">
+        <route edges="1252226318#0 587063900#0 -1252226314 -1293084433"/>
+    </vehicle>
+    <vehicle id="vehicle_91" type="veh_passenger" depart="3564.31" departLane="best" departPos="random" departSpeed="max" color="0,128,0" speedFactor="1.0000">
+        <route edges="1296098177 1287697069 1252226323 421085682 -333292211#2"/>
+    </vehicle>
+    <vehicle id="vehicle_92" type="veh_passenger" depart="3564.84" departLane="best" departPos="random" departSpeed="max" color="blue" speedFactor="1.0500">
+        <route edges="587063904 1252226326 1252226316 587063887#0"/>
+    </vehicle>
+    <vehicle id="vehicle_31" type="veh_passenger" depart="3584.08" departLane="best" departSpeed="max">
+        <route edges="587063904 1252226326 587063900#0 -1252226314"/>
+    </vehicle>
+</routes>

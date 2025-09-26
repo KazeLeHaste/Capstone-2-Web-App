@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- generated on 2025-09-26 19:57:30.472673 by randomTrips.py v1_24_0+0000-b72eb3fabc8
+<configuration>
+    <net-file value="C:/Users/kgaqu/OneDrive/Documents/4th Year/Capstone 2/v10/backend/networks/statesfield_area/statesfield_area.net.xml"/>
+    <output-trip-file value="C:/Users/kgaqu/AppData/Local/Temp/tmp8gon2lzy.trips_3.xml"/>
+    <vehicle-class value="motorcycle"/>
+    <random-factor value="2.25"/>
+    <fringe-factor value="2.0"/>
+    <edge-permission value="motorcycle"/>
+    <seed value="456"/>
+    <random value="True"/>
+    <min-distance value="300.0"/>
+    <period value="438.63959055072223"/>
+</configuration>
+-->
+
+<!-- generated on 2025-09-26 19:57:30 by Eclipse SUMO duarouter Version 1.24.0
+<duarouterConfiguration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/duarouterConfiguration.xsd">
+
+    <input>
+        <net-file value="C:/Users/kgaqu/OneDrive/Documents/4th Year/Capstone 2/v10/backend/networks/statesfield_area/statesfield_area.net.xml"/>
+        <route-files value="C:/Users/kgaqu/AppData/Local/Temp/tmp8gon2lzy.trips_3.xml"/>
+    </input>
+
+    <output>
+        <output-file value="routes.rou.xml"/>
+        <alternatives-output value="NUL"/>
+    </output>
+
+    <time>
+        <begin value="0"/>
+        <end value="3600"/>
+    </time>
+
+    <report>
+        <no-warnings value="true"/>
+        <ignore-errors value="true"/>
+        <no-step-log value="true"/>
+    </report>
+
+</duarouterConfiguration>
+-->
+
+<routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/routes_file.xsd">
+    <vType id="motorcycle" vClass="motorcycle"/>
+    <vehicle id="0" type="motorcycle" depart="0.00">
+        <route edges="1019458707 938079508#1 573710407"/>
+    </vehicle>
+    <vehicle id="1" type="motorcycle" depart="438.64">
+        <route edges="938079508#0 -1019458707"/>
+    </vehicle>
+    <vehicle id="2" type="motorcycle" depart="877.28">
+        <route edges="938079508#0 938079508#1 -651079992#1"/>
+    </vehicle>
+    <vehicle id="3" type="motorcycle" depart="1315.92">
+        <route edges="1019458707 938079508#1 573710407"/>
+    </vehicle>
+    <vehicle id="4" type="motorcycle" depart="1754.56">
+        <route edges="651079976#0 573710407"/>
+    </vehicle>
+    <vehicle id="5" type="motorcycle" depart="2193.20">
+        <route edges="1019458707 -938079508#0"/>
+    </vehicle>
+    <vehicle id="6" type="motorcycle" depart="2631.84">
+        <route edges="938079508#0 938079508#1 -651079992#1"/>
+    </vehicle>
+    <vehicle id="7" type="motorcycle" depart="3070.48">
+        <route edges="651079976#0 -938079508#2 -938079508#0"/>
+    </vehicle>
+    <vehicle id="8" type="motorcycle" depart="3509.12">
+        <route edges="938079508#0 938079508#1 -651079992#1"/>
+    </vehicle>
+</routes>

@@ -1,0 +1,29 @@
+{
+  "name": "bayanan_area",
+  "type": "osm_imported",
+  "is_osm_scenario": true,
+  "import_date": "2025-09-26T19:56:08.650124",
+  "original_scenario": "Bayanan Area",
+  "vehicle_types": [
+    "passenger",
+    "bus",
+    "truck",
+    "motorcycle"
+  ],
+  "network_info": {
+    "edges": 11,
+    "junctions": 9,
+    "lanes": 58,
+    "boundary": "-9.37,-37.31,701.86,420.08",
+    "file_size": 6970
+  },
+  "stats": {
+    "total_files": 21,
+    "route_files": 0,
+    "trip_files": 0,
+    "total_size": 1154379
+  },
+  "description": "Imported OSM scenario: Bayanan Area",
+  "supports_realistic_traffic": true,
+  "configuration_overlay_supported": true
+}

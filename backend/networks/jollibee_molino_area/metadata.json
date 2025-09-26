@@ -1,0 +1,29 @@
+{
+  "name": "jollibee_molino_area",
+  "type": "osm_imported",
+  "is_osm_scenario": true,
+  "import_date": "2025-09-26T19:56:26.907188",
+  "original_scenario": "Jollibee Molino Area",
+  "vehicle_types": [
+    "passenger",
+    "bus",
+    "truck",
+    "motorcycle"
+  ],
+  "network_info": {
+    "edges": 28,
+    "junctions": 14,
+    "lanes": 145,
+    "boundary": "0.00,-20.19,730.73,438.61",
+    "file_size": 13896
+  },
+  "stats": {
+    "total_files": 21,
+    "route_files": 0,
+    "trip_files": 0,
+    "total_size": 476713
+  },
+  "description": "Imported OSM scenario: Jollibee Molino Area",
+  "supports_realistic_traffic": true,
+  "configuration_overlay_supported": true
+}

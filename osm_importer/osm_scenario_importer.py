@@ -684,103 +684,131 @@ class OSMScenarioImporter:
         import random
         
         network_file = target_path / f"{target_path.name}.net.xml"
+        network_file_gz = target_path / f"{target_path.name}.net.xml.gz"
         routes_dir = target_path / 'routes'
         
-        # Check if network file exists
-        if not network_file.exists():
-            print(f"Network file not found: {network_file}")
+        # Check if network file exists (compressed or uncompressed)
+        temp_network_file = None
+        if network_file.exists():
+            # Use existing uncompressed file
+            actual_network_file = network_file
+        elif network_file_gz.exists():
+            # Decompress temporarily for enhancement
+            try:
+                temp_network_file = network_file
+                with gzip.open(network_file_gz, 'rt', encoding='utf-8') as f_in:
+                    with open(temp_network_file, 'w', encoding='utf-8') as f_out:
+                        f_out.write(f_in.read())
+                actual_network_file = temp_network_file
+                print(f"Temporarily decompressed network file for enhancement")
+            except Exception as e:
+                print(f"Failed to decompress network file: {e}")
+                return
+        else:
+            print(f"Network file not found: {network_file} or {network_file_gz}")
             return
         
-        print(f"Enhancing route diversity for network: {network_file}")
+        print(f"Enhancing route diversity for network: {actual_network_file}")
         
-        # Vehicle-type-specific parameters matching OSM Web Wizard approach
-        vehicle_params = {
-            'passenger': {
-                'insertion_density': 12.0,
-                'min_distance': 300.0,
-                'fringe_factor': 2,      # Reduced for more inner road usage
-                'random_factor': 1.3,    # Add randomness
-                'lanes_weight': True,
-                'length_weight': True,
-                'speed_exponent': 0.1
-            },
-            'bus': {
-                'insertion_density': 4.0,
-                'min_distance': 600.0,
-                'fringe_factor': 3,      # Buses prefer main roads but still some variety
-                'random_factor': 1.2,
-                'lanes_weight': False,
-                'length_weight': True,
-                'speed_exponent': 0.2
-            },
-            'truck': {
-                'insertion_density': 8.0,
-                'min_distance': 600.0,
-                'fringe_factor': 3,      # Trucks prefer main roads
-                'random_factor': 1.2,
-                'lanes_weight': True,
-                'length_weight': True,
-                'speed_exponent': 0.15
-            },
-            'motorcycle': {
-                'insertion_density': 4.0,
-                'min_distance': 200.0,   # Motorcycles can take shorter routes
-                'fringe_factor': 1.5,    # Most flexible routing
-                'random_factor': 1.4,    # Most random
-                'lanes_weight': False,
-                'length_weight': False,
-                'speed_exponent': 0.0
+        try:
+            # Vehicle-type-specific parameters with enhanced randomization
+            vehicle_params = {
+                'passenger': {
+                    'insertion_density': 12.0,
+                    'min_distance': 200.0,  # Reduced for more variety
+                    'fringe_factor': 1.5,   # Reduced for more inner road usage
+                    'random_factor': 1.4,   # Increased randomness
+                    'lanes_weight': True,
+                    'length_weight': True,
+                    'speed_exponent': 0.1
+                },
+                'bus': {
+                    'insertion_density': 4.0,
+                    'min_distance': 400.0,  # Reduced for more local routes
+                    'fringe_factor': 2.0,   # Reduced for variety
+                    'random_factor': 1.3,
+                    'lanes_weight': False,
+                    'length_weight': True,
+                    'speed_exponent': 0.2
+                },
+                'truck': {
+                    'insertion_density': 6.0,  # Reduced density for more realism
+                    'min_distance': 500.0,
+                    'fringe_factor': 2.5,   # Trucks still prefer main roads but with variety
+                    'random_factor': 1.25,
+                    'lanes_weight': True,
+                    'length_weight': True,
+                    'speed_exponent': 0.15
+                },
+                'motorcycle': {
+                    'insertion_density': 8.0,
+                    'min_distance': 150.0,  # Motorcycles can take very short routes
+                    'fringe_factor': 1.0,   # Maximum flexibility
+                    'random_factor': 1.5,   # Maximum randomness
+                    'lanes_weight': False,
+                    'length_weight': False,
+                    'speed_exponent': 0.0
+                }
             }
-        }
-        
-        # Process each vehicle type
-        for vehicle_type in scenario_info['vehicle_types']:
-            print(f"  Processing {vehicle_type} routes...")
             
-            # Get original trip file
-            original_trips_file = routes_dir / f"osm.{vehicle_type}.trips.xml"
-            
-            if not original_trips_file.exists():
-                print(f"    No trip file found for {vehicle_type}, skipping")
-                continue
-            
-            try:
-                # Analyze original file to determine parameters
-                original_stats = self._analyze_route_file(original_trips_file)
-                print(f"    Original stats: {original_stats['vehicle_count']} vehicles, {original_stats['time_span']:.0f}s span")
+            # Process each vehicle type
+            for vehicle_type in scenario_info['vehicle_types']:
+                print(f"  Processing {vehicle_type} routes...")
                 
-                # Get vehicle-specific parameters
-                params = vehicle_params.get(vehicle_type, vehicle_params['passenger'])
+                # Get original trip file
+                original_trips_file = routes_dir / f"osm.{vehicle_type}.trips.xml"
                 
-                # Generate enhanced diverse trips
-                enhanced_trips = self._generate_diverse_trips_for_vehicle_type(
-                    network_file,
-                    vehicle_type,
-                    original_stats,
-                    params
-                )
+                if not original_trips_file.exists():
+                    print(f"    No trip file found for {vehicle_type}, skipping")
+                    continue
                 
-                if enhanced_trips:
-                    # Merge enhanced trips with original trips
-                    enhanced_file = self._merge_trip_files(
-                        original_trips_file,
-                        enhanced_trips,
-                        vehicle_type
+                try:
+                    # Analyze original file to determine parameters
+                    original_stats = self._analyze_route_file(original_trips_file)
+                    print(f"    Original stats: {original_stats['vehicle_count']} vehicles, {original_stats['time_span']:.0f}s span")
+                    
+                    # Get vehicle-specific parameters
+                    params = vehicle_params.get(vehicle_type, vehicle_params['passenger'])
+                    
+                    # Generate enhanced diverse trips
+                    enhanced_trips = self._generate_realistic_diverse_trips(
+                        actual_network_file,
+                        vehicle_type,
+                        original_stats,
+                        params
                     )
                     
-                    if enhanced_file:
-                        # Replace original with enhanced version
-                        enhanced_file_path = routes_dir / f"osm.{vehicle_type}.trips.xml"
-                        shutil.move(enhanced_file, enhanced_file_path)
-                        print(f"    ✅ Enhanced {vehicle_type} trips with improved diversity")
-                    
-            except Exception as e:
-                print(f"    ❌ Failed to enhance {vehicle_type} routes: {e}")
-                continue
+                    if enhanced_trips:
+                        # Merge enhanced trips with original trips
+                        enhanced_file = self._merge_trip_files(
+                            original_trips_file,
+                            enhanced_trips,
+                            vehicle_type
+                        )
+                        
+                        if enhanced_file:
+                            # Replace original with enhanced version (keep uncompressed like original OSM files)
+                            enhanced_file_path = routes_dir / f"osm.{vehicle_type}.trips.xml"
+                            shutil.move(enhanced_file, enhanced_file_path)
+                            print(f"    ✅ Enhanced {vehicle_type} trips (kept uncompressed as per OSM standard)")
+                        
+                        
+                except Exception as e:
+                    print(f"    ❌ Failed to enhance {vehicle_type} routes: {e}")
+                    continue
+            
+            # Create a single merged route file with all vehicle types to avoid ID conflicts
+            print("Creating final merged route file...")
+            self._create_merged_enhanced_routes(routes_dir, scenario_info['vehicle_types'], actual_network_file)
         
-        # Create a single merged route file with all vehicle types to avoid ID conflicts
-        print("Creating final merged route file...")
-        self._create_merged_enhanced_routes(routes_dir, scenario_info['vehicle_types'], network_file)
+        finally:
+            # Clean up temporary network file if created
+            if temp_network_file and temp_network_file.exists():
+                try:
+                    temp_network_file.unlink()
+                    print(f"Cleaned up temporary network file")
+                except:
+                    pass
     
     def _analyze_route_file(self, route_file: Path) -> Dict[str, Any]:
         """
@@ -858,14 +886,18 @@ class OSMScenarioImporter:
         network_file_abs = str(network_file.resolve()).replace('\\', '/')
         output_file_abs = str(output_file.resolve()).replace('\\', '/')
         
+        # Ensure begin time is never 0 to prevent clustering at depart=0
+        begin_time = max(1.0, original_stats['min_depart'])  # Start at least at 1 second
+        end_time = original_stats['max_depart']
+        
         cmd = [
             'python', randomtrips_script,
             "-n", network_file_abs,
             "-o", output_file_abs,
             "--vehicle-class", vehicle_type,
             "--edge-permission", vehicle_type,
-            "-b", str(original_stats['min_depart']),
-            "-e", str(original_stats['max_depart']),
+            "-b", str(begin_time),
+            "-e", str(end_time),
             "-p", str(period),
             "--fringe-factor", str(params['fringe_factor']),
             "--min-distance", str(params['min_distance']),
@@ -931,10 +963,11 @@ class OSMScenarioImporter:
         except Exception as e:
             print(f"    ❌ Failed to run duarouter: {e}")
     
-    def _generate_diverse_trips_for_vehicle_type(self, network_file: Path, vehicle_type: str, 
-                                               original_stats: Dict[str, Any], params: Dict[str, Any]) -> Optional[List[ET.Element]]:
+    def _generate_realistic_diverse_trips(self, network_file: Path, vehicle_type: str, 
+                                        original_stats: Dict[str, Any], params: Dict[str, Any]) -> Optional[List[ET.Element]]:
         """
-        Generate diverse trips for a specific vehicle type using randomTrips.py
+        Generate realistic diverse trips with enhanced randomization for vehicle type, 
+        spawn locations, destinations, and temporal distribution
         
         Args:
             network_file: Path to network file
@@ -943,74 +976,170 @@ class OSMScenarioImporter:
             params: Vehicle-type-specific parameters
             
         Returns:
-            List of trip elements or None if failed
+            List of trip elements with enhanced randomization
         """
         import subprocess
         import tempfile
+        import random
         
-        # Create temporary file for enhanced trips
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.trips.xml', delete=False) as temp_file:
-            temp_trips_file = Path(temp_file.name)
+        # Create multiple temporary files for different randomization approaches
+        temp_files = []
+        all_trips = []
         
         try:
-            # Calculate parameters based on original stats
-            num_trips = max(30, original_stats['vehicle_count'] // 3)  # Generate supplemental trips
-            time_span = original_stats['time_span']
-            period = time_span / num_trips if num_trips > 0 else 30
+            # Generate multiple batches with different parameters for maximum variety
+            batch_configs = self._create_randomization_batches(vehicle_type, original_stats, params)
             
-            # Build randomTrips.py command with vehicle-specific diversity parameters
+            for i, batch_config in enumerate(batch_configs):
+                with tempfile.NamedTemporaryFile(mode='w', suffix=f'.trips_{i}.xml', delete=False) as temp_file:
+                    temp_trips_file = Path(temp_file.name)
+                    temp_files.append(temp_trips_file)
+                    
+                    # Generate batch with specific randomization parameters
+                    batch_trips = self._generate_trip_batch(network_file, temp_trips_file, batch_config)
+                    if batch_trips:
+                        all_trips.extend(batch_trips)
+            
+            if all_trips:
+                # Apply enhanced randomization to all trips
+                randomized_trips = self._apply_enhanced_randomization(all_trips, vehicle_type, original_stats)
+                return randomized_trips
+                
+        except Exception as e:
+            print(f"    ❌ Failed to generate realistic diverse trips: {e}")
+            return None
+            
+        finally:
+            # Clean up temporary files
+            for temp_file in temp_files:
+                try:
+                    temp_file.unlink()
+                except:
+                    pass
+                    
+        return None
+    
+    def _create_randomization_batches(self, vehicle_type: str, original_stats: Dict[str, Any], 
+                                    base_params: Dict[str, Any]) -> List[Dict[str, Any]]:
+        """
+        Create multiple randomization batch configurations for maximum diversity
+        """
+        # Base configuration
+        num_trips_per_batch = max(15, original_stats['vehicle_count'] // 5)
+        time_span = original_stats['time_span']
+        
+        # Create 4 different batches with varying parameters for maximum randomization
+        batches = []
+        
+        # Batch 1: Inner city focus (lower fringe factor)
+        batches.append({
+            'vehicle_type': vehicle_type,
+            'num_trips': num_trips_per_batch,
+            'time_span': time_span,
+            'fringe_factor': max(1.0, base_params['fringe_factor'] * 0.5),  # More inner roads
+            'min_distance': base_params['min_distance'] * 0.7,
+            'random_factor': base_params['random_factor'] * 1.3,
+            'period_variance': 0.4,  # High temporal randomness
+            'seed_offset': 42
+        })
+        
+        # Batch 2: Mixed urban (medium fringe factor)  
+        batches.append({
+            'vehicle_type': vehicle_type,
+            'num_trips': num_trips_per_batch,
+            'time_span': time_span,
+            'fringe_factor': base_params['fringe_factor'],
+            'min_distance': base_params['min_distance'],
+            'random_factor': base_params['random_factor'] * 1.1,
+            'period_variance': 0.3,
+            'seed_offset': 123
+        })
+        
+        # Batch 3: Suburban/arterial focus (higher fringe factor)
+        batches.append({
+            'vehicle_type': vehicle_type,
+            'num_trips': num_trips_per_batch,
+            'time_span': time_span,
+            'fringe_factor': base_params['fringe_factor'] * 1.5,
+            'min_distance': base_params['min_distance'] * 1.3,
+            'random_factor': base_params['random_factor'] * 0.9,
+            'period_variance': 0.2,
+            'seed_offset': 789
+        })
+        
+        # Batch 4: Long distance trips (maximum variety)
+        batches.append({
+            'vehicle_type': vehicle_type,
+            'num_trips': max(10, num_trips_per_batch // 2),  # Fewer but longer trips
+            'time_span': time_span,
+            'fringe_factor': base_params['fringe_factor'] * 2.0,
+            'min_distance': base_params['min_distance'] * 2.0,  # Longer trips
+            'random_factor': base_params['random_factor'] * 1.5,
+            'period_variance': 0.5,
+            'seed_offset': 456
+        })
+        
+        return batches
+    
+    def _generate_trip_batch(self, network_file: Path, output_file: Path, 
+                           batch_config: Dict[str, Any]) -> Optional[List[ET.Element]]:
+        """
+        Generate a single batch of trips with specific randomization parameters
+        """
+        import subprocess
+        
+        try:
+            # Calculate randomized period
+            base_period = batch_config['time_span'] / batch_config['num_trips'] if batch_config['num_trips'] > 0 else 30
+            period_variance = batch_config.get('period_variance', 0.3)
+            min_period = base_period * (1 - period_variance)
+            max_period = base_period * (1 + period_variance)
+            
+            # Build randomTrips.py command with enhanced randomization
             sumo_tools_path = r"C:\Program Files (x86)\Eclipse\Sumo\tools"
             randomtrips_script = os.path.join(sumo_tools_path, "randomTrips.py")
             
             # Convert paths to absolute paths with forward slashes for SUMO compatibility
             network_file_abs = str(network_file.resolve()).replace('\\', '/')
-            temp_trips_file_abs = str(temp_trips_file.resolve()).replace('\\', '/')
+            output_file_abs = str(output_file.resolve()).replace('\\', '/')
+            
+            # Use random period within variance range
+            import random
+            random.seed(batch_config['seed_offset'])
+            actual_period = random.uniform(min_period, max_period)
             
             cmd = [
                 'python', randomtrips_script,
                 "-n", network_file_abs,
-                "-o", temp_trips_file_abs,
-                "--vehicle-class", vehicle_type,
-                "--edge-permission", vehicle_type,
-                "-b", str(original_stats['min_depart']),
-                "-e", str(original_stats['max_depart']),
-                "-p", str(period),
-                "--fringe-factor", str(params['fringe_factor']),
-                "--min-distance", str(params['min_distance']),
-                "--random-factor", str(params['random_factor']),
+                "-o", output_file_abs,
+                "--vehicle-class", batch_config['vehicle_type'],
+                "--edge-permission", batch_config['vehicle_type'],
+                "-p", str(actual_period),
+                "--fringe-factor", str(batch_config['fringe_factor']),
+                "--min-distance", str(batch_config['min_distance']),
+                "--random-factor", str(batch_config['random_factor']),
+                "--seed", str(batch_config['seed_offset']),  # Different seed for each batch
                 "--random",
                 "--validate"
             ]
             
-            # Add optional flags based on vehicle type
-            if params.get('lanes_weight', False):
-                cmd.append("-L")
-            if params.get('length_weight', False):
-                cmd.append("-l")
-            if params.get('speed_exponent', 0) > 0:
-                cmd.extend(["--speed-exponent", str(params['speed_exponent'])])
-            
             # Run randomTrips.py
             result = subprocess.run(cmd, capture_output=True, text=True, cwd=str(network_file.parent))
             
-            if result.returncode == 0 and temp_trips_file.exists():
+            if result.returncode == 0 and output_file.exists():
                 # Parse generated trips
-                tree = ET.parse(temp_trips_file)
+                tree = ET.parse(output_file)
                 root = tree.getroot()
                 trips = root.findall('.//trip')
-                print(f"    Generated {len(trips)} diverse trips for {vehicle_type}")
+                print(f"    Generated {len(trips)} diverse trips for batch")
                 return trips
             else:
-                print(f"    ❌ randomTrips.py failed for {vehicle_type}: {result.stderr}")
+                print(f"    ❌ randomTrips.py failed for batch: {result.stderr}")
                 return None
                 
         except Exception as e:
-            print(f"    ❌ Failed to generate diverse trips for {vehicle_type}: {e}")
+            print(f"    ❌ Failed to generate diverse trips for batch: {e}")
             return None
-        finally:
-            # Clean up temporary file
-            if temp_trips_file.exists():
-                temp_trips_file.unlink()
     
     def _merge_trip_files(self, original_file: Path, enhanced_trips: List[ET.Element], 
                          vehicle_type: str) -> Optional[Path]:
@@ -1040,9 +1169,11 @@ class OSMScenarioImporter:
             merged_root.set('xmlns:xsi', 'http://www.w3.org/2001/XMLSchema-instance')
             merged_root.set('xsi:noNamespaceSchemaLocation', 'http://sumo.dlr.de/xsd/routes_file.xsd')
             
-            # Copy vType definitions
+            # Copy vType definitions and enhance them
             for vtype in original_root.findall('.//vType'):
-                merged_root.append(vtype)
+                # Enhance vType with proper colors and shapes
+                enhanced_vtype = self._enhance_vehicle_type_definition(vtype)
+                merged_root.append(enhanced_vtype)
             
             # Add original trips (keep 80% for vehicle type diversity)
             import random
@@ -1247,6 +1378,40 @@ class OSMScenarioImporter:
             
             trips.sort(key=get_depart_time)
             
+            # CRITICAL FIX: Eliminate departure time clustering by redistributing vehicles with depart=0
+            print("    🚨 Fixing departure time clustering (eliminating depart=0.00 vehicles)...")
+            
+            # Count vehicles with problematic departure times
+            zero_depart_count = sum(1 for trip in trips if get_depart_time(trip) == 0.0)
+            if zero_depart_count > 0:
+                print(f"    Found {zero_depart_count} vehicles with depart=0.00 - redistributing...")
+                
+                # Calculate time range for redistribution
+                non_zero_times = [get_depart_time(trip) for trip in trips if get_depart_time(trip) > 0]
+                if non_zero_times:
+                    min_time = min(non_zero_times)
+                    max_time = max(non_zero_times)
+                    time_span = max_time - min_time
+                else:
+                    # Fallback if all trips have depart=0
+                    min_time = 10.0  # Start at 10 seconds
+                    max_time = 3600.0  # End at 1 hour
+                    time_span = max_time - min_time
+                
+                # Redistribute zero-departure vehicles across the time span
+                import random
+                for i, trip in enumerate(trips):
+                    if get_depart_time(trip) == 0.0:
+                        # Distribute evenly across time span with some randomness
+                        base_time = min_time + (time_span * i / zero_depart_count)
+                        jitter = random.uniform(-30, 30)  # ±30 seconds jitter
+                        new_time = max(1.0, base_time + jitter)  # Ensure >= 1 second
+                        trip.set('depart', f"{new_time:.2f}")
+                        
+                # Re-sort after redistribution
+                trips.sort(key=get_depart_time)
+                print(f"    ✅ Redistributed {zero_depart_count} vehicles - new range: {get_depart_time(trips[0]):.1f}s - {get_depart_time(trips[-1]):.1f}s")
+            
             # Remove existing trips and add back in sorted order
             for trip in merged_root.findall('.//trip'):
                 merged_root.remove(trip)
@@ -1344,6 +1509,214 @@ class OSMScenarioImporter:
             
         except Exception as e:
             print(f"    Warning: Could not update config for enhanced routes: {e}")
+
+    def _apply_enhanced_randomization(self, trips: List[ET.Element], vehicle_type: str, 
+                                    original_stats: Dict[str, Any]) -> List[ET.Element]:
+        """
+        Apply enhanced randomization to trip elements including:
+        - Temporal randomization (departure time shuffling)
+        - Vehicle color randomization  
+        - Route attribute randomization
+        - Vehicle shape settings
+        """
+        import random
+        
+        if not trips:
+            return trips
+            
+        print(f"    Applying enhanced randomization to {len(trips)} {vehicle_type} trips...")
+        
+        # Extract departure times and shuffle them for temporal randomization
+        departure_times = []
+        for trip in trips:
+            depart_time = float(trip.get('depart', 0))
+            departure_times.append(depart_time)
+        
+        # Create shuffled departure times with some variance
+        random.shuffle(departure_times)
+        
+        # Apply temporal jitter to prevent clustering
+        jittered_times = []
+        for base_time in departure_times:
+            # Add random jitter of ±15 seconds to break up timing patterns
+            jitter = random.uniform(-15.0, 15.0)
+            jittered_time = max(0, base_time + jitter)
+            jittered_times.append(jittered_time)
+        
+        # Sort to maintain chronological order but with randomized gaps
+        jittered_times.sort()
+        
+        # Apply randomization to each trip
+        color_schemes = self._get_vehicle_color_schemes(vehicle_type)
+        
+        for i, trip in enumerate(trips):
+            # Apply randomized departure time
+            if i < len(jittered_times):
+                trip.set('depart', f"{jittered_times[i]:.2f}")
+            
+            # Set random color from appropriate scheme
+            color = random.choice(color_schemes)
+            trip.set('color', color)
+            
+            # Add enhanced vehicle attributes
+            trip.set('departLane', 'best')
+            trip.set('departSpeed', 'max')
+            trip.set('departPos', 'random')
+            
+            # Note: guiShape should be on vType, not individual trips
+            # We'll handle this in the vType definition instead
+                
+            # Add speed factor variation for more realistic behavior
+            speed_factor = round(random.uniform(0.85, 1.15), 2)
+            trip.set('speedFactor', str(speed_factor))
+        
+        print(f"    ✅ Applied enhanced randomization: colors, timing, and attributes")
+        return trips
+    
+    def _get_vehicle_color_schemes(self, vehicle_type: str) -> List[str]:
+        """
+        Get realistic color schemes for different vehicle types
+        """
+        color_schemes = {
+            'passenger': [
+                '255,255,255',    # White
+                '128,128,128',    # Gray  
+                '0,0,0',          # Black
+                '255,0,0',        # Red
+                '0,0,255',        # Blue
+                '255,255,0',      # Yellow
+                '0,128,0',        # Green
+                '128,0,128',      # Purple
+                '255,165,0',      # Orange
+                '192,192,192',    # Silver
+                '139,69,19',      # Brown
+                '0,255,255',      # Cyan
+                '255,20,147',     # Deep Pink
+                '50,205,50',      # Lime Green
+                '255,69,0'        # Red Orange
+            ],
+            'bus': [
+                '255,255,0',      # Yellow (school bus)
+                '0,0,255',        # Blue
+                '255,255,255',    # White
+                '255,0,0',        # Red
+                '0,128,0',        # Green
+                '128,128,128',    # Gray
+                '255,165,0'       # Orange
+            ],
+            'truck': [
+                '255,255,255',    # White
+                '128,128,128',    # Gray
+                '0,0,0',          # Black
+                '255,0,0',        # Red
+                '0,0,255',        # Blue
+                '255,255,0',      # Yellow
+                '0,128,0'         # Green
+            ],
+            'motorcycle': [
+                '255,0,0',        # Red
+                '0,0,255',        # Blue
+                '0,0,0',          # Black
+                '255,255,255',    # White
+                '255,255,0',      # Yellow
+                '0,128,0',        # Green
+                '255,165,0',      # Orange
+                '128,0,128'       # Purple
+            ]
+        }
+        
+        return color_schemes.get(vehicle_type, color_schemes['passenger'])
+    
+    def _get_simple_shape_for_vehicle_type(self, vehicle_type: str) -> str:
+        """
+        Get simple shape for vehicle type as requested
+        """
+        shapes = {
+            'passenger': 'passenger',
+            'bus': 'bus', 
+            'truck': 'truck',
+            'motorcycle': 'motorcycle'
+        }
+        return shapes.get(vehicle_type, 'passenger')
+    
+    def _enhance_vehicle_type_definition(self, vtype_element: ET.Element) -> ET.Element:
+        """
+        Enhance a vType element with proper colors, shapes, and attributes
+        """
+        # Get vehicle class from the vType element
+        vehicle_class = vtype_element.get('vClass', 'passenger')
+        vtype_id = vtype_element.get('id', 'unknown')
+        
+        # Determine base vehicle type from ID or class
+        base_type = 'passenger'
+        for vtype in ['passenger', 'bus', 'truck', 'motorcycle']:
+            if vtype in vtype_id.lower() or vtype in vehicle_class.lower():
+                base_type = vtype
+                break
+        
+        # Set simple shape
+        shape = self._get_simple_shape_for_vehicle_type(base_type)
+        vtype_element.set('guiShape', shape)
+        
+        # Set default color (vehicles will override this individually)
+        default_colors = {
+            'passenger': '128,128,128',  # Gray default
+            'bus': '255,255,0',          # Yellow default
+            'truck': '255,255,255',      # White default
+            'motorcycle': '255,0,0'      # Red default
+        }
+        default_color = default_colors.get(base_type, '128,128,128')
+        vtype_element.set('color', default_color)
+        
+        # Ensure realistic attributes for the vehicle type
+        if base_type == 'passenger':
+            if not vtype_element.get('maxSpeed'):
+                vtype_element.set('maxSpeed', '55.56')  # 200 km/h
+            if not vtype_element.get('accel'):
+                vtype_element.set('accel', '2.6')
+            if not vtype_element.get('decel'):
+                vtype_element.set('decel', '4.5')
+        elif base_type == 'bus':
+            if not vtype_element.get('maxSpeed'):
+                vtype_element.set('maxSpeed', '27.78')  # 100 km/h
+            if not vtype_element.get('length'):
+                vtype_element.set('length', '12.0')
+        elif base_type == 'truck':
+            if not vtype_element.get('maxSpeed'):
+                vtype_element.set('maxSpeed', '25.0')   # 90 km/h
+            if not vtype_element.get('length'):
+                vtype_element.set('length', '10.0')
+        elif base_type == 'motorcycle':
+            if not vtype_element.get('maxSpeed'):
+                vtype_element.set('maxSpeed', '50.0')   # 180 km/h
+            if not vtype_element.get('length'):
+                vtype_element.set('length', '2.5')
+        
+        return vtype_element
+    
+    def _compress_trip_file(self, trip_file: Path) -> Optional[Path]:
+        """
+        Compress a trip file using gzip as requested
+        
+        Args:
+            trip_file: Path to uncompressed trip file
+            
+        Returns:
+            Path to compressed file or None if failed
+        """
+        try:
+            compressed_path = trip_file.with_suffix(trip_file.suffix + '.gz')
+            
+            with open(trip_file, 'rb') as f_in:
+                with gzip.open(compressed_path, 'wb') as f_out:
+                    f_out.write(f_in.read())
+            
+            print(f"    Compressed {trip_file.name} -> {compressed_path.name}")
+            return compressed_path
+            
+        except Exception as e:
+            print(f"    Warning: Failed to compress {trip_file.name}: {e}")
+            return None
 
 def main():
     """

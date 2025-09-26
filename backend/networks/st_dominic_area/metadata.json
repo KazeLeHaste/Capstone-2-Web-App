@@ -1,0 +1,29 @@
+{
+  "name": "st_dominic_area",
+  "type": "osm_imported",
+  "is_osm_scenario": true,
+  "import_date": "2025-09-26T19:54:59.050875",
+  "original_scenario": "St Dominic Area",
+  "vehicle_types": [
+    "passenger",
+    "bus",
+    "truck",
+    "motorcycle"
+  ],
+  "network_info": {
+    "edges": 13,
+    "junctions": 10,
+    "lanes": 86,
+    "boundary": "218.31,-4.75,548.67,426.65",
+    "file_size": 9080
+  },
+  "stats": {
+    "total_files": 21,
+    "route_files": 0,
+    "trip_files": 0,
+    "total_size": 595272
+  },
+  "description": "Imported OSM scenario: St Dominic Area",
+  "supports_realistic_traffic": true,
+  "configuration_overlay_supported": true
+}
