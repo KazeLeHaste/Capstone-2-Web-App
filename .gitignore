@@ -70,6 +70,10 @@ Thumbs.db
 backend/sessions/*/
 !backend/sessions/README.md
 
+# Database files (generated during runtime)
+backend/traffic_simulator.db
+backend/traffic_simulator.db-journal
+
 # Logs
 *.log
 logs/
