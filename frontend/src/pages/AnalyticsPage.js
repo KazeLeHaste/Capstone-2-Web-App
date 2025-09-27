@@ -52,7 +52,7 @@ const AnalyticsPage = ({ socket, simulationData, simulationStatus }) => {
   // State management
   const [analyticsData, setAnalyticsData] = useState(null);
   const [availableSessions, setAvailableSessions] = useState([]);
-  const [selectedSession, setSelectedSession] = useState(sessionIdFromUrl || '');
+  const [selectedSession, setSelectedSession] = useState(''); // Don't initialize with URL param
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [activeTab, setActiveTab] = useState('kpis');
@@ -64,30 +64,77 @@ const AnalyticsPage = ({ socket, simulationData, simulationStatus }) => {
 
   const loadAvailableSessions = useCallback(async () => {
     try {
+      console.log('Loading available sessions...');
       const response = await apiClient.get('/api/analytics/sessions');
       
       if (response.data.success) {
+        console.log('Sessions loaded:', response.data.sessions.length, 'total');
         setAvailableSessions(response.data.sessions);
         
-        // Auto-select first analyzable session if none selected
-        if (!selectedSession && !isInitialized && response.data.sessions.length > 0) {
-          const firstAnalyzable = response.data.sessions.find(s => s.can_analyze);
-          if (firstAnalyzable) {
-            setSelectedSession(firstAnalyzable.session_id);
-          }
+        // Handle URL session parameter - check if it exists
+        const urlSession = sessionIdFromUrl;
+        const sessionExists = response.data.sessions.find(s => s.session_id === urlSession);
+        
+        console.log('URL session:', urlSession);
+        console.log('Session exists:', !!sessionExists);
+        
+        if (urlSession && !sessionExists) {
+          console.warn(`Session from URL not found: ${urlSession}`);
+          console.log('Available sessions:', response.data.sessions.slice(0, 3).map(s => s.session_id));
         }
+        
+        // Auto-select session logic
+        setSelectedSession(currentSelected => {
+          console.log('Auto-selecting session, current:', currentSelected);
+          
+          // If URL session exists, use it
+          if (urlSession && sessionExists) {
+            console.log('Using URL session:', urlSession);
+            return urlSession;
+          }
+          
+          // If URL session doesn't exist but was provided, find a similar one or use first available
+          if (urlSession && !sessionExists) {
+            console.warn(`Session from URL not found: ${urlSession}`);
+            // Try to find a session with similar timestamp
+            const timestamp = urlSession.match(/\d+/)?.[0];
+            if (timestamp) {
+              const similarSession = response.data.sessions.find(s => 
+                s.can_analyze && s.session_id.includes(timestamp)
+              );
+              if (similarSession) {
+                console.log(`Using similar session: ${similarSession.session_id}`);
+                return similarSession.session_id;
+              }
+            }
+          }
+          
+          // Auto-select first analyzable session if none selected
+          if (!currentSelected && response.data.sessions.length > 0) {
+            const firstAnalyzable = response.data.sessions.find(s => s.can_analyze);
+            const selectedId = firstAnalyzable ? firstAnalyzable.session_id : currentSelected;
+            console.log('Auto-selected first analyzable session:', selectedId);
+            return selectedId;
+          }
+          
+          return currentSelected;
+        });
+        
         setIsInitialized(true);
       }
     } catch (err) {
       console.error('Failed to load sessions:', err);
       setError('Failed to load sessions');
     }
-  }, [selectedSession, isInitialized]);
+  }, []); // Remove sessionIdFromUrl dependency to prevent loops
 
   const loadSessionAnalytics = useCallback(async (sessionId) => {
     if (!sessionId) {
+      console.log('loadSessionAnalytics called with empty sessionId');
       return;
     }
+
+    console.log('Loading analytics for session:', sessionId);
 
     // Clear previous state and set loading
     setLoading(true);
@@ -95,57 +142,101 @@ const AnalyticsPage = ({ socket, simulationData, simulationStatus }) => {
     setAnalyticsData(null);
 
     try {
-      const response = await apiClient.get(`/api/analytics/session/${sessionId}`);
+      // FIRST: Verify the session exists and can be analyzed
+      console.log('Checking if session exists in available sessions...');
+      const sessionsResponse = await apiClient.get('/api/analytics/sessions');
+      
+      if (!sessionsResponse.data.success) {
+        throw new Error('Failed to load available sessions');
+      }
+
+      const sessionExists = sessionsResponse.data.sessions?.find(s => s.session_id === sessionId);
+      
+      if (!sessionExists) {
+        console.error(`Session ${sessionId} not found in available sessions`);
+        console.log('Available sessions:', sessionsResponse.data.sessions?.map(s => s.session_id).slice(0, 5));
+        
+        // Try to find a similar session by timestamp
+        const timestamp = sessionId.match(/\d+/)?.[0];
+        if (timestamp) {
+          const similarSession = sessionsResponse.data.sessions?.find(s => 
+            s.can_analyze && s.session_id.includes(timestamp)
+          );
+          if (similarSession) {
+            console.log(`Found similar session: ${similarSession.session_id}, redirecting...`);
+            setSelectedSession(similarSession.session_id);
+            setLoading(false);
+            return;
+          }
+        }
+        
+        setError(`Session ${sessionId} not found. Please select a different session.`);
+        setLoading(false);
+        return;
+      }
+
+      if (!sessionExists.can_analyze) {
+        console.error(`Session ${sessionId} cannot be analyzed yet`);
+        setError('This session cannot be analyzed yet. Please wait for the session to complete processing.');
+        setLoading(false);
+        return;
+      }
+
+      console.log('Session validation passed, loading analytics...');
+
+      const url = `/api/analytics/session/${sessionId}`;
+      console.log('Making API call to:', url);
+      
+      const response = await apiClient.get(url);
+      
+      console.log('API response status:', response.status);
+      console.log('API response success:', response.data?.success);
       
       if (response.data && response.data.success && response.data.analytics) {
+        console.log('Analytics loaded successfully');
         setAnalyticsData(response.data.analytics);
         setError(null);
       } else {
         const errorMsg = response.data?.message || 'No analytics data available';
+        console.error('Analytics loading failed:', errorMsg);
         setError(errorMsg);
         setAnalyticsData(null);
       }
     } catch (err) {
       const errorMessage = err.response?.data?.message || `Failed to load analytics: ${err.message}`;
+      console.error('Analytics API call failed:', err);
+      console.error('Error details:', {
+        status: err.response?.status,
+        data: err.response?.data,
+        message: err.message
+      });
       setError(errorMessage);
       setAnalyticsData(null);
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [setSelectedSession]);
 
   // Load sessions on component mount
   useEffect(() => {
     loadAvailableSessions();
-  }, []); // Empty dependency array - only run on mount
+  }, []); // Empty dependency - loadAvailableSessions is stable with empty deps
 
   // Load analytics when session changes
   useEffect(() => {
     if (selectedSession && isInitialized) {
       loadSessionAnalytics(selectedSession);
     }
-  }, [selectedSession, isInitialized]); // Only depend on selectedSession and initialization
+  }, [selectedSession, isInitialized, loadSessionAnalytics]);
 
   // Handle click outside to close dropdown
   useEffect(() => {
     const handleClickOutside = (event) => {
       // Check if click is outside the dropdown container
-      if (exportDropdownOpen && !event.target.closest('.dropdown')) {
-        closeExportDropdown();
-      }
-    };
-
-    document.addEventListener('click', handleClickOutside);
-    return () => {
-      document.removeEventListener('click', handleClickOutside);
-    };
-  }, [exportDropdownOpen]);
-
-  // Handle click outside dropdown to close it
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (exportDropdownOpen && !event.target.closest('.dropdown')) {
-        setExportDropdownOpen(false);
+      if (exportDropdownOpen && event.target && typeof event.target.closest === 'function') {
+        if (!event.target.closest('.dropdown')) {
+          setExportDropdownOpen(false);
+        }
       }
     };
 
@@ -462,7 +553,6 @@ const AnalyticsPage = ({ socket, simulationData, simulationStatus }) => {
                 </button>
                 <button
                   onClick={() => {
-                    // Start comparison with selected sessions
                     setShowSessionComparison(true);
                   }}
                   disabled={!canStartComparison}
@@ -531,9 +621,25 @@ const AnalyticsPage = ({ socket, simulationData, simulationStatus }) => {
         {error && (
           <div className="alert alert-error">
             <AlertCircle />
-            <div>
+            <div className="flex-1">
               <h3 className="font-medium">Error Loading Analytics</h3>
               <p className="mt-xs">{error}</p>
+            </div>
+            <div className="ml-4">
+              <button
+                onClick={() => {
+                  setError(null);
+                  if (selectedSession) {
+                    loadSessionAnalytics(selectedSession);
+                  } else {
+                    loadAvailableSessions();
+                  }
+                }}
+                className="btn btn-sm btn-outline"
+              >
+                <RefreshCw className="w-4 h-4 mr-1" />
+                Retry
+              </button>
             </div>
           </div>
         )}
@@ -633,11 +739,21 @@ const AnalyticsPage = ({ socket, simulationData, simulationStatus }) => {
         <SessionComparison
           selectedSessions={selectedSessionsForComparison}
           onClose={() => {
+            console.log('Closing session comparison');
             setShowSessionComparison(false);
             setShowComparison(false);
             setSelectedSessionsForComparison([]);
           }}
         />
+      )}
+      
+      {/* Debug info */}
+      {process.env.NODE_ENV === 'development' && (
+        <div style={{ position: 'fixed', bottom: '10px', right: '10px', background: 'rgba(0,0,0,0.8)', color: 'white', padding: '10px', fontSize: '12px' }}>
+          <div>showSessionComparison: {showSessionComparison.toString()}</div>
+          <div>selectedSessions: {selectedSessionsForComparison.length}</div>
+          <div>canStartComparison: {canStartComparison.toString()}</div>
+        </div>
       )}
     </div>
   );

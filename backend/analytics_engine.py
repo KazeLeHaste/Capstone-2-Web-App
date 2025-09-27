@@ -241,13 +241,14 @@ class TrafficAnalyticsEngine:
             )
         ]
     
-    def analyze_session(self, session_path: str, session_id: str = None) -> Dict[str, Any]:
+    def analyze_session(self, session_path: str, session_id: str = None, force_reprocess: bool = False) -> Dict[str, Any]:
         """
         Analyze a complete simulation session
         
         Args:
             session_path: Path to session directory containing SUMO output files
             session_id: Session ID (for database storage)
+            force_reprocess: Force reprocessing even if analytics already exist
             
         Returns:
             Dictionary containing complete analytics results
@@ -258,6 +259,19 @@ class TrafficAnalyticsEngine:
             # Extract session_id from path if not provided
             if not session_id:
                 session_id = session_path.name
+
+            # Quick check if analytics already exist (unless forcing reprocess)
+            if not force_reprocess:
+                try:
+                    existing_kpis = self.db_service.get_kpis(session_id)
+                    if existing_kpis:
+                        print(f"Using cached analytics for session {session_id}")
+                        return self._build_cached_analytics_response(session_id)
+                except Exception:
+                    # If there's an error checking existing data, proceed with full analysis
+                    pass
+            
+            print(f"Processing analytics for session {session_id}...")
             
             # Locate output files
             tripinfo_file = self._find_file(session_path, "*.tripinfos.xml")
@@ -313,9 +327,10 @@ class TrafficAnalyticsEngine:
                         rec_dicts.append(rec_dict)
                     self.db_service.save_recommendations(session_id, rec_dicts)
                     
-                    # Save vehicle emissions data (if available)
+                    # Save vehicle emissions data (if available) - with reduced processing for speed
                     if emissions_file and emissions_file.exists():
-                        emissions_data = self._extract_emissions_data(emissions_file)
+                        # Use smaller sample size for faster processing
+                        emissions_data = self._extract_emissions_data(emissions_file, max_vehicles=250)
                         if emissions_data:
                             self.db_service.save_vehicle_emissions(session_id, emissions_data)
                     
@@ -1018,7 +1033,7 @@ class TrafficAnalyticsEngine:
 
     def compare_sessions(self, session_paths: List[str]) -> Dict[str, Any]:
         """
-        Compare multiple simulation sessions
+        Compare multiple simulation sessions with caching
         
         Args:
             session_paths: List of session directory paths
@@ -1026,22 +1041,33 @@ class TrafficAnalyticsEngine:
         Returns:
             Comparison analysis results
         """
+        # Generate cache key for this comparison
+        session_ids = [Path(path).name for path in session_paths]
+        cache_key = f"comparison_{'_'.join(sorted(session_ids))}"
+        
+        # Check if comparison is cached
+        cached_result = self._get_comparison_cache(cache_key)
+        if cached_result:
+            print(f"Using cached comparison for sessions: {session_ids}")
+            return cached_result
+        
+        print(f"Computing comparison for sessions: {session_ids}")
         comparisons = {}
         session_data = {}
         
-        # Analyze each session
+        # Analyze each session (this uses individual session caching)
         for session_path in session_paths:
             session_id = Path(session_path).name
-            analysis = self.analyze_session(session_path)
+            analysis = self.analyze_session(session_path)  # This already has caching
             session_data[session_id] = analysis
         
         # Compare KPIs
         kpi_comparison = self._compare_kpis(session_data)
         
-        # Compare recommendations
+        # Compare recommendations  
         recommendation_comparison = self._compare_recommendations(session_data)
         
-        return {
+        result = {
             "comparison_timestamp": datetime.now().isoformat(),
             "sessions": list(session_data.keys()),
             "session_data": session_data,
@@ -1049,6 +1075,11 @@ class TrafficAnalyticsEngine:
             "recommendation_comparison": recommendation_comparison,
             "best_performing_session": self._find_best_session(session_data)
         }
+        
+        # Cache the result
+        self._cache_comparison(cache_key, result)
+        
+        return result
     
     def _compare_kpis(self, session_data: Dict[str, Dict]) -> Dict[str, Any]:
         """Compare KPIs across sessions"""
@@ -1324,10 +1355,19 @@ class TrafficAnalyticsEngine:
             print(f"Error analyzing trip safety patterns: {e}")
             return kpis
     
-    def _extract_emissions_data(self, emissions_file: Path) -> List[Dict[str, Any]]:
-        """Extract vehicle emissions data for database storage"""
+    def _extract_emissions_data(self, emissions_file: Path, max_vehicles: int = 250) -> List[Dict[str, Any]]:
+        """Extract vehicle emissions data for database storage with sampling for large files"""
         emissions_data = []
         try:
+            # Check file size first
+            file_size = emissions_file.stat().st_size
+            large_file_threshold = 100 * 1024 * 1024  # 100MB
+            
+            if file_size > large_file_threshold:
+                print(f"Large emissions file detected ({file_size / (1024*1024):.1f} MB). Using streaming approach...")
+                return self._extract_emissions_data_streaming(emissions_file, max_vehicles)
+            
+            # For smaller files, use the normal approach
             import xml.etree.ElementTree as ET
             tree = ET.parse(emissions_file)
             root = tree.getroot()
@@ -1351,6 +1391,64 @@ class TrafficAnalyticsEngine:
                 
         except Exception as e:
             print(f"Error extracting emissions data: {e}")
+            
+        return emissions_data
+    
+    def _extract_emissions_data_streaming(self, emissions_file: Path, max_vehicles: int = 250) -> List[Dict[str, Any]]:
+        """Extract emissions data using streaming for large files"""
+        emissions_data = []
+        vehicle_count = 0
+        sample_interval = 1  # Start by sampling every vehicle
+        
+        try:
+            import xml.etree.ElementTree as ET
+            
+            # Calculate sampling interval based on file size
+            file_size = emissions_file.stat().st_size
+            estimated_vehicles = file_size // 1000  # Rough estimate
+            if estimated_vehicles > max_vehicles:
+                sample_interval = estimated_vehicles // max_vehicles
+                print(f"Sampling every {sample_interval}th vehicle from large emissions file")
+            
+            # Use iterparse for memory-efficient processing
+            context = ET.iterparse(emissions_file, events=('start', 'end'))
+            context = iter(context)
+            
+            event, root = next(context)
+            
+            for event, elem in context:
+                if event == 'end' and elem.tag == 'vehicle':
+                    vehicle_count += 1
+                    
+                    # Sample vehicles based on interval
+                    if vehicle_count % sample_interval == 0:
+                        vehicle_data = {
+                            'vehicle_id': elem.get('id', ''),
+                            'vehicle_type': elem.get('type', 'default'),
+                            'co2_emissions': float(elem.get('CO2', 0)),
+                            'co_emissions': float(elem.get('CO', 0)),
+                            'hc_emissions': float(elem.get('HC', 0)),
+                            'nox_emissions': float(elem.get('NOx', 0)),
+                            'pmx_emissions': float(elem.get('PMx', 0)),
+                            'fuel_consumption': float(elem.get('fuel', 0)),
+                            'energy_consumption': float(elem.get('electricity', 0)),
+                            'distance_traveled': 0.0,
+                            'travel_time': 0.0
+                        }
+                        emissions_data.append(vehicle_data)
+                        
+                        # Stop when we have enough samples
+                        if len(emissions_data) >= max_vehicles:
+                            break
+                    
+                    # Clear the element to free memory
+                    elem.clear()
+                    root.clear()
+            
+            print(f"Extracted {len(emissions_data)} vehicle emissions records from {vehicle_count} total vehicles")
+            
+        except Exception as e:
+            print(f"Error in streaming emissions extraction: {e}")
             
         return emissions_data
     
@@ -1490,4 +1588,68 @@ class TrafficAnalyticsEngine:
         except Exception as e:
             print(f"Error extracting safety metrics: {e}")
             return {}
+
+    def _build_cached_analytics_response(self, session_id: str) -> Dict[str, Any]:
+        """Build analytics response from cached database data for faster loading"""
+        try:
+            # Get cached data from database
+            kpis = self.db_service.get_kpis(session_id)
+            recommendations = self.db_service.get_recommendations(session_id)
+            time_series = self.db_service.get_time_series(session_id)
+            
+            # Build the response in the expected format
+            analytics_dict = {
+                'kpis': kpis.__dict__ if hasattr(kpis, '__dict__') else kpis,
+                'recommendations': [rec.__dict__ if hasattr(rec, '__dict__') else rec for rec in recommendations] if recommendations else [],
+                'time_series': [ts.__dict__ if hasattr(ts, '__dict__') else ts for ts in time_series] if time_series else [],
+                'analysis_timestamp': datetime.now().isoformat(),
+                'emissions_data': [],  # Could be populated if needed
+                'safety_data': {},
+                'network_analysis': {},
+                'route_analysis': {},
+                'temporal_patterns': {},
+                'performance_metrics': {}
+            }
+            
+            return analytics_dict
+            
+        except Exception as e:
+            print(f"Error building cached analytics response: {e}")
+            # Fall back to empty response structure
+            return {
+                'kpis': {},
+                'recommendations': [],
+                'time_series': [],
+                'analysis_timestamp': datetime.now().isoformat(),
+                'emissions_data': [],
+                'safety_data': {},
+                'network_analysis': {},
+                'route_analysis': {},
+                'temporal_patterns': {},
+                'performance_metrics': {}
+            }
+
+    def _get_comparison_cache(self, cache_key: str) -> Optional[Dict[str, Any]]:
+        """Get cached comparison result"""
+        try:
+            cache_file = Path("cache") / f"{cache_key}.json"
+            if cache_file.exists():
+                # Check if cache is less than 1 hour old
+                if (datetime.now() - datetime.fromtimestamp(cache_file.stat().st_mtime)).total_seconds() < 3600:
+                    with open(cache_file, 'r') as f:
+                        return json.load(f)
+        except Exception as e:
+            print(f"Error reading comparison cache: {e}")
+        return None
+    
+    def _cache_comparison(self, cache_key: str, result: Dict[str, Any]) -> None:
+        """Cache comparison result"""
+        try:
+            cache_dir = Path("cache")
+            cache_dir.mkdir(exist_ok=True)
+            cache_file = cache_dir / f"{cache_key}.json"
+            with open(cache_file, 'w') as f:
+                json.dump(result, f, indent=2)
+        except Exception as e:
+            print(f"Error caching comparison: {e}")
 
