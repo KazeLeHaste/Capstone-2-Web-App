@@ -25,7 +25,8 @@ import {
   Bus,
   Truck,
   Bike,
-  User
+  User,
+  MapPin
 } from 'lucide-react';
 import { api } from '../utils/apiClient';
 
@@ -71,6 +72,20 @@ const ConfigurationPage = ({ socket }) => {
     // Traffic Scale Control (SUMO --scale parameter)
     trafficScale: 1.0, // Traffic scale factor - 1.0 = normal traffic, 2.0 = double traffic, etc.
     
+    // Traffic Control Configuration
+    trafficControl: {
+      method: 'existing', // Options: 'existing', 'fixed', 'adaptive'
+      cycleTime: 90, // Fixed timing cycle time (seconds)
+      addToHighPriority: false, // Toggle to add traffic lights to high priority intersections
+      adaptiveSettings: {
+        maxGap: 3.0, // Maximum gap between vehicles to extend green phase (seconds)
+        minDuration: 5, // Minimum green phase duration (seconds)
+        maxDuration: 50, // Maximum green phase duration (seconds)
+        detectorGap: 2.0, // Distance between detector and stop line in time (seconds)
+        speedThreshold: 50 // Speed threshold for adding TLS to priority junctions (km/h)
+      }
+    },
+    
     // Vehicle Types Configuration - Controls which vehicle types are included in simulation
     vehicleTypes: {
       passenger: { enabled: true, name: 'Private Vehicles' },
@@ -101,7 +116,48 @@ const ConfigurationPage = ({ socket }) => {
     }));
   };
 
-
+  // Traffic control configuration change handler
+  const handleTrafficControlChange = (key, value) => {
+    if (key === 'method') {
+      setConfig(prev => ({
+        ...prev,
+        trafficControl: {
+          ...prev.trafficControl,
+          method: value
+        }
+      }));
+    } else if (key === 'cycleTime') {
+      // For fixed timing cycle time
+      setConfig(prev => ({
+        ...prev,
+        trafficControl: {
+          ...prev.trafficControl,
+          cycleTime: value
+        }
+      }));
+    } else if (key === 'addToHighPriority') {
+      // For high priority intersection toggle
+      setConfig(prev => ({
+        ...prev,
+        trafficControl: {
+          ...prev.trafficControl,
+          addToHighPriority: value
+        }
+      }));
+    } else {
+      // For adaptive settings
+      setConfig(prev => ({
+        ...prev,
+        trafficControl: {
+          ...prev.trafficControl,
+          adaptiveSettings: {
+            ...prev.trafficControl.adaptiveSettings,
+            [key]: value
+          }
+        }
+      }));
+    }
+  };
 
   // Simplified configuration change handler for basic parameters only
   const handleConfigChange = (key, value) => {
@@ -137,6 +193,9 @@ const ConfigurationPage = ({ socket }) => {
           
           // Traffic Scale Control (SUMO --scale parameter)
           traffic_scale: config.trafficScale, // Traffic scale factor for SUMO
+          
+          // Traffic Control Configuration
+          trafficControl: config.trafficControl, // Traffic light control settings
           
           // Vehicle Types Configuration (maps to enabled vehicles in route selection)
           enabledVehicles: Object.keys(config.vehicleTypes).filter(
@@ -430,6 +489,165 @@ const ConfigurationPage = ({ socket }) => {
               </div>
             </div>
 
+            {/* Traffic Control Method */}
+            <div className="config-section">
+              <div className="config-section-header">
+                <MapPin className="config-section-icon" />
+                <h2 className="config-section-title">Traffic Light Control</h2>
+                <div className="config-section-help">
+                  <HelpCircle className="w-4 h-4 text-muted" />
+                  <span className="config-help-text">Configure how traffic lights operate in the simulation</span>
+                </div>
+              </div>
+              <div className="space-y-4">
+                <div className="config-info-panel">
+                  <div className="info-panel-header">
+                    <Info className="info-panel-icon" />
+                    <div className="info-panel-content">
+                      <p className="text-sm text-secondary">
+                        Traffic light control affects intersection behavior. Adaptive control automatically adjusts timing based on traffic demand, giving more green time to busier roads.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="config-form-group">
+                  <label className="config-label">Control Method</label>
+                  <select
+                    value={config.trafficControl.method}
+                    onChange={(e) => handleTrafficControlChange('method', e.target.value)}
+                    className="config-input"
+                  >
+                    <option value="existing">Keep Existing Traffic Lights</option>
+                    <option value="fixed">Fixed-Time Control</option>
+                    <option value="adaptive">Adaptive Control (Recommended)</option>
+                  </select>
+                  <span className="config-help-text">
+                    Adaptive control automatically gives more green time to roads with heavier traffic
+                  </span>
+                </div>
+
+                {/* High Priority Intersection Toggle */}
+                <div className="config-form-group">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <label className="config-label">Add Traffic Lights to High Priority Intersections</label>
+                      <span className="config-help-text">
+                        Automatically add adaptive traffic lights to busy priority intersections (roads &gt; {config.trafficControl.adaptiveSettings.speedThreshold}km/h)
+                      </span>
+                    </div>
+                    <label className="relative inline-flex items-center cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={config.trafficControl.addToHighPriority}
+                        onChange={(e) => handleTrafficControlChange('addToHighPriority', e.target.checked)}
+                        className="sr-only peer"
+                      />
+                      <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                    </label>
+                  </div>
+                </div>
+
+                {config.trafficControl.method === 'fixed' && (
+                  <div className="config-form-group">
+                    <label className="config-label">Cycle Time (seconds)</label>
+                    <input
+                      type="number"
+                      value={config.trafficControl.cycleTime}
+                      onChange={(e) => handleTrafficControlChange('cycleTime', parseInt(e.target.value) || 90)}
+                      className="config-input"
+                      min="60"
+                      max="300"
+                      step="10"
+                    />
+                    <span className="config-help-text">
+                      Total time for one complete cycle through all phases
+                    </span>
+                  </div>
+                )}
+
+                {(config.trafficControl.method === 'adaptive' || config.trafficControl.method === 'add_adaptive') && (
+                  <>
+                    <div className="config-form-group">
+                      <label className="config-label">Maximum Gap Between Vehicles (seconds)</label>
+                      <input
+                        type="number"
+                        value={config.trafficControl.adaptiveSettings.maxGap}
+                        onChange={(e) => handleTrafficControlChange('maxGap', parseFloat(e.target.value) || 3.0)}
+                        className="config-input"
+                        min="1.0"
+                        max="10.0"
+                        step="0.5"
+                      />
+                      <span className="config-help-text">
+                        Green phase continues if vehicles arrive within this time gap
+                      </span>
+                    </div>
+
+                    <div className="config-form-group">
+                      <label className="config-label">Minimum Green Time (seconds)</label>
+                      <input
+                        type="number"
+                        value={config.trafficControl.adaptiveSettings.minDuration}
+                        onChange={(e) => handleTrafficControlChange('minDuration', parseInt(e.target.value) || 5)}
+                        className="config-input"
+                        min="3"
+                        max="30"
+                      />
+                      <span className="config-help-text">
+                        Minimum time a phase stays green regardless of traffic
+                      </span>
+                    </div>
+
+                    <div className="config-form-group">
+                      <label className="config-label">Maximum Green Time (seconds)</label>
+                      <input
+                        type="number"
+                        value={config.trafficControl.adaptiveSettings.maxDuration}
+                        onChange={(e) => handleTrafficControlChange('maxDuration', parseInt(e.target.value) || 50)}
+                        className="config-input"
+                        min="10"
+                        max="120"
+                      />
+                      <span className="config-help-text">
+                        Maximum time a phase can stay green even with continuous traffic
+                      </span>
+                    </div>
+
+                    {config.trafficControl.method === 'add_adaptive' && (
+                      <div className="config-form-group">
+                        <label className="config-label">Speed Threshold (km/h)</label>
+                        <input
+                          type="number"
+                          value={config.trafficControl.adaptiveSettings.speedThreshold}
+                          onChange={(e) => handleTrafficControlChange('speedThreshold', parseInt(e.target.value) || 50)}
+                          className="config-input"
+                          min="20"
+                          max="80"
+                          step="10"
+                        />
+                        <span className="config-help-text">
+                          Priority intersections with roads above this speed get traffic lights
+                        </span>
+                      </div>
+                    )}
+
+                    <div className="mt-3 p-3 info-block rounded-lg">
+                      <div className="flex items-center text-sm text-info-dark">
+                        <Info className="w-4 h-4 mr-2" />
+                        <div>
+                          <div><strong>Adaptive Control Benefits:</strong></div>
+                          <div>• Automatically prioritizes busier roads with longer green times</div>
+                          <div>• Reduces waiting time by responding to actual traffic demand</div>
+                          <div>• Improves traffic flow efficiency compared to fixed timing</div>
+                        </div>
+                      </div>
+                    </div>
+                  </>
+                )}
+              </div>
+            </div>
+
             {/* Vehicle Types Selection */}
             <div className="config-section">
               <div className="config-section-header">
@@ -616,6 +834,15 @@ const ConfigurationPage = ({ socket }) => {
                 <span className="config-preview-value">{config.trafficScale}x</span>
               </div>
               <div className="config-preview-item">
+                <span className="config-preview-label">Traffic Control:</span>
+                <span className="config-preview-value">
+                  {config.trafficControl.method === 'existing' && 'Keep Existing'}
+                  {config.trafficControl.method === 'fixed' && `Fixed (${config.trafficControl.cycleTime}s cycle)`}
+                  {config.trafficControl.method === 'adaptive' && 'Adaptive Control'}
+                  {config.trafficControl.method === 'add_adaptive' && 'Add Adaptive TLS'}
+                </span>
+              </div>
+              <div className="config-preview-item">
                 <span className="config-preview-label">Vehicle Types:</span>
                 <span className="config-preview-value">
                   {Object.values(config.vehicleTypes).filter(t => t.enabled).length} selected
@@ -653,7 +880,13 @@ const ConfigurationPage = ({ socket }) => {
                 <div>Vehicle types: {Object.keys(config.vehicleTypes).filter(t => config.vehicleTypes[t].enabled).length} enabled 
                   ({Object.keys(config.vehicleTypes).filter(t => config.vehicleTypes[t].enabled).join(', ') || 'none'})
                 </div>
-                <div>Traffic lights: Default behavior (uses network configuration)</div>
+                <div>Traffic control: {
+                  config.trafficControl.method === 'existing' ? 'Keep existing network traffic lights' :
+                  config.trafficControl.method === 'fixed' ? `Fixed timing (${config.trafficControl.cycleTime}s cycle)` :
+                  config.trafficControl.method === 'adaptive' ? `Adaptive control (${config.trafficControl.adaptiveSettings.minDuration}-${config.trafficControl.adaptiveSettings.maxDuration}s green)` :
+                  config.trafficControl.method === 'add_adaptive' ? `Add adaptive TLS to priority junctions (>${config.trafficControl.adaptiveSettings.speedThreshold}km/h)` :
+                  'Default behavior'
+                }</div>
               </div>
             </div>
           </div>

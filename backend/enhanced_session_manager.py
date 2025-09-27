@@ -335,15 +335,16 @@ class EnhancedSessionManager:
     
     def _apply_configuration_to_files(self, session_dir: Path, network_id: str, config: Dict[str, Any]):
         """Apply configuration parameters to SUMO files"""
-        # Update SUMO config file
+        # Update SUMO config file first
         sumocfg_files = list(session_dir.glob("*.sumocfg"))
         if sumocfg_files:
             self._update_sumo_config(sumocfg_files[0], config)
         
-        # Generate additional files (traffic lights, routes, etc.)
-        if config.get('trafficControl'):
-            self._generate_traffic_lights(session_dir, network_id, config['trafficControl'])
+        # Apply traffic control configuration to network file
+        if config.get('trafficControl') and config['trafficControl'].get('method') != 'existing':
+            self._apply_traffic_control_configuration(session_dir, network_id, config['trafficControl'])
         
+        # Update vehicle types configuration
         if config.get('enabledVehicles'):
             self._update_vehicle_types(session_dir, config['enabledVehicles'])
     
@@ -373,18 +374,165 @@ class EnhancedSessionManager:
         except Exception as e:
             print(f"Error updating SUMO config: {e}")
     
-    def _generate_traffic_lights(self, session_dir: Path, network_id: str, traffic_control: Dict[str, Any]):
-        """Generate traffic light configuration files"""
-        # This would integrate with existing traffic light generation logic
-        # For now, just create a placeholder
-        tls_file = session_dir / f"{network_id}_tls.xml"
-        if not tls_file.exists():
-            # Create minimal traffic light file
-            tls_content = """<?xml version="1.0" encoding="UTF-8"?>
-<additional xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/additional_file.xsd">
-    <!-- Traffic light configurations will be generated here -->
-</additional>"""
-            tls_file.write_text(tls_content)
+    def _apply_traffic_control_configuration(self, session_dir: Path, network_id: str, traffic_control: Dict[str, Any]):
+        """Apply traffic control configuration using netconvert"""
+        method = traffic_control.get('method', 'existing')
+        
+        if method == 'existing':
+            return  # Keep current traffic lights as-is
+        
+        # Find the network file (could be .net.xml or .net.xml.gz)
+        network_file = session_dir / f"{network_id}.net.xml"
+        network_gz_file = session_dir / f"{network_id}.net.xml.gz"
+        
+        # Handle compressed network files
+        actual_network_file = network_file if network_file.exists() else network_gz_file
+        if not actual_network_file.exists():
+            print(f"Warning: Network file not found: {network_file} or {network_gz_file}")
+            return
+        
+        try:
+            self._modify_traffic_lights_with_netconvert(actual_network_file, traffic_control)
+            print(f"Successfully applied {method} traffic control to {network_id}")
+        except Exception as e:
+            print(f"Error applying traffic control configuration: {e}")
+    
+    def _modify_traffic_lights_with_netconvert(self, network_file: Path, config: Dict[str, Any]):
+        """Use netconvert to modify traffic lights according to configuration"""
+        import subprocess
+        import tempfile
+        import shutil
+        
+        method = config['method']
+        
+        # Create temporary file for output
+        with tempfile.NamedTemporaryFile(suffix='.net.xml', delete=False) as tmp_file:
+            temp_output = Path(tmp_file.name)
+        
+        try:
+            # Build netconvert command
+            cmd = ['netconvert']
+            
+            # Input file
+            if str(network_file).endswith('.gz'):
+                # For compressed files, we need to decompress first
+                with tempfile.NamedTemporaryFile(suffix='.net.xml', delete=False) as tmp_input:
+                    temp_input = Path(tmp_input.name)
+                
+                # Decompress the network file
+                import gzip
+                with gzip.open(network_file, 'rb') as f_in:
+                    with open(temp_input, 'wb') as f_out:
+                        shutil.copyfileobj(f_in, f_out)
+                
+                cmd.extend(['-s', str(temp_input)])
+            else:
+                cmd.extend(['-s', str(network_file)])
+            
+            cmd.extend(['-o', str(temp_output)])
+            
+            # Apply configuration based on method
+            if method == 'fixed':
+                cmd.extend([
+                    '--tls.rebuild',  # Rebuild all traffic light programs
+                    '--tls.default-type', 'static',
+                    '--tls.cycle.time', str(config.get('cycleTime', 90))
+                ])
+            
+            elif method == 'adaptive':
+                adaptive_settings = config.get('adaptiveSettings', {})
+                cmd.extend([
+                    '--tls.rebuild',  # Rebuild all traffic light programs
+                    '--tls.default-type', 'actuated',
+                    '--tls.min-dur', str(adaptive_settings.get('minDuration', 5)),
+                    '--tls.max-dur', str(adaptive_settings.get('maxDuration', 50))
+                ])
+                
+                # Create additional file for actuated parameters
+                self._create_actuated_additional_file(
+                    network_file.parent, 
+                    adaptive_settings
+                )
+            
+            elif method == 'add_adaptive':
+                adaptive_settings = config.get('adaptiveSettings', {})
+                speed_threshold_ms = adaptive_settings.get('speedThreshold', 50) * 0.277778  # km/h to m/s
+                
+                cmd.extend([
+                    '--tls.guess',  # Guess where to add traffic lights
+                    '--tls.guess.threshold', str(speed_threshold_ms * 5),  # SUMO uses sum of speeds
+                    '--tls.default-type', 'actuated',
+                    '--tls.min-dur', str(adaptive_settings.get('minDuration', 5)),
+                    '--tls.max-dur', str(adaptive_settings.get('maxDuration', 50))
+                ])
+                
+                # Create additional file for actuated parameters
+                self._create_actuated_additional_file(
+                    network_file.parent, 
+                    adaptive_settings
+                )
+            
+            # Execute netconvert
+            print(f"Running netconvert with command: {' '.join(cmd)}")
+            result = subprocess.run(cmd, capture_output=True, text=True, timeout=60)
+            
+            if result.returncode != 0:
+                print(f"netconvert stderr: {result.stderr}")
+                raise Exception(f"netconvert failed with return code {result.returncode}: {result.stderr}")
+            
+            # Replace original file with modified version
+            if str(network_file).endswith('.gz'):
+                # Compress the output and replace
+                with open(temp_output, 'rb') as f_in:
+                    with gzip.open(network_file, 'wb') as f_out:
+                        shutil.copyfileobj(f_in, f_out)
+                        
+                # Clean up temporary input file
+                if 'temp_input' in locals():
+                    temp_input.unlink()
+            else:
+                shutil.move(str(temp_output), str(network_file))
+            
+            print(f"Successfully applied {method} traffic control configuration")
+            
+        except subprocess.TimeoutExpired:
+            raise Exception("netconvert operation timed out")
+        except FileNotFoundError:
+            raise Exception("netconvert not found. Please ensure SUMO is properly installed and in PATH")
+        except Exception as e:
+            raise Exception(f"Failed to modify traffic lights: {str(e)}")
+        finally:
+            # Clean up temporary files
+            if temp_output.exists():
+                temp_output.unlink()
+    
+    def _create_actuated_additional_file(self, session_dir: Path, adaptive_settings: Dict[str, Any]):
+        """Create additional file with actuated traffic light parameters"""
+        additional_file = session_dir / "traffic_lights.add.xml"
+        
+        max_gap = adaptive_settings.get('maxGap', 3.0)
+        detector_gap = adaptive_settings.get('detectorGap', 2.0)
+        
+        content = f'''<?xml version="1.0" encoding="UTF-8"?>
+<additional xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+           xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/additional_file.xsd">
+    <!-- Global actuated traffic light parameters -->
+    <!-- Individual TLS configurations can be added here if needed -->
+    <!--
+    Example for specific traffic light:
+    <tlLogic id="TLS_ID" programID="actuated" type="actuated">
+        <param key="max-gap" value="{max_gap}"/>
+        <param key="detector-gap" value="{detector_gap}"/>
+        <param key="show-detectors" value="true"/>
+    </tlLogic>
+    -->
+</additional>'''
+        
+        try:
+            additional_file.write_text(content)
+            print(f"Created actuated traffic light parameters file: {additional_file}")
+        except Exception as e:
+            print(f"Warning: Could not create additional file: {e}")
     
     def _update_vehicle_types(self, session_dir: Path, enabled_vehicles: List[str]):
         """Update vehicle type configuration"""

@@ -22,6 +22,13 @@ This application provides an enterprise-grade web interface for traffic simulati
 
 ## Core Features
 
+### Adaptive Traffic Control System ⭐
+- **Traffic-Responsive Control**: Automatically prioritizes busy roads with longer green times
+- **Adaptive vs Fixed Control**: Choose between adaptive (responds to traffic demand) or fixed timing
+- **Smart Junction Enhancement**: Convert priority intersections to adaptive traffic lights
+- **Easy Configuration**: Simple UI controls with real-time parameter adjustment
+- **SUMO Native Integration**: Uses netconvert for robust, stable traffic light modification
+
 ### Multi-Session Management
 - **Concurrent Simulations**: Run multiple traffic simulations simultaneously
 - **Session Isolation**: Each session gets dedicated resources and temporary directories
