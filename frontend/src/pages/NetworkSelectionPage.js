@@ -24,9 +24,11 @@ import {
   Copy,
   Settings,
   Clock,
-  Car
+  Car,
+  Plus
 } from 'lucide-react';
 import { apiClient } from '../utils/apiClient';
+import OSMNetworkWizard from '../components/OSMNetworkWizard';
 
 const NetworkSelectionPage = ({ socket, onLoadingChange }) => {
   const navigate = useNavigate();
@@ -38,6 +40,15 @@ const NetworkSelectionPage = ({ socket, onLoadingChange }) => {
   const [copying, setCopying] = useState(false);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(false);
+  
+  // OSM Network Wizard
+  const [showOSMWizard, setShowOSMWizard] = useState(false);
+  const [successType, setSuccessType] = useState(null); // 'copy' or 'import'
+
+  // Debug logging for OSM wizard state
+  useEffect(() => {
+    console.log('OSM Wizard state changed:', showOSMWizard);
+  }, [showOSMWizard]);
   
   // Configuration from previous step
   const [sessionConfig, setSessionConfig] = useState(null);
@@ -127,6 +138,7 @@ const NetworkSelectionPage = ({ socket, onLoadingChange }) => {
       
       if (response.data.success) {
         setSuccess(true);
+        setSuccessType('copy');
         
         // Store session data for simulation
         const sessionData = {
@@ -170,6 +182,22 @@ const NetworkSelectionPage = ({ socket, onLoadingChange }) => {
     navigate('/configuration');
   };
 
+  const handleOSMNetworkAdded = (networkInfo) => {
+    // Refresh the networks list to include the newly imported network
+    loadNetworks();
+    
+    // Show success message
+    setSuccess(true);
+    setSuccessType('import');
+    setError(null);
+    
+    // Auto-hide success message after 5 seconds
+    setTimeout(() => {
+      setSuccess(false);
+      setSuccessType(null);
+    }, 5000);
+  };
+
   const NetworkCard = ({ network, isSelected, onSelect }) => (
     <div 
       className={`network-card ${isSelected ? 'selected' : ''} ${network.isOsmScenario ? 'osm-scenario' : ''}`}
@@ -183,11 +211,7 @@ const NetworkSelectionPage = ({ socket, onLoadingChange }) => {
           <div className="network-card-text">
             <h3 className="network-card-title">{network.name}</h3>
             <p className="network-card-id">ID: {network.id}</p>
-            {network.isOsmScenario && (
-              <span className="osm-badge">
-                🌍 OSM Realistic Traffic
-              </span>
-            )}
+           
           </div>
         </div>
         
@@ -246,9 +270,7 @@ const NetworkSelectionPage = ({ socket, onLoadingChange }) => {
           </div>
           {network.routeSource && (
             <div className="network-card-meta-item">
-              <span className={`route-source-badge ${network.isOsmScenario ? 'osm' : 'generated'}`}>
-                {network.routeSource}
-              </span>
+              
             </div>
           )}
         </div>
@@ -333,7 +355,12 @@ const NetworkSelectionPage = ({ socket, onLoadingChange }) => {
         {success && (
           <div className="alert alert-success mb-6">
             <CheckCircle className="w-5 h-5" />
-            <span>Network setup completed successfully! Launching simulation...</span>
+            <span>
+              {successType === 'import' 
+                ? 'OSM network imported successfully! It is now available in the networks list.'
+                : 'Network setup completed successfully! Launching simulation...'
+              }
+            </span>
           </div>
         )}
         
@@ -373,10 +400,26 @@ const NetworkSelectionPage = ({ socket, onLoadingChange }) => {
             {networks.length > 0 ? (
               <>
                 <div className="networks-header">
-                  <h2 className="networks-title">Available Networks</h2>
-                  <div className="networks-status">
-                    <CheckCircle />
-                    <span className="networks-status-text">{networks.length} networks found</span>
+                  <div className="flex items-center justify-between w-full">
+                    <div className="flex items-center space-x-4">
+                      <h2 className="networks-title">Available Networks</h2>
+                      <div className="networks-status">
+                        <CheckCircle />
+                        <span className="networks-status-text">{networks.length} networks found</span>
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => {
+                        console.log('Add New Network button clicked!');
+                        console.log('Current showOSMWizard state:', showOSMWizard);
+                        setShowOSMWizard(true);
+                        console.log('setShowOSMWizard(true) called');
+                      }}
+                      className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
+                    >
+                      <Plus className="w-4 h-4" />
+                      <span>Add New Network</span>
+                    </button>
                   </div>
                 </div>
                 
@@ -501,6 +544,13 @@ const NetworkSelectionPage = ({ socket, onLoadingChange }) => {
           </div>
         </div>
       </div>
+      
+      {/* OSM Network Creation Wizard */}
+      <OSMNetworkWizard 
+        isOpen={showOSMWizard}
+        onClose={() => setShowOSMWizard(false)}
+        onNetworkAdded={handleOSMNetworkAdded}
+      />
     </div>
   );
 };

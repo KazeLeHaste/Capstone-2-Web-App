@@ -190,6 +190,60 @@ export const formatApiError = (error) => {
   };
 };
 
+/**
+ * OSM Web Wizard Integration API Functions
+ */
+export const osmApi = {
+  /**
+   * Launch OSM Web Wizard
+   */
+  launchWizard: () => {
+    return apiClient.post('/api/osm/launch-wizard');
+  },
+
+  /**
+   * Get OSM Web Wizard status
+   */
+  getWizardStatus: () => {
+    return apiClient.get('/api/osm/wizard-status');
+  },
+
+  /**
+   * Stop OSM Web Wizard
+   */
+  stopWizard: () => {
+    return apiClient.post('/api/osm/stop-wizard');
+  },
+
+  /**
+   * Scan for new OSM scenarios
+   */
+  scanScenarios: () => {
+    return apiClient.get('/api/osm/scan-scenarios');
+  },
+
+  /**
+   * Import OSM scenario
+   * @param {Object} data - Import data
+   * @param {string} data.source_folder - Source scenario folder name
+   * @param {string} data.target_name - Target network name
+   * @param {boolean} data.enhance_diversity - Whether to enhance route diversity
+   */
+  importScenario: (data) => {
+    return apiClient.post('/api/osm/import-scenario', data);
+  },
+
+  /**
+   * Preview OSM scenario
+   * @param {string} folderName - Scenario folder name
+   */
+  previewScenario: (folderName) => {
+    return apiClient.get('/api/osm/preview-scenario', {
+      params: { folder_name: folderName }
+    });
+  }
+};
+
 // Export the configured axios instance as default
 export { apiClient };
 export default api;

@@ -8475,3 +8475,1433 @@ html.dark .session-comparison-table tr:hover {
     grid-template-columns: 1fr;
   }
 }
+
+/* =============================================================================
+   OSM Network Wizard Modal Styles
+   Comprehensive styles for the OSM Web Wizard integration modal
+   ============================================================================= */
+
+/* OSM Modal Backdrop - High z-index to ensure visibility */
+.osm-modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 9999;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+/* Dark mode backdrop */
+html.dark .osm-modal-backdrop {
+  background-color: rgba(0, 0, 0, 0.7);
+}
+
+/* OSM Modal Container */
+.osm-modal-container {
+  background-color: var(--bg-primary);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  max-width: 64rem; /* 4xl */
+  width: 100%;
+  max-height: 90vh;
+  overflow: hidden;
+  border: 1px solid var(--border-color);
+}
+
+/* Dark mode container */
+html.dark .osm-modal-container {
+  background-color: var(--bg-secondary);
+  border-color: var(--border-hover);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+}
+
+/* OSM Modal Header */
+.osm-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.5rem;
+  border-bottom: 1px solid var(--border-color);
+  background-color: var(--bg-primary);
+}
+
+html.dark .osm-modal-header {
+  border-bottom-color: var(--border-hover);
+  background-color: var(--bg-secondary);
+}
+
+.osm-modal-header-content {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.osm-modal-icon-container {
+  width: 2rem;
+  height: 2rem;
+  background-color: var(--color-primary-50);
+  border-radius: var(--radius-lg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+html.dark .osm-modal-icon-container {
+  background-color: rgba(59, 130, 246, 0.1);
+}
+
+.osm-modal-icon {
+  width: 1rem;
+  height: 1rem;
+  color: var(--primary-color);
+}
+
+.osm-modal-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+html.dark .osm-modal-title {
+  color: var(--dark-text-primary);
+}
+
+.osm-modal-subtitle {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+html.dark .osm-modal-subtitle {
+  color: var(--dark-text-secondary);
+}
+
+.osm-modal-close-button {
+  padding: 0.5rem;
+  background-color: transparent;
+  border: none;
+  border-radius: var(--radius-lg);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+
+.osm-modal-close-button:hover {
+  background-color: var(--bg-tertiary);
+}
+
+html.dark .osm-modal-close-button:hover {
+  background-color: var(--dark-bg-tertiary);
+}
+
+/* Step Indicator */
+.osm-step-indicator {
+  padding: 0 1.5rem;
+  padding-top: 1.5rem;
+}
+
+.osm-step-indicator-list {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.osm-step-indicator-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+  position: relative;
+}
+
+.osm-step-indicator-item:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  top: 1rem;
+  left: 60%;
+  right: -40%;
+  height: 2px;
+  background-color: var(--border-color);
+  z-index: 1;
+}
+
+html.dark .osm-step-indicator-item:not(:last-child)::after {
+  background-color: var(--dark-border-color);
+}
+
+.osm-step-indicator-item.active:not(:last-child)::after,
+.osm-step-indicator-item.completed:not(:last-child)::after {
+  background-color: var(--primary-color);
+}
+
+.osm-step-number {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.875rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  z-index: 2;
+  position: relative;
+  background-color: var(--bg-tertiary);
+  color: var(--text-secondary);
+  border: 2px solid var(--border-color);
+}
+
+.osm-step-indicator-item.active .osm-step-number {
+  background-color: var(--primary-color);
+  color: white;
+  border-color: var(--primary-color);
+}
+
+.osm-step-indicator-item.completed .osm-step-number {
+  background-color: var(--success-color);
+  color: white;
+  border-color: var(--success-color);
+}
+
+html.dark .osm-step-number {
+  background-color: var(--dark-bg-tertiary);
+  color: var(--dark-text-secondary);
+  border-color: var(--dark-border-color);
+}
+
+.osm-step-title {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  text-align: center;
+  margin: 0;
+}
+
+.osm-step-indicator-item.active .osm-step-title {
+  color: var(--primary-color);
+  font-weight: 600;
+}
+
+html.dark .osm-step-title {
+  color: var(--dark-text-secondary);
+}
+
+html.dark .osm-step-indicator-item.active .osm-step-title {
+  color: var(--primary-color);
+}
+
+.osm-step-subtitle {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  text-align: center;
+  margin: 0;
+  margin-top: 0.25rem;
+}
+
+html.dark .osm-step-subtitle {
+  color: var(--dark-text-muted);
+}
+
+/* OSM Modal Content */
+.osm-modal-content {
+  padding: 0 1.5rem 1.5rem;
+  overflow-y: auto;
+  max-height: calc(90vh - 200px);
+}
+
+/* Error Alert */
+.osm-error-alert {
+  margin-bottom: 1.5rem;
+  background-color: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: var(--radius-lg);
+  padding: 1rem;
+}
+
+html.dark .osm-error-alert {
+  background-color: rgba(239, 68, 68, 0.1);
+  border-color: rgba(239, 68, 68, 0.3);
+}
+
+.osm-error-content {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+
+.osm-error-icon {
+  width: 1.25rem;
+  height: 1.25rem;
+  color: #dc2626;
+  margin-top: 0.125rem;
+  flex-shrink: 0;
+}
+
+.osm-error-text {
+  font-size: 0.875rem;
+  color: #7f1d1d;
+  margin: 0;
+}
+
+html.dark .osm-error-text {
+  color: #fca5a5;
+}
+
+/* Wizard Status Sections */
+.osm-status-section {
+  margin-bottom: 1.5rem;
+}
+
+.osm-status-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.osm-status-icon {
+  width: 1.5rem;
+  height: 1.5rem;
+  color: var(--success-color);
+}
+
+.osm-status-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+html.dark .osm-status-title {
+  color: var(--dark-text-primary);
+}
+
+.osm-status-description {
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+html.dark .osm-status-description {
+  color: var(--dark-text-secondary);
+}
+
+/* Success Alert */
+.osm-success-alert {
+  background-color: var(--success-bg);
+  border: 1px solid var(--success-border);
+  border-radius: var(--radius-lg);
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+
+html.dark .osm-success-alert {
+  background-color: rgba(34, 197, 94, 0.1);
+  border-color: rgba(34, 197, 94, 0.3);
+}
+
+.osm-success-content {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+
+.osm-success-icon {
+  width: 1.25rem;
+  height: 1.25rem;
+  color: var(--success-color);
+  margin-top: 0.125rem;
+  flex-shrink: 0;
+}
+
+.osm-success-text {
+  font-size: 0.875rem;
+  color: var(--success-text);
+  margin: 0;
+}
+
+html.dark .osm-success-text {
+  color: #4ade80;
+}
+
+.osm-success-link {
+  color: var(--success-text);
+  text-decoration: underline;
+}
+
+.osm-success-link:hover {
+  text-decoration: none;
+}
+
+html.dark .osm-success-link {
+  color: #4ade80;
+}
+
+.osm-success-directory {
+  font-size: 0.75rem;
+  color: var(--success-text-dark);
+  margin-top: 0.25rem;
+  margin: 0;
+}
+
+html.dark .osm-success-directory {
+  color: #22c55e;
+}
+
+/* Info Alert */
+.osm-info-alert {
+  background-color: var(--info-bg);
+  border: 1px solid var(--info-border);
+  border-radius: var(--radius-lg);
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+
+html.dark .osm-info-alert {
+  background-color: rgba(59, 130, 246, 0.1);
+  border-color: rgba(59, 130, 246, 0.3);
+}
+
+.osm-info-content {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+
+.osm-info-icon {
+  width: 1.25rem;
+  height: 1.25rem;
+  color: var(--info-color);
+  margin-top: 0.125rem;
+  flex-shrink: 0;
+}
+
+.osm-info-title {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--info-text);
+  margin: 0 0 0.5rem 0;
+}
+
+html.dark .osm-info-title {
+  color: #60a5fa;
+}
+
+.osm-info-list {
+  font-size: 0.875rem;
+  color: var(--info-text);
+  margin: 0;
+  padding-left: 1rem;
+}
+
+html.dark .osm-info-list {
+  color: #60a5fa;
+}
+
+.osm-info-list li {
+  margin-bottom: 0.25rem;
+}
+
+/* Warning Alert */
+.osm-warning-alert {
+  background-color: var(--bg-warning);
+  border: 1px solid var(--border-warning);
+  border-radius: var(--radius-lg);
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+
+html.dark .osm-warning-alert {
+  background-color: rgba(245, 158, 11, 0.1);
+  border-color: rgba(245, 158, 11, 0.3);
+}
+
+.osm-warning-content {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+
+.osm-warning-icon {
+  width: 1.25rem;
+  height: 1.25rem;
+  color: var(--warning-color);
+  margin-top: 0.125rem;
+  flex-shrink: 0;
+}
+
+.osm-warning-title {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-warning);
+  margin: 0 0 0.25rem 0;
+}
+
+html.dark .osm-warning-title {
+  color: #fbbf24;
+}
+
+.osm-warning-text {
+  font-size: 0.875rem;
+  color: var(--text-warning);
+  margin: 0;
+}
+
+html.dark .osm-warning-text {
+  color: #fbbf24;
+}
+
+/* Wizard Status Indicator */
+.osm-wizard-status {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.osm-status-indicator {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.osm-status-indicator.running {
+  color: var(--success-color);
+}
+
+.osm-status-indicator.stopped {
+  color: var(--text-secondary);
+}
+
+html.dark .osm-status-indicator.stopped {
+  color: var(--dark-text-secondary);
+}
+
+.osm-status-dot {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+}
+
+.osm-status-dot.running {
+  background-color: var(--success-color);
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.osm-status-dot.stopped {
+  background-color: var(--color-gray-300);
+}
+
+html.dark .osm-status-dot.stopped {
+  background-color: #6b7280;
+}
+
+.osm-status-text {
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+/* OSM Modal Footer */
+.osm-modal-footer {
+  padding: 1rem 1.5rem;
+  border-top: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: var(--bg-primary);
+}
+
+html.dark .osm-modal-footer {
+  border-top-color: var(--border-hover);
+  background-color: var(--bg-secondary);
+}
+
+.osm-footer-left {
+  display: flex;
+  align-items: center;
+}
+
+.osm-footer-right {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+/* OSM Buttons */
+.osm-button {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius-lg);
+  font-size: 0.875rem;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+  transition: var(--transition-fast);
+  text-decoration: none;
+}
+
+.osm-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.osm-button.back {
+  color: var(--text-primary);
+  background-color: transparent;
+}
+
+.osm-button.back:hover:not(:disabled) {
+  background-color: var(--bg-tertiary);
+}
+
+.osm-button.back:disabled {
+  color: var(--text-muted);
+}
+
+html.dark .osm-button.back {
+  color: var(--dark-text-primary);
+}
+
+html.dark .osm-button.back:hover:not(:disabled) {
+  background-color: var(--dark-bg-tertiary);
+}
+
+html.dark .osm-button.back:disabled {
+  color: var(--dark-text-muted);
+}
+
+.osm-button.primary {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+.osm-button.primary:hover:not(:disabled) {
+  background-color: var(--primary-hover);
+}
+
+.osm-button.secondary {
+  background-color: var(--color-gray-300);
+  color: var(--text-primary);
+}
+
+.osm-button.secondary:hover:not(:disabled) {
+  background-color: var(--border-hover);
+}
+
+html.dark .osm-button.secondary {
+  background-color: #6b7280;
+  color: var(--dark-text-primary);
+}
+
+html.dark .osm-button.secondary:hover:not(:disabled) {
+  background-color: #9ca3af;
+}
+
+.osm-button.success {
+  background-color: var(--success-color);
+  color: white;
+  padding: 0.75rem 2rem;
+  font-size: 1.125rem;
+  font-weight: 600;
+  box-shadow: var(--shadow-lg);
+}
+
+.osm-button.success:hover:not(:disabled) {
+  background-color: var(--success-hover);
+}
+
+.osm-button.danger {
+  color: #dc2626;
+  background-color: transparent;
+}
+
+.osm-button.danger:hover:not(:disabled) {
+  background-color: #fef2f2;
+}
+
+html.dark .osm-button.danger:hover:not(:disabled) {
+  background-color: rgba(239, 68, 68, 0.1);
+}
+
+.osm-button.open-wizard {
+  background-color: var(--primary-color);
+  color: white;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.osm-button.open-wizard:hover:not(:disabled) {
+  background-color: var(--primary-hover);
+}
+
+/* Responsive Design for OSM Modal */
+@media (max-width: 768px) {
+  .osm-modal-backdrop {
+    padding: 0.5rem;
+  }
+  
+  .osm-modal-container {
+    max-width: calc(100vw - 1rem);
+    max-height: calc(100vh - 1rem);
+  }
+  
+  .osm-modal-header {
+    padding: 1rem;
+  }
+  
+  .osm-modal-title {
+    font-size: 1.125rem;
+  }
+  
+  .osm-modal-content {
+    padding: 0 1rem 1rem;
+  }
+  
+  .osm-modal-footer {
+    padding: 1rem;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .osm-footer-left,
+  .osm-footer-right {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .osm-step-indicator {
+    padding: 0 1rem;
+    padding-top: 1rem;
+  }
+  
+  .osm-step-indicator-list {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .osm-step-indicator-item:not(:last-child)::after {
+    display: none;
+  }
+  
+  .osm-button.success {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+/* OSM Wizard Animation */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: .5;
+  }
+}
+
+/* =============================================================================
+   OSM Instructions Component Styles
+   Detailed styling for the OSM wizard instructions step
+   ============================================================================= */
+
+.osm-instructions-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.osm-instructions-header {
+  text-align: center;
+}
+
+.osm-instructions-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 0.5rem 0;
+}
+
+html.dark .osm-instructions-title {
+  color: var(--dark-text-primary);
+}
+
+.osm-instructions-description {
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+html.dark .osm-instructions-description {
+  color: var(--dark-text-secondary);
+}
+
+/* Wizard Status Alert */
+.osm-wizard-status-alert {
+  background-color: var(--success-bg);
+  border: 1px solid var(--success-border);
+  border-radius: var(--radius-lg);
+  padding: 1rem;
+}
+
+html.dark .osm-wizard-status-alert {
+  background-color: rgba(34, 197, 94, 0.1);
+  border-color: rgba(34, 197, 94, 0.3);
+}
+
+.osm-wizard-status-content {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.osm-wizard-status-icon {
+  width: 1.25rem;
+  height: 1.25rem;
+  color: var(--success-color);
+  flex-shrink: 0;
+}
+
+.osm-wizard-status-text {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--success-text);
+  margin: 0;
+}
+
+html.dark .osm-wizard-status-text {
+  color: #4ade80;
+}
+
+.osm-wizard-status-subtext {
+  font-size: 0.75rem;
+  color: var(--success-text-dark);
+  margin: 0;
+}
+
+html.dark .osm-wizard-status-subtext {
+  color: #22c55e;
+}
+
+/* Instructions Grid */
+.osm-instructions-grid {
+  display: grid;
+  gap: 1rem;
+}
+
+.osm-instruction-card {
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 1rem;
+  background-color: var(--bg-primary);
+}
+
+html.dark .osm-instruction-card {
+  border-color: var(--border-hover);
+  background-color: var(--bg-secondary);
+}
+
+.osm-instruction-content {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.osm-instruction-icon-container {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: var(--radius-lg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.osm-instruction-icon-container.step-1 {
+  background-color: #fef3c7;
+  color: #d97706;
+}
+
+html.dark .osm-instruction-icon-container.step-1 {
+  background-color: rgba(217, 119, 6, 0.1);
+  color: #fbbf24;
+}
+
+.osm-instruction-icon-container.step-2 {
+  background-color: #dbeafe;
+  color: #2563eb;
+}
+
+html.dark .osm-instruction-icon-container.step-2 {
+  background-color: rgba(37, 99, 235, 0.1);
+  color: #60a5fa;
+}
+
+.osm-instruction-icon-container.step-3 {
+  background-color: #dcfce7;
+  color: #16a34a;
+}
+
+html.dark .osm-instruction-icon-container.step-3 {
+  background-color: rgba(22, 163, 74, 0.1);
+  color: #4ade80;
+}
+
+.osm-instruction-icon-container.step-4 {
+  background-color: #f3e8ff;
+  color: #9333ea;
+}
+
+html.dark .osm-instruction-icon-container.step-4 {
+  background-color: rgba(147, 51, 234, 0.1);
+  color: #c084fc;
+}
+
+.osm-instruction-icon {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+.osm-instruction-details {
+  flex: 1;
+}
+
+.osm-instruction-title {
+  font-weight: 500;
+  color: var(--text-primary);
+  margin: 0 0 0.25rem 0;
+}
+
+html.dark .osm-instruction-title {
+  color: var(--dark-text-primary);
+}
+
+.osm-instruction-description {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  margin: 0 0 0.75rem 0;
+}
+
+html.dark .osm-instruction-description {
+  color: var(--dark-text-secondary);
+}
+
+.osm-instruction-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.osm-instruction-list-item {
+  font-size: 0.875rem;
+  color: var(--text-primary);
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+
+html.dark .osm-instruction-list-item {
+  color: var(--dark-text-primary);
+}
+
+.osm-instruction-bullet {
+  display: inline-block;
+  width: 0.25rem;
+  height: 0.25rem;
+  background-color: var(--color-gray-300);
+  border-radius: 50%;
+  margin-top: 0.5rem;
+  flex-shrink: 0;
+}
+
+html.dark .osm-instruction-bullet {
+  background-color: #6b7280;
+}
+
+/* Tips Grid */
+.osm-tips-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1rem;
+}
+
+/* Launch Button Section */
+.osm-launch-section {
+  text-align: center;
+  padding: 1.5rem 0;
+}
+
+.osm-launch-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 2rem;
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  border-radius: var(--radius-lg);
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition-fast);
+  box-shadow: var(--shadow-md);
+  text-decoration: none;
+}
+
+.osm-launch-button:hover:not(:disabled) {
+  background-color: var(--primary-hover);
+  box-shadow: var(--shadow-lg);
+}
+
+.osm-launch-button:disabled {
+  background-color: var(--color-gray-300);
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+html.dark .osm-launch-button:disabled {
+  background-color: #6b7280;
+}
+
+.osm-launch-icon {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+.osm-loading-spinner {
+  width: 1rem;
+  height: 1rem;
+  border: 2px solid transparent;
+  border-top: 2px solid currentColor;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Responsive Design for Instructions */
+@media (max-width: 768px) {
+  .osm-instructions-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .osm-tips-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .osm-instruction-content {
+    gap: 0.75rem;
+  }
+  
+  .osm-instruction-icon-container {
+    width: 2rem;
+    height: 2rem;
+  }
+  
+  .osm-instruction-icon {
+    width: 1rem;
+    height: 1rem;
+  }
+  
+  .osm-launch-button {
+    padding: 0.75rem 1.5rem;
+    font-size: 0.875rem;
+  }
+}
+
+.osm-wizard-note {
+  margin-top: 0.5rem !important;
+}
+
+.osm-link-button {
+  background: none !important;
+  border: none !important;
+  padding: 0 !important;
+  cursor: pointer;
+  font-size: inherit;
+  text-decoration: underline;
+}
+
+/* =============================================================================
+   OSM Scenario Scanner Component Styles
+   Styling for the scenario scanning and import step
+   ============================================================================= */
+
+.osm-scanner-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.osm-scanner-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.osm-scanner-title-section h3 {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+html.dark .osm-scanner-title-section h3 {
+  color: var(--dark-text-primary);
+}
+
+.osm-scanner-title-section p {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+html.dark .osm-scanner-title-section p {
+  color: var(--dark-text-secondary);
+}
+
+.osm-scanner-refresh-button {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-color);
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+
+.osm-scanner-refresh-button:hover:not(:disabled) {
+  border-color: var(--border-hover);
+  background-color: var(--bg-tertiary);
+}
+
+.osm-scanner-refresh-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+html.dark .osm-scanner-refresh-button {
+  border-color: var(--border-hover);
+  background-color: var(--bg-secondary);
+  color: var(--dark-text-primary);
+}
+
+html.dark .osm-scanner-refresh-button:hover:not(:disabled) {
+  background-color: var(--dark-bg-tertiary);
+}
+
+.osm-scanner-refresh-icon {
+  width: 1rem;
+  height: 1rem;
+}
+
+.osm-scanner-refresh-icon.spinning {
+  animation: spin 1s linear infinite;
+}
+
+/* Loading State */
+.osm-scanner-loading {
+  text-align: center;
+  padding: 2rem 0;
+}
+
+.osm-scanner-loading-icon {
+  width: 2rem;
+  height: 2rem;
+  color: var(--primary-color);
+  margin: 0 auto;
+  animation: spin 1s linear infinite;
+}
+
+.osm-scanner-loading-text {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  margin-top: 0.5rem;
+  margin-bottom: 0;
+}
+
+html.dark .osm-scanner-loading-text {
+  color: var(--dark-text-secondary);
+}
+
+/* Empty State */
+.osm-scanner-empty {
+  text-align: center;
+  padding: 3rem 0;
+  background-color: var(--bg-secondary);
+  border-radius: var(--radius-lg);
+}
+
+html.dark .osm-scanner-empty {
+  background-color: var(--dark-bg-tertiary);
+}
+
+.osm-scanner-empty-icon {
+  width: 3rem;
+  height: 3rem;
+  color: var(--color-gray-300);
+  margin: 0 auto 1rem;
+}
+
+html.dark .osm-scanner-empty-icon {
+  color: #6b7280;
+}
+
+.osm-scanner-empty-title {
+  font-size: 1.125rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  margin: 0 0 0.5rem 0;
+}
+
+html.dark .osm-scanner-empty-title {
+  color: var(--dark-text-primary);
+}
+
+.osm-scanner-empty-description {
+  color: var(--text-secondary);
+  margin: 0 0 1rem 0;
+}
+
+html.dark .osm-scanner-empty-description {
+  color: var(--dark-text-secondary);
+}
+
+.osm-scanner-empty-list {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  max-width: 24rem;
+  margin-left: auto;
+  margin-right: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+html.dark .osm-scanner-empty-list {
+  color: var(--dark-text-secondary);
+}
+
+/* Scenarios List */
+.osm-scenarios-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.osm-scenario-card {
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 1rem;
+  background-color: var(--bg-primary);
+  transition: var(--transition-fast);
+}
+
+.osm-scenario-card:hover {
+  border-color: var(--border-hover);
+}
+
+html.dark .osm-scenario-card {
+  border-color: var(--border-hover);
+  background-color: var(--bg-secondary);
+}
+
+html.dark .osm-scenario-card:hover {
+  border-color: var(--color-gray-300);
+}
+
+/* Import Modal Specific Styles */
+.osm-import-modal {
+  max-width: 28rem;
+}
+
+/* Responsive Design for Scanner */
+@media (max-width: 768px) {
+  .osm-scanner-header {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: stretch;
+  }
+  
+  .osm-scanner-refresh-button {
+    justify-content: center;
+  }
+  
+  .osm-scanner-empty {
+    padding: 2rem 1rem;
+  }
+  
+  .osm-scanner-empty-icon {
+    width: 2rem;
+    height: 2rem;
+  }
+  
+  .osm-import-modal {
+    max-width: calc(100vw - 2rem);
+  }
+}
+
+/* =============================================================================
+   OSM Form Input Styles
+   Proper form styling with dark mode support for OSM wizard components
+   ============================================================================= */
+
+/* Form Labels */
+.osm-form-label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  margin-bottom: 0.25rem;
+}
+
+html.dark .osm-form-label {
+  color: var(--dark-text-primary);
+}
+
+/* Text Inputs */
+.osm-form-input {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  font-size: 0.875rem;
+  transition: var(--transition-fast);
+}
+
+.osm-form-input:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+}
+
+.osm-form-input::placeholder {
+  color: var(--text-muted);
+}
+
+/* Dark mode input styling */
+html.dark .osm-form-input {
+  background-color: var(--bg-tertiary);
+  border-color: var(--border-color);
+  color: var(--text-primary);
+}
+
+html.dark .osm-form-input:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.2);
+}
+
+html.dark .osm-form-input::placeholder {
+  color: var(--text-muted);
+}
+
+/* Checkboxes */
+.osm-form-checkbox {
+  width: 1rem;
+  height: 1rem;
+  accent-color: var(--primary-color);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  background-color: var(--bg-primary);
+}
+
+.osm-form-checkbox:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+}
+
+html.dark .osm-form-checkbox {
+  border-color: var(--border-color);
+  background-color: var(--bg-tertiary);
+}
+
+html.dark .osm-form-checkbox:focus {
+  box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.2);
+}
+
+/* Form Help Text */
+.osm-form-help {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  margin-top: 0.25rem;
+  margin-bottom: 0;
+}
+
+html.dark .osm-form-help {
+  color: var(--text-secondary);
+}
+
+/* Checkbox Container */
+.osm-checkbox-container {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.osm-checkbox-label {
+  font-size: 0.875rem;
+  color: var(--text-primary);
+  margin: 0;
+  cursor: pointer;
+}
+
+html.dark .osm-checkbox-label {
+  color: var(--text-primary);
+}
+
+/* Source Scenario Display */
+.osm-source-scenario {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  background-color: var(--bg-secondary);
+  border-radius: var(--radius-md);
+  padding: 0.5rem;
+  border: 1px solid var(--border-color);
+}
+
+html.dark .osm-source-scenario {
+  color: var(--text-secondary);
+  background-color: var(--bg-tertiary);
+  border-color: var(--border-color);
+}
+
+.osm-source-scenario-name {
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+html.dark .osm-source-scenario-name {
+  color: var(--text-primary);
+}
+
+.osm-source-scenario-meta {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+html.dark .osm-source-scenario-meta {
+  color: var(--text-muted);
+}

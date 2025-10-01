@@ -746,15 +746,6 @@ const AnalyticsPage = ({ socket, simulationData, simulationStatus }) => {
           }}
         />
       )}
-      
-      {/* Debug info */}
-      {process.env.NODE_ENV === 'development' && (
-        <div style={{ position: 'fixed', bottom: '10px', right: '10px', background: 'rgba(0,0,0,0.8)', color: 'white', padding: '10px', fontSize: '12px' }}>
-          <div>showSessionComparison: {showSessionComparison.toString()}</div>
-          <div>selectedSessions: {selectedSessionsForComparison.length}</div>
-          <div>canStartComparison: {canStartComparison.toString()}</div>
-        </div>
-      )}
     </div>
   );
 };

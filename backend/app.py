@@ -51,6 +51,14 @@ enhanced_session_manager = EnhancedSessionManager(
     websocket_handler=websocket_handler
 )
 
+# Initialize OSM service for network creation
+from osm_service import OSMService
+osm_service = OSMService(
+    osm_scenarios_dir="osm_importer/osm_scenarios",
+    target_networks_dir="networks",
+    db_service=db_service
+)
+
 # Add request logging
 @app.before_request
 def log_request_info():
@@ -1498,17 +1506,156 @@ def get_resource_usage_v2():
 # END NEW SIMULATION WORKFLOW ENDPOINTS
 # ============================================================================
 
+# ============================================================================
+# OSM WEB WIZARD INTEGRATION ENDPOINTS
+# ============================================================================
+
+@app.route('/api/osm/launch-wizard', methods=['POST'])
+def launch_osm_wizard():
+    """Launch OSM Web Wizard in osm_scenarios directory"""
+    try:
+        result = osm_service.launch_osm_wizard()
+        
+        if result['success']:
+            return jsonify(result)
+        else:
+            return jsonify(result), 500
+            
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': f'Failed to launch OSM Web Wizard: {str(e)}'
+        }), 500
+
+@app.route('/api/osm/wizard-status', methods=['GET'])
+def get_wizard_status():
+    """Check if OSM Web Wizard is currently running"""
+    try:
+        status = osm_service.get_wizard_status()
+        return jsonify({
+            'success': True,
+            'status': status
+        })
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': f'Failed to get wizard status: {str(e)}'
+        }), 500
+
+@app.route('/api/osm/stop-wizard', methods=['POST'])
+def stop_osm_wizard():
+    """Stop the OSM Web Wizard process"""
+    try:
+        result = osm_service.stop_wizard()
+        return jsonify(result)
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': f'Failed to stop wizard: {str(e)}'
+        }), 500
+
+@app.route('/api/osm/scan-scenarios', methods=['GET'])
+def scan_new_scenarios():
+    """Scan for new unprocessed OSM scenarios"""
+    try:
+        result = osm_service.scan_new_scenarios()
+        return jsonify(result)
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': f'Failed to scan scenarios: {str(e)}',
+            'scenarios': []
+        }), 500
+
+@app.route('/api/osm/import-scenario', methods=['POST'])
+def import_osm_scenario():
+    """Import selected OSM scenario with custom name"""
+    try:
+        data = request.get_json()
+        
+        # Validate required fields
+        if not data or 'source_folder' not in data or 'target_name' not in data:
+            return jsonify({
+                'success': False,
+                'error': 'Missing required fields: source_folder and target_name'
+            }), 400
+        
+        source_folder = data['source_folder']
+        target_name = data['target_name']
+        enhance_diversity = data.get('enhance_diversity', False)
+        
+        # Validate target name (basic sanitization)
+        if not target_name or not target_name.replace('_', '').replace('-', '').isalnum():
+            return jsonify({
+                'success': False,
+                'error': 'Target name must contain only letters, numbers, hyphens, and underscores'
+            }), 400
+        
+        result = osm_service.import_scenario(source_folder, target_name, enhance_diversity)
+        
+        if result['success']:
+            # Emit network import event via WebSocket
+            socketio.emit('network_imported', {
+                'network_name': target_name,
+                'source': source_folder,
+                'timestamp': datetime.now().isoformat()
+            })
+            
+            return jsonify(result)
+        else:
+            return jsonify(result), 500
+            
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': f'Failed to import scenario: {str(e)}'
+        }), 500
+
+@app.route('/api/osm/preview-scenario', methods=['GET'])
+def preview_scenario():
+    """Get detailed preview of a specific scenario"""
+    try:
+        folder_name = request.args.get('folder_name')
+        if not folder_name:
+            return jsonify({
+                'success': False,
+                'error': 'Missing folder_name parameter'
+            }), 400
+        
+        result = osm_service.preview_scenario(folder_name)
+        return jsonify(result)
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': f'Failed to preview scenario: {str(e)}'
+        }), 500
+
+# ============================================================================
+# END OSM WEB WIZARD INTEGRATION ENDPOINTS
+# ============================================================================
+
 if __name__ == '__main__':
     print("Starting Traffic Simulator Backend...")
     print("Backend API: http://localhost:5000")
     print("WebSocket: ws://localhost:5000")
     print("Make sure SUMO is installed and accessible from PATH")
     
-    # Start Flask-SocketIO server
-    socketio.run(
-        app,
-        host='0.0.0.0',
-        port=5000,
-        debug=True,
-        allow_unsafe_werkzeug=True
-    )
+    try:
+        # Start Flask-SocketIO server
+        socketio.run(
+            app,
+            host='0.0.0.0',
+            port=5000,
+            debug=True,
+            allow_unsafe_werkzeug=True
+        )
+    finally:
+        # Cleanup OSM service on shutdown
+        try:
+            osm_service.cleanup_wizard()
+        except:
+            pass
