@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!-- generated on 2025-09-17 21:32:50.636824 by randomTrips.py v1_24_0+0000-b72eb3fabc8
+<!-- generated on 2025-10-02 19:16:46.790839 by randomTrips.py v1_24_0+0000-b72eb3fabc8
 <configuration>
     <net-file value="osm.net.xml.gz"/>
     <output-trip-file value="osm.truck.trips.xml"/>
@@ -20,7 +20,7 @@
 </configuration>
 -->
 
-<!-- generated on 2025-09-17 21:32:50 by Eclipse SUMO duarouter Version 1.24.0
+<!-- generated on 2025-10-02 19:16:46 by Eclipse SUMO duarouter Version 1.24.0
 <duarouterConfiguration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/duarouterConfiguration.xsd">
 
     <input>
@@ -52,107 +52,4 @@
 -->
 
 <routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/routes_file.xsd">
-    <vType id="truck_truck" vClass="truck"/>
-    <vehicle id="truck0" type="truck_truck" depart="0.00" departLane="best" departSpeed="max">
-        <route edges="1054315844#0 555020953#0 653727191#0 -653727191#1 -712245744#1 -564298126#9"/>
-    </vehicle>
-    <vehicle id="truck1" type="truck_truck" depart="106.89" departLane="best" departSpeed="max">
-        <route edges="-1392084250 -653727191#1 -712245744#1 -564298126#9 1392084244#0 712245744#0 653727191#0 653727192"/>
-    </vehicle>
-    <vehicle id="truck2" type="truck_truck" depart="213.78" departLane="best" departSpeed="max">
-        <route edges="1054315844#0 555020953#0 653727191#0 -653727191#1 -712245744#1 -564298126#9"/>
-    </vehicle>
-    <vehicle id="truck3" type="truck_truck" depart="320.67" departLane="best" departSpeed="max">
-        <route edges="1392084244#0 712245744#0 653727191#0 -653727191#1 -712245744#1 -564298126#9"/>
-    </vehicle>
-    <vehicle id="truck4" type="truck_truck" depart="427.57" departLane="best" departSpeed="max">
-        <route edges="-1392084250 -653727191#1 -712245744#1 -564298126#9 1392084244#0 712245744#0 653727191#0 653727192"/>
-    </vehicle>
-    <vehicle id="truck5" type="truck_truck" depart="534.46" departLane="best" departSpeed="max">
-        <route edges="1054315844#0 555020953#0 653727191#0 -653727191#1 -712245744#1 -564298126#9"/>
-    </vehicle>
-    <vehicle id="truck6" type="truck_truck" depart="641.35" departLane="best" departSpeed="max">
-        <route edges="-1392084250 -653727191#1 -712245744#1 -564298126#9 1392084244#0 712245744#0 653727191#0 653727192"/>
-    </vehicle>
-    <vehicle id="truck7" type="truck_truck" depart="748.24" departLane="best" departSpeed="max">
-        <route edges="1392084244#0 712245744#0 -712245744#1 -564298126#9"/>
-    </vehicle>
-    <vehicle id="truck8" type="truck_truck" depart="855.13" departLane="best" departSpeed="max">
-        <route edges="1392084244#0 712245744#0 653727191#0 -653727191#1 1054315845#0"/>
-    </vehicle>
-    <vehicle id="truck9" type="truck_truck" depart="962.02" departLane="best" departSpeed="max">
-        <route edges="1054315844#0 555020953#0 653727191#0 -653727191#1 -712245744#1 -564298126#9"/>
-    </vehicle>
-    <vehicle id="truck10" type="truck_truck" depart="1068.92" departLane="best" departSpeed="max">
-        <route edges="1392084244#0 712245744#0 -712245744#1 -564298126#9"/>
-    </vehicle>
-    <vehicle id="truck11" type="truck_truck" depart="1175.81" departLane="best" departSpeed="max">
-        <route edges="-1392084250 -653727191#1 -712245744#1 -564298126#9 1392084244#0 712245744#0 653727191#0 653727192"/>
-    </vehicle>
-    <vehicle id="truck12" type="truck_truck" depart="1282.70" departLane="best" departSpeed="max">
-        <route edges="-1392084250 -653727191#1 -712245744#1 -564298126#9 1392084244#0 712245744#0 653727191#0 653727192"/>
-    </vehicle>
-    <vehicle id="truck13" type="truck_truck" depart="1389.59" departLane="best" departSpeed="max">
-        <route edges="-1392084250 -653727191#1 -712245744#1 -564298126#9 1392084244#0 712245744#0 653727191#0 653727192"/>
-    </vehicle>
-    <vehicle id="truck14" type="truck_truck" depart="1496.48" departLane="best" departSpeed="max">
-        <route edges="-1392084250 -653727191#1 -712245744#1 -564298126#9 1392084244#0 712245744#0 653727191#0 653727192"/>
-    </vehicle>
-    <vehicle id="truck15" type="truck_truck" depart="1603.37" departLane="best" departSpeed="max">
-        <route edges="1392084244#0 712245744#0 653727191#0 -653727191#1 -712245744#1 -564298126#9"/>
-    </vehicle>
-    <vehicle id="truck16" type="truck_truck" depart="1710.27" departLane="best" departSpeed="max">
-        <route edges="1392084244#0 712245744#0 -712245744#1 -564298126#9"/>
-    </vehicle>
-    <vehicle id="truck17" type="truck_truck" depart="1817.16" departLane="best" departSpeed="max">
-        <route edges="1392084244#0 712245744#0 653727191#0 -653727191#1 1054315845#0"/>
-    </vehicle>
-    <vehicle id="truck18" type="truck_truck" depart="1924.05" departLane="best" departSpeed="max">
-        <route edges="1392084244#0 712245744#0 653727191#0 -653727191#1 -712245744#1 -564298126#9"/>
-    </vehicle>
-    <vehicle id="truck19" type="truck_truck" depart="2030.94" departLane="best" departSpeed="max">
-        <route edges="1054315844#0 555020953#0 653727191#0 -653727191#1 -712245744#1 -564298126#9"/>
-    </vehicle>
-    <vehicle id="truck20" type="truck_truck" depart="2137.83" departLane="best" departSpeed="max">
-        <route edges="1392084244#0 712245744#0 653727191#0 -653727191#1 -712245744#1 -564298126#9"/>
-    </vehicle>
-    <vehicle id="truck21" type="truck_truck" depart="2244.72" departLane="best" departSpeed="max">
-        <route edges="1392084244#0 712245744#0 653727191#0 -653727191#1 -712245744#1 -564298126#9"/>
-    </vehicle>
-    <vehicle id="truck22" type="truck_truck" depart="2351.62" departLane="best" departSpeed="max">
-        <route edges="1392084244#0 712245744#0 653727191#0 -653727191#1 1054315845#0"/>
-    </vehicle>
-    <vehicle id="truck23" type="truck_truck" depart="2458.51" departLane="best" departSpeed="max">
-        <route edges="-1392084250 -653727191#1 -712245744#1 -564298126#9 1392084244#0 712245744#0 653727191#0 653727192"/>
-    </vehicle>
-    <vehicle id="truck24" type="truck_truck" depart="2565.40" departLane="best" departSpeed="max">
-        <route edges="1392084244#0 712245744#0 653727191#0 -653727191#1 -712245744#1 -564298126#9"/>
-    </vehicle>
-    <vehicle id="truck25" type="truck_truck" depart="2672.29" departLane="best" departSpeed="max">
-        <route edges="1392084244#0 712245744#0 -712245744#1 -564298126#9"/>
-    </vehicle>
-    <vehicle id="truck26" type="truck_truck" depart="2779.18" departLane="best" departSpeed="max">
-        <route edges="1392084244#0 712245744#0 653727191#0 -653727191#1 1054315845#0"/>
-    </vehicle>
-    <vehicle id="truck27" type="truck_truck" depart="2886.07" departLane="best" departSpeed="max">
-        <route edges="1392084244#0 712245744#0 653727191#0 -653727191#1 -712245744#1 -564298126#9"/>
-    </vehicle>
-    <vehicle id="truck28" type="truck_truck" depart="2992.97" departLane="best" departSpeed="max">
-        <route edges="1392084244#0 712245744#0 -712245744#1 -564298126#9"/>
-    </vehicle>
-    <vehicle id="truck29" type="truck_truck" depart="3099.86" departLane="best" departSpeed="max">
-        <route edges="1392084244#0 712245744#0 653727191#0 -653727191#1 1054315845#0"/>
-    </vehicle>
-    <vehicle id="truck30" type="truck_truck" depart="3206.75" departLane="best" departSpeed="max">
-        <route edges="1392084244#0 712245744#0 653727191#0 -653727191#1 -712245744#1 -564298126#9"/>
-    </vehicle>
-    <vehicle id="truck31" type="truck_truck" depart="3313.64" departLane="best" departSpeed="max">
-        <route edges="1392084244#0 712245744#0 653727191#0 -653727191#1 1054315845#0"/>
-    </vehicle>
-    <vehicle id="truck32" type="truck_truck" depart="3420.53" departLane="best" departSpeed="max">
-        <route edges="1392084244#0 712245744#0 653727191#0 -653727191#1 1054315845#0"/>
-    </vehicle>
-    <vehicle id="truck33" type="truck_truck" depart="3527.42" departLane="best" departSpeed="max">
-        <route edges="1392084244#0 712245744#0 653727191#0 -653727191#1 1054315845#0"/>
-    </vehicle>
 </routes>

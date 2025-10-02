@@ -17,6 +17,7 @@ Before running the Traffic Simulator, ensure you have the following installed:
 3. **SUMO (Simulation of Urban MObility)**
    - Download from: https://sumo.dlr.de/docs/Installing/index.html
    - **Important**: Add SUMO to your system PATH
+   - **Required Version**: 1.19.0+ for sublane model support
    - Verify installation: Open command prompt and run `sumo --help`
 
 ### Development Tools (Optional but Recommended)
@@ -108,9 +109,9 @@ npx serve -s build -l 3000
 ### 5. Application Workflow
 
 1. **Home Page** (http://localhost:3000) - System status and onboarding
-2. **Configuration** → Set SUMO parameters (timing, vehicles, traffic control)
-3. **Network Selection** → Choose from 6 Philippine traffic scenarios
-4. **Simulation** → Launch SUMO with real-time monitoring
+2. **Configuration** → Set SUMO parameters (timing, vehicles, traffic control, sublane model)
+3. **Network Selection** → Choose from 7 Philippine traffic scenarios
+4. **Simulation** → Launch SUMO with real-time monitoring and smooth lane changing
 5. **Analytics** → View KPIs, charts, and AI recommendations
 
 ## Troubleshooting
@@ -221,37 +222,39 @@ npm install
 ```
 traffic-simulator/
 ├── backend/                        # Flask backend with database
-│   ├── app.py                     # Main Flask app (1544 lines) - comprehensive API
-│   ├── enhanced_session_manager.py# Multi-session support (553 lines)
-│   ├── simulation_manager.py      # Core workflow logic (3048 lines)
-│   ├── analytics_engine.py        # KPI analysis (855 lines)
-│   ├── sumo_controller.py         # SUMO/TraCI integration (318 lines)
+│   ├── app.py                     # Main Flask app (1662 lines) - comprehensive API
+│   ├── enhanced_session_manager.py# Multi-session support (645 lines)
+│   ├── simulation_manager.py      # Core workflow logic (3387 lines) with sublane model
+│   ├── analytics_engine.py        # KPI analysis (1655 lines)
 │   ├── websocket_handler.py       # Real-time communication
 │   ├── multi_session_api.py       # V2 API endpoints
+│   ├── osm_service.py             # OSM scenario management
 │   ├── traffic_simulator.db       # SQLite database (auto-created)
 │   ├── requirements.txt           # Python dependencies
 │   ├── database/                  # Database layer
 │   │   ├── models.py              # 8 SQLAlchemy models
-│   │   └── service.py             # Database operations (632 lines)
+│   │   └── service.py             # Database operations (787 lines)
 │   ├── networks/                  # Philippine traffic scenarios
-│   │   ├── jollibee_molino/       # Complete SUMO network + metadata
+│   │   ├── bayanan_area/          # Complete SUMO network + metadata
+│   │   ├── jollibee_molino_area/  # Complete SUMO network + metadata
+│   │   ├── perpetual_molino_area/ # Complete SUMO network + metadata
 │   │   ├── sm_bacoor_area/        # Complete SUMO network + metadata
 │   │   ├── sm_molino_area/        # Complete SUMO network + metadata
-│   │   ├── pag_asa_area/          # Complete SUMO network + metadata  
 │   │   ├── st_dominic_area/       # Complete SUMO network + metadata
 │   │   └── statesfield_area/      # Complete SUMO network + metadata
 │   └── sessions/                  # Dynamic session directories
 ├── frontend/                      # Modern React application
 │   ├── src/
-│   │   ├── components/           # 11 React components
+│   │   ├── components/           # 17 React components
 │   │   ├── pages/               # 5 main pages (workflow-based)
 │   │   ├── contexts/            # React context providers
 │   │   └── utils/              # API clients and helpers
 │   ├── package.json            # Dependencies (React 18, Socket.io, Charts)
 │   └── public/                 # Static assets
 ├── osm_importer/               # Network import utility
-│   ├── osm_scenario_importer.py# Tool for importing new OSM networks
-│   └── osm_scenarios/          # Staging for new imports
+│   ├── osm_scenario_importer.py# Tool for importing new OSM networks (1772 lines)
+│   ├── osm_scenarios/          # Source OSM scenarios (7 Philippine areas)
+│   └── README.md              # Import tool documentation
 ├── .venv/                      # Python virtual environment
 ├── README.md                   # Updated project documentation
 └── SETUP.md                   # This detailed setup guide
@@ -283,10 +286,12 @@ Once you have the application running:
 ### Key Features to Test:
 
 - **Real-time Updates**: WebSocket data streaming during simulation
+- **Sublane Model**: Smooth vehicle lane changing instead of teleporting
 - **Traffic Control**: Fixed timer vs adaptive traffic light configurations  
 - **Vehicle Types**: Enable/disable different vehicle categories
 - **Session Isolation**: Multiple simulations running simultaneously
 - **Database Persistence**: Session data stored and retrievable
 - **Analytics Engine**: KPI calculations and recommendation generation
+- **OSM Import**: Import new scenarios from OpenStreetMap using the osm_importer tool
 
 Happy simulating! 🚗📊

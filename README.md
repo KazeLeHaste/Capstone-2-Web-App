@@ -10,19 +10,25 @@ This application provides an enterprise-grade web interface for traffic simulati
 - **Configuration-first workflow** - Configure parameters before network selection
 - **Real-time visualization** - Live WebSocket data streaming and 2D map views
 - **Advanced analytics** - Comprehensive KPI analysis with AI-powered recommendations
-- **OSM network support** - 6 predefined Philippine traffic scenarios
+- **OSM network support** - 7 predefined Philippine traffic scenarios with sublane model for smooth lane changing
 
 ## Architecture
 
 - **Backend**: Python Flask server with SQLite database and enhanced session management
 - **Frontend**: React application with real-time WebSocket communication
-- **Simulation**: SUMO traffic simulator with TraCI integration
+- **Simulation**: SUMO traffic simulator with sublane model for realistic lane changing
 - **Database**: SQLite with comprehensive schema for sessions, analytics, and KPIs
 - **Multi-session**: Concurrent simulations with isolated resources and dynamic port allocation
+- **OSM Import**: Automated import system for OpenStreetMap-based traffic scenarios
 
 ## Core Features
 
-### Adaptive Traffic Control System ⭐
+### SUMO Sublane Model ⭐
+- **Smooth Lane Changes**: Vehicles transition gradually between lanes instead of teleporting
+- **Realistic Lateral Movement**: Continuous vehicle positioning with 0.8m lateral resolution
+- **Multi-Vehicle Lane Sharing**: Support for motorcycles and bicycles sharing lanes
+- **Enhanced Visual Fidelity**: Realistic lane-changing maneuvers in SUMO GUI
+### Adaptive Traffic Control System
 - **Traffic-Responsive Control**: Automatically prioritizes busy roads with longer green times
 - **Adaptive vs Fixed Control**: Choose between adaptive (responds to traffic demand) or fixed timing
 - **Smart Junction Enhancement**: Convert priority intersections to adaptive traffic lights
@@ -49,17 +55,20 @@ This application provides an enterprise-grade web interface for traffic simulati
 - **Data Export**: PDF reports and data download capabilities
 
 ### Philippine Traffic Scenarios
-- **6 OSM-Based Networks**: Jollibee Molino, SM Bacoor, SM Molino, Pag-asa, St. Dominic, Statesfield
+- **7 OSM-Based Networks**: Bayanan Area, Jollibee Molino, Perpetual Molino, SM Bacoor, SM Molino, St. Dominic, Statesfield
 - **Realistic Traffic Patterns**: Imported from OpenStreetMap with authentic vehicle flows
 - **Multiple Vehicle Types**: Support for cars, buses, trucks, motorcycles
 - **Configurable Parameters**: Modify traffic intensity, signal timing, and road conditions
+- **Automated Import System**: Easy import of new OSM scenarios via `osm_importer` tool
 
 ## Quick Start
+
+🚀 **New to the project?** Check out [QUICKSTART.md](QUICKSTART.md) for a 5-minute setup guide!
 
 ### Prerequisites
 - Python 3.8+
 - Node.js 14+
-- SUMO installation
+- SUMO installation (1.19.0+ for sublane model support)
 - Git
 
 ### Installation
@@ -102,9 +111,9 @@ This application provides an enterprise-grade web interface for traffic simulati
 
 1. **Home Page**: Start at the landing page with system status overview
 2. **Onboarding**: Follow the guided tour for first-time users (configuration → network → simulation → analytics)
-3. **Configuration**: Set SUMO parameters (timing, vehicles, traffic control) first
-4. **Network Selection**: Choose from 6 Philippine traffic scenarios
-5. **Simulation Launch**: Start SUMO simulation with live visualization and controls
+3. **Configuration**: Set SUMO parameters (timing, vehicles, traffic control, sublane model) first
+4. **Network Selection**: Choose from 7 Philippine traffic scenarios
+5. **Simulation Launch**: Start SUMO simulation with live visualization and smooth lane changing
 6. **Analytics Dashboard**: View comprehensive KPIs, charts, and AI recommendations
 7. **Data Export**: Download results as PDF reports or raw data files
 
@@ -115,21 +124,22 @@ traffic-simulator/
 ├── backend/                        # Flask backend with database
 │   ├── app.py                     # Main Flask application with comprehensive API
 │   ├── enhanced_session_manager.py# Multi-session management system
-│   ├── simulation_manager.py      # Core simulation workflow logic  
+│   ├── simulation_manager.py      # Core simulation workflow logic with sublane model
 │   ├── analytics_engine.py        # KPI analysis and recommendations
-│   ├── sumo_controller.py         # SUMO integration via TraCI
 │   ├── websocket_handler.py       # Real-time WebSocket communication
 │   ├── multi_session_api.py       # V2 API endpoints for enhanced features
+│   ├── osm_service.py             # OSM scenario import and management
 │   ├── traffic_simulator.db       # SQLite database
 │   ├── requirements.txt           # Python dependencies
 │   ├── database/                  # Database models and services
 │   │   ├── models.py              # SQLAlchemy models (8 core tables)
 │   │   └── service.py             # Database operations layer
 │   ├── networks/                  # Philippine traffic scenarios
-│   │   ├── jollibee_molino/       # Jollibee Molino area network
+│   │   ├── bayanan_area/          # Bayanan area network with metadata
+│   │   ├── jollibee_molino_area/  # Jollibee Molino area network
+│   │   ├── perpetual_molino_area/ # Perpetual Molino area network
 │   │   ├── sm_bacoor_area/        # SM Bacoor area network
 │   │   ├── sm_molino_area/        # SM Molino area network
-│   │   ├── pag_asa_area/          # Pag-asa area network
 │   │   ├── st_dominic_area/       # St. Dominic area network
 │   │   └── statesfield_area/      # Statesfield area network
 │   └── sessions/                  # Dynamic session directories (auto-created)
@@ -139,20 +149,27 @@ traffic-simulator/
 │   │   │   ├── KPIDashboard.js   # Analytics dashboard component
 │   │   │   ├── AnalyticsCharts.js# Chart visualizations
 │   │   │   ├── MapVisualization.js# 2D traffic visualization
-│   │   │   └── ...               # Other UI components
+│   │   │   ├── OnboardingModal.js # User onboarding and tutorial
+│   │   │   ├── SessionComparison.js# Multi-session comparison
+│   │   │   ├── OSMScenarioScanner.js# OSM scenario management
+│   │   │   └── ...               # 17 total components
 │   │   ├── pages/               # Main application pages
 │   │   │   ├── HomePage.js       # Landing page with system status
-│   │   │   ├── ConfigurationPage.js# Parameter configuration
-│   │   │   ├── NetworkSelectionPage.js# Network selection
+│   │   │   ├── ConfigurationPage.js# Parameter configuration with sublane settings
+│   │   │   ├── NetworkSelectionPage.js# Network selection with OSM indicators
 │   │   │   ├── SimulationPage.js # Live simulation monitoring
 │   │   │   └── AnalyticsPage.js  # Post-simulation analytics
 │   │   └── utils/               # Utility functions and API clients
 │   └── package.json            # Node.js dependencies (React, Socket.io, Charts)
 ├── osm_importer/               # OSM scenario import utility
-│   ├── osm_scenario_importer.py# Import tool for new networks
-│   └── osm_scenarios/          # Staging area for new imports
-├── README.md                   # This documentation
-└── SETUP.md                   # Detailed setup instructions
+│   ├── osm_scenario_importer.py# Import tool for new networks (1772 lines)
+│   ├── osm_scenarios/          # Source OSM scenarios (7 Philippine areas)
+│   └── README.md              # Import tool documentation
+├── README.md                   # This comprehensive documentation
+├── QUICKSTART.md              # 5-minute setup guide  
+├── SETUP.md                   # Detailed installation instructions
+├── PROJECT_STATUS.md          # Current capabilities and metrics
+└── DEPLOYMENT_STRATEGY.md     # Packaging and deployment options
 ```
 
 ## Technical Specifications
@@ -167,11 +184,11 @@ traffic-simulator/
 
 ### Backend Architecture
 - **Enhanced Session Manager**: Concurrent simulation support with resource isolation
-- **Simulation Manager**: Configuration-first workflow with network copying
+- **Simulation Manager**: Configuration-first workflow with sublane model and network copying
 - **Analytics Engine**: Post-simulation KPI calculation and rule-based recommendations  
 - **Database Service**: Comprehensive SQLAlchemy ORM layer
 - **WebSocket Handler**: Real-time data broadcasting to connected clients
-- **TraCI Integration**: Direct SUMO control and data extraction
+- **OSM Service**: Automated import and management of OpenStreetMap scenarios
 
 ### Frontend Technology Stack
 - **React 18.2**: Modern functional components with hooks
@@ -245,16 +262,17 @@ The application uses SQLite with 8 core tables:
 
 ## Philippine Traffic Networks
 
-6 real-world traffic scenarios imported from OpenStreetMap:
+7 real-world traffic scenarios imported from OpenStreetMap:
 
-1. **Jollibee Molino** - Commercial area with mixed traffic patterns
-2. **SM Bacoor** - Shopping mall area with high pedestrian activity  
-3. **SM Molino** - Major commercial district with bus routes
-4. **Pag-asa** - Residential area with local traffic patterns
-5. **St. Dominic** - Church and school area with periodic congestion
-6. **Statesfield** - Residential subdivision with controlled access
+1. **Bayanan Area** - Mixed residential and commercial area with diverse traffic patterns
+2. **Jollibee Molino** - Commercial area with mixed traffic patterns and restaurants
+3. **Perpetual Molino** - Educational area with school traffic and pedestrian activity
+4. **SM Bacoor** - Shopping mall area with high pedestrian activity  
+5. **SM Molino** - Major commercial district with bus routes
+6. **St. Dominic** - Church and school area with periodic congestion
+7. **Statesfield** - Residential subdivision with controlled access
 
-Each network includes realistic vehicle flows, traffic light timing, and infrastructure data.
+Each network includes realistic vehicle flows, traffic light timing, and infrastructure data with full support for the sublane model.
 
 ## Contributing
 
@@ -272,8 +290,11 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 ## Support & Documentation
 
 For questions, issues, or contributions:
-- **Setup Issues**: Check SETUP.md for detailed installation steps
-- **Technical Issues**: Review troubleshooting section above
+- **Quick Start**: See [QUICKSTART.md](QUICKSTART.md) for 5-minute setup
+- **Detailed Setup**: Check [SETUP.md](SETUP.md) for comprehensive installation guide
+- **Current Status**: Review [PROJECT_STATUS.md](PROJECT_STATUS.md) for latest capabilities
+- **Deployment**: See [DEPLOYMENT_STRATEGY.md](DEPLOYMENT_STRATEGY.md) for packaging options
+- **OSM Import**: Check [osm_importer/README.md](osm_importer/README.md) for network import guide
 - **SUMO Integration**: Consult SUMO documentation at sumo.dlr.de
 - **Database Questions**: Check SQLAlchemy 2.0+ documentation
 - **Bug Reports**: Open an issue on GitHub with system info and error logs

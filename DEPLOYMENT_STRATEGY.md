@@ -1,19 +1,21 @@
 # SUMO Traffic Simulator - Deployment Strategy Guide
 
 ## System Overview
-This application is a **SUMO (Simulation of Urban Mobility) traffic simulation controller** with a web-based interface. It's essentially a desktop application that uses web technologies for the UI, not a traditional web application.
+This application is a **SUMO (Simulation of Urban Mobility) traffic simulation controller** with a modern web-based interface. It combines the power of SUMO's sublane model with an intuitive React frontend for comprehensive traffic analysis.
 
 ### Architecture Components
-- **Backend**: Python Flask with SUMO subprocess management
+- **Backend**: Python Flask with SUMO subprocess management and sublane model support
 - **Frontend**: React web interface with real-time WebSocket communication
-- **SUMO Integration**: Direct binary execution and TraCI communication
-- **Data**: SQLite database + file-based network scenarios
+- **SUMO Integration**: Direct binary execution with lateral resolution (sublane model)
+- **Data**: SQLite database + 7 Philippine traffic scenarios
+- **Import System**: Automated OSM scenario import via `osm_importer` tool
 
 ### Key Dependencies
-- SUMO installation (currently hardcoded to `C:\Program Files (x86)\Eclipse\Sumo\`)
-- Python environment with Flask, TraCI, SQLAlchemy
-- Node.js environment for React frontend
-- Network scenario files (compressed XML data)
+- SUMO installation 1.19.0+ (hardcoded to `C:\Program Files (x86)\Eclipse\Sumo\`)
+- Python 3.8+ environment with Flask, SQLAlchemy, TraCI
+- Node.js 14+ environment for React frontend  
+- Network scenario files (7 compressed XML datasets)
+- Sublane model configuration (0.8m lateral resolution)
 
 ## Recommended Deployment Strategy: Desktop Application Packaging
 

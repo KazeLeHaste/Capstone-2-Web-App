@@ -1,19 +1,25 @@
+# Traffic Simulator Web Application - Backend Dependencies
+# Python 3.8+ required for optimal compatibility
+
 # Core Flask framework and extensions
-Flask==2.3.3
-Flask-CORS==4.0.0
-Flask-SocketIO==5.3.6
+Flask==2.3.3                    # Main web framework
+Flask-CORS==4.0.0               # Cross-origin resource sharing for React frontend
+Flask-SocketIO==5.3.6           # Real-time WebSocket communication
 
 # Real-time WebSocket communication
-python-socketio==5.8.0
+python-socketio==5.8.0          # SocketIO server for live data streaming
 
 # SUMO traffic simulator integration
-traci==1.19.0
-sumolib==1.19.0
+traci==1.19.0                   # Traffic Control Interface for SUMO (supports sublane model)
+sumolib==1.19.0                 # SUMO utilities and helper functions
 
 # Database ORM and migrations
-SQLAlchemy>=2.0.23
-alembic==1.12.0
+SQLAlchemy>=2.0.23              # Object-relational mapping for database operations
+alembic==1.12.0                 # Database migration tool (future use)
 
 # HTTP client and environment management
-requests==2.31.0
-python-dotenv==1.0.0
+requests==2.31.0                # HTTP client for external API calls
+python-dotenv==1.0.0            # Environment variable management
+
+# Note: xml.etree.ElementTree, pathlib, json, datetime, threading, subprocess
+# are part of Python standard library and do not require installation

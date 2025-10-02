@@ -2,7 +2,7 @@
   "name": "perpetual_molino_area",
   "type": "osm_imported",
   "is_osm_scenario": true,
-  "import_date": "2025-09-26T19:57:04.683566",
+  "import_date": "2025-10-02T19:20:47.010960",
   "original_scenario": "Perpetual Molino Area",
   "vehicle_types": [
     "passenger",
@@ -18,10 +18,10 @@
     "file_size": 4627
   },
   "stats": {
-    "total_files": 21,
+    "total_files": 24,
     "route_files": 0,
     "trip_files": 0,
-    "total_size": 114393
+    "total_size": 116993
   },
   "description": "Imported OSM scenario: Perpetual Molino Area",
   "supports_realistic_traffic": true,

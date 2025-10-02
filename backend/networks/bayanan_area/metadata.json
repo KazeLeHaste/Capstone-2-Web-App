@@ -2,7 +2,7 @@
   "name": "bayanan_area",
   "type": "osm_imported",
   "is_osm_scenario": true,
-  "import_date": "2025-09-26T19:56:08.650124",
+  "import_date": "2025-10-02T19:19:55.340340",
   "original_scenario": "Bayanan Area",
   "vehicle_types": [
     "passenger",
@@ -18,10 +18,10 @@
     "file_size": 6970
   },
   "stats": {
-    "total_files": 21,
+    "total_files": 24,
     "route_files": 0,
     "trip_files": 0,
-    "total_size": 1154379
+    "total_size": 159902
   },
   "description": "Imported OSM scenario: Bayanan Area",
   "supports_realistic_traffic": true,

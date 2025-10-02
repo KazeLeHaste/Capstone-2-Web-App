@@ -1,17 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!-- generated on 2025-09-17 21:56:31 by Eclipse SUMO GUI Version 1.24.0
+<!-- generated on 2025-10-02 19:17:45 by Eclipse SUMO GUI Version 1.24.0
 <sumoConfiguration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/sumoConfiguration.xsd">
 
     <input>
-        <net-file value="C:\Users\kgaqu\OneDrive\Documents\4th Year\Capstone 2\v10\osm_scenarios\2025-09-17-21-56-24\osm.net.xml.gz"/>
-        <route-files value="C:\Users\kgaqu\OneDrive\Documents\4th Year\Capstone 2\v10\osm_scenarios\2025-09-17-21-56-24\osm.bus.trips.xml,C:\Users\kgaqu\OneDrive\Documents\4th Year\Capstone 2\v10\osm_scenarios\2025-09-17-21-56-24\osm.motorcycle.trips.xml,C:\Users\kgaqu\OneDrive\Documents\4th Year\Capstone 2\v10\osm_scenarios\2025-09-17-21-56-24\osm.passenger.trips.xml,C:\Users\kgaqu\OneDrive\Documents\4th Year\Capstone 2\v10\osm_scenarios\2025-09-17-21-56-24\osm.truck.trips.xml"/>
-        <additional-files value="C:\Users\kgaqu\OneDrive\Documents\4th Year\Capstone 2\v10\osm_scenarios\2025-09-17-21-56-24\osm.poly.xml.gz,C:\Users\kgaqu\OneDrive\Documents\4th Year\Capstone 2\v10\osm_scenarios\2025-09-17-21-56-24\output.add.xml"/>
+        <net-file value="osm.net.xml.gz"/>
+        <route-files value="osm.bus.trips.xml,osm.motorcycle.trips.xml,osm.passenger.trips.xml,osm.truck.trips.xml"/>
+        <additional-files value="osm.poly.xml.gz,output.add.xml"/>
     </input>
 
     <output>
-        <tripinfo-output value="C:\Users\kgaqu\OneDrive\Documents\4th Year\Capstone 2\v10\osm_scenarios\2025-09-17-21-56-24\tripinfos.xml"/>
-        <statistic-output value="C:\Users\kgaqu\OneDrive\Documents\4th Year\Capstone 2\v10\osm_scenarios\2025-09-17-21-56-24\stats.xml"/>
+        <emission-output value="Statesfield Area_emissions.xml"/>
+        <summary-output value="Statesfield Area_summary.xml"/>
+        <tripinfo-output value="tripinfos.xml"/>
+        <edgedata-output value="Statesfield Area_edgedata.xml"/>
+        <statistic-output value="stats.xml"/>
     </output>
 
     <processing>
@@ -31,11 +34,35 @@
     </report>
 
     <gui_only>
-        <gui-settings-file value="C:\Users\kgaqu\OneDrive\Documents\4th Year\Capstone 2\v10\osm_scenarios\2025-09-17-21-56-24\osm.view.xml"/>
+        <gui-settings-file value="osm.view.xml"/>
     </gui_only>
 
 </sumoConfiguration>
 -->
 
 <tripinfos xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/tripinfo_file.xsd">
+    <tripinfo id="motorcycle0" depart="0.00" departLane="-573710407_0" departPos="2.30" departSpeed="17.67" departDelay="0.00" arrival="29.00" arrivalLane="-938079508#2_0" arrivalPos="122.29" arrivalSpeed="7.93" duration="29.00" routeLength="308.51" waitingTime="0.00" waitingCount="0" stopTime="0.00" timeLoss="3.74" rerouteNo="0" devices="tripinfo_motorcycle0 routing_motorcycle0 emissions_motorcycle0" vType="motorcycle_motorcycle" speedFactor="1.06" vaporized="">
+        <emissions CO_abs="1108.93" CO2_abs="32604.53" HC_abs="402.38" PMx_abs="7.94" NOx_abs="46.56" fuel_abs="10572.18" electricity_abs="0.00"/>
+    </tripinfo>
+    <tripinfo id="veh0" depart="0.00" departLane="1019458707_0" departPos="5.10" departSpeed="22.45" departDelay="0.00" arrival="43.00" arrivalLane="-938079508#0_0" arrivalPos="195.23" arrivalSpeed="8.12" duration="43.00" routeLength="488.29" waitingTime="0.00" waitingCount="0" stopTime="0.00" timeLoss="5.26" rerouteNo="0" devices="tripinfo_veh0 routing_veh0 emissions_veh0" vType="veh_passenger" speedFactor="1.01" vaporized="">
+        <emissions CO_abs="442.66" CO2_abs="78561.41" HC_abs="3.01" PMx_abs="9.80" NOx_abs="27.67" fuel_abs="25468.67" electricity_abs="0.00"/>
+    </tripinfo>
+    <tripinfo id="veh1" depart="91.00" departLane="938079508#0_0" departPos="5.10" departSpeed="9.02" departDelay="0.89" arrival="148.00" arrivalLane="-651079992#1_0" arrivalPos="244.69" arrivalSpeed="17.23" duration="57.00" routeLength="578.41" waitingTime="0.00" waitingCount="0" stopTime="0.00" timeLoss="6.03" rerouteNo="1" devices="tripinfo_veh1 routing_veh1 emissions_veh1" vType="veh_passenger" speedFactor="1.08" vaporized="">
+        <emissions CO_abs="782.62" CO2_abs="134743.38" HC_abs="5.22" PMx_abs="13.32" NOx_abs="47.51" fuel_abs="43682.05" electricity_abs="0.00"/>
+    </tripinfo>
+    <tripinfo id="veh2" depart="181.00" departLane="-573710407_0" departPos="5.10" departSpeed="13.85" departDelay="0.79" arrival="238.00" arrivalLane="-1019458707_0" arrivalPos="288.26" arrivalSpeed="17.94" duration="57.00" routeLength="606.06" waitingTime="0.00" waitingCount="0" stopTime="0.00" timeLoss="7.59" rerouteNo="1" devices="tripinfo_veh2 routing_veh2 emissions_veh2" vType="veh_passenger" speedFactor="0.83" vaporized="">
+        <emissions CO_abs="907.66" CO2_abs="137786.19" HC_abs="6.07" PMx_abs="13.85" NOx_abs="48.96" fuel_abs="44668.40" electricity_abs="0.00"/>
+    </tripinfo>
+    <tripinfo id="veh3" depart="272.00" departLane="-573710407_0" departPos="5.10" departSpeed="8.16" departDelay="1.68" arrival="324.00" arrivalLane="-1019458707_0" arrivalPos="288.26" arrivalSpeed="22.08" duration="52.00" routeLength="606.06" waitingTime="0.00" waitingCount="0" stopTime="0.00" timeLoss="12.47" rerouteNo="1" devices="tripinfo_veh3 routing_veh3 emissions_veh3" vType="veh_passenger" speedFactor="1.05" vaporized="">
+        <emissions CO_abs="1467.26" CO2_abs="168351.33" HC_abs="9.79" PMx_abs="15.83" NOx_abs="61.69" fuel_abs="54577.00" electricity_abs="0.00"/>
+    </tripinfo>
+    <tripinfo id="motorcycle1" depart="271.00" departLane="-573710407_0" departPos="2.30" departSpeed="15.64" departDelay="0.68" arrival="338.00" arrivalLane="-938079508#0_0" arrivalPos="195.23" arrivalSpeed="5.47" duration="67.00" routeLength="511.12" waitingTime="0.00" waitingCount="0" stopTime="0.00" timeLoss="12.28" rerouteNo="1" devices="tripinfo_motorcycle1 routing_motorcycle1 emissions_motorcycle1" vType="motorcycle_motorcycle" speedFactor="0.94" vaporized="">
+        <emissions CO_abs="1257.71" CO2_abs="80404.46" HC_abs="1002.21" PMx_abs="20.98" NOx_abs="81.93" fuel_abs="26071.78" electricity_abs="0.00"/>
+    </tripinfo>
+    <tripinfo id="veh4" depart="361.00" departLane="-573710407_0" departPos="5.10" departSpeed="14.77" departDelay="0.57" arrival="415.00" arrivalLane="-1019458707_0" arrivalPos="288.26" arrivalSpeed="19.25" duration="54.00" routeLength="606.06" waitingTime="0.00" waitingCount="0" stopTime="0.00" timeLoss="7.22" rerouteNo="1" devices="tripinfo_veh4 routing_veh4 emissions_veh4" vType="veh_passenger" speedFactor="0.89" vaporized="">
+        <emissions CO_abs="1063.17" CO2_abs="144734.90" HC_abs="7.10" PMx_abs="14.50" NOx_abs="51.63" fuel_abs="46920.99" electricity_abs="0.00"/>
+    </tripinfo>
+    <tripinfo id="veh5" depart="451.00" departLane="938079508#0_0" departPos="5.10" departSpeed="7.14" departDelay="0.47" arrival="498.00" arrivalLane="-1019458707_0" arrivalPos="288.26" arrivalSpeed="18.04" duration="47.00" routeLength="485.63" waitingTime="0.00" waitingCount="0" stopTime="0.00" timeLoss="5.17" rerouteNo="0" devices="tripinfo_veh5 routing_veh5 emissions_veh5" vType="veh_passenger" speedFactor="0.86" vaporized="">
+        <emissions CO_abs="777.27" CO2_abs="114540.64" HC_abs="5.20" PMx_abs="11.51" NOx_abs="40.76" fuel_abs="37132.51" electricity_abs="0.00"/>
+    </tripinfo>
 </tripinfos>

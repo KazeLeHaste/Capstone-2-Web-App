@@ -2,7 +2,7 @@
   "name": "statesfield_area",
   "type": "osm_imported",
   "is_osm_scenario": true,
-  "import_date": "2025-09-26T19:57:30.873974",
+  "import_date": "2025-10-02T19:21:14.066106",
   "original_scenario": "Statesfield Area",
   "vehicle_types": [
     "passenger",
@@ -18,10 +18,10 @@
     "file_size": 5475
   },
   "stats": {
-    "total_files": 21,
+    "total_files": 24,
     "route_files": 0,
     "trip_files": 0,
-    "total_size": 184746
+    "total_size": 487705
   },
   "description": "Imported OSM scenario: Statesfield Area",
   "supports_realistic_traffic": true,

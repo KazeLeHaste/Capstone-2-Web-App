@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!-- generated on 2025-09-17 21:32:48.765181 by randomTrips.py v1_24_0+0000-b72eb3fabc8
+<!-- generated on 2025-10-02 19:16:44.735097 by randomTrips.py v1_24_0+0000-b72eb3fabc8
 <configuration>
     <net-file value="osm.net.xml.gz"/>
     <output-trip-file value="osm.bus.trips.xml"/>
@@ -19,7 +19,7 @@
 </configuration>
 -->
 
-<!-- generated on 2025-09-17 21:32:48 by Eclipse SUMO duarouter Version 1.24.0
+<!-- generated on 2025-10-02 19:16:44 by Eclipse SUMO duarouter Version 1.24.0
 <duarouterConfiguration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/duarouterConfiguration.xsd">
 
     <input>
@@ -51,56 +51,4 @@
 -->
 
 <routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/routes_file.xsd">
-    <vType id="bus_bus" vClass="bus"/>
-    <vehicle id="bus0" type="bus_bus" depart="0.00" departLane="best" departSpeed="max">
-        <route edges="1392084244#0 712245744#0 653727191#0 -653727191#1 -712245744#1 -564298126#9"/>
-    </vehicle>
-    <vehicle id="bus1" type="bus_bus" depart="213.78" departLane="best" departSpeed="max">
-        <route edges="1392084244#0 712245744#0 653727191#0 -653727191#1 -712245744#1 -564298126#9"/>
-    </vehicle>
-    <vehicle id="bus2" type="bus_bus" depart="427.57" departLane="best" departSpeed="max">
-        <route edges="1392084244#0 712245744#0 653727191#0 -653727191#1 -712245744#1 -564298126#9"/>
-    </vehicle>
-    <vehicle id="bus3" type="bus_bus" depart="641.35" departLane="best" departSpeed="max">
-        <route edges="1392084244#0 712245744#0 653727191#0 -653727191#1 1054315845#0"/>
-    </vehicle>
-    <vehicle id="bus4" type="bus_bus" depart="855.13" departLane="best" departSpeed="max">
-        <route edges="1392084244#0 712245744#0 653727191#0 -653727191#1 -712245744#1 -564298126#9"/>
-    </vehicle>
-    <vehicle id="bus5" type="bus_bus" depart="1068.92" departLane="best" departSpeed="max">
-        <route edges="1392084244#0 712245744#0 653727191#0 -653727191#1 1054315845#0"/>
-    </vehicle>
-    <vehicle id="bus6" type="bus_bus" depart="1282.70" departLane="best" departSpeed="max">
-        <route edges="-1392084250 -653727191#1 -712245744#1 -564298126#9 1392084244#0 712245744#0 653727191#0 653727192"/>
-    </vehicle>
-    <vehicle id="bus7" type="bus_bus" depart="1496.48" departLane="best" departSpeed="max">
-        <route edges="1392084244#0 712245744#0 653727191#0 -653727191#1 -712245744#1 -564298126#9"/>
-    </vehicle>
-    <vehicle id="bus8" type="bus_bus" depart="1710.27" departLane="best" departSpeed="max">
-        <route edges="1392084244#0 712245744#0 653727191#0 -653727191#1 -712245744#1 -564298126#9"/>
-    </vehicle>
-    <vehicle id="bus9" type="bus_bus" depart="1924.05" departLane="best" departSpeed="max">
-        <route edges="1392084244#0 712245744#0 653727191#0 -653727191#1 -712245744#1 -564298126#9"/>
-    </vehicle>
-    <vehicle id="bus10" type="bus_bus" depart="2137.83" departLane="best" departSpeed="max">
-        <route edges="-1392084250 -653727191#1 -712245744#1 -564298126#9 1392084244#0 712245744#0 653727191#0 653727192"/>
-    </vehicle>
-    <vehicle id="bus11" type="bus_bus" depart="2351.62" departLane="best" departSpeed="max">
-        <route edges="-1392084250 -653727191#1 -712245744#1 -564298126#9 1392084244#0 712245744#0 653727191#0 653727192"/>
-    </vehicle>
-    <vehicle id="bus12" type="bus_bus" depart="2565.40" departLane="best" departSpeed="max">
-        <route edges="1392084244#0 712245744#0 653727191#0 -653727191#1 1054315845#0"/>
-    </vehicle>
-    <vehicle id="bus13" type="bus_bus" depart="2779.18" departLane="best" departSpeed="max">
-        <route edges="1392084244#0 712245744#0 653727191#0 -653727191#1 -712245744#1 -564298126#9"/>
-    </vehicle>
-    <vehicle id="bus14" type="bus_bus" depart="2992.97" departLane="best" departSpeed="max">
-        <route edges="1392084244#0 712245744#0 653727191#0 -653727191#1 -712245744#1 -564298126#9"/>
-    </vehicle>
-    <vehicle id="bus15" type="bus_bus" depart="3206.75" departLane="best" departSpeed="max">
-        <route edges="1392084244#0 712245744#0 653727191#0 -653727191#1 -712245744#1 -564298126#9"/>
-    </vehicle>
-    <vehicle id="bus16" type="bus_bus" depart="3420.53" departLane="best" departSpeed="max">
-        <route edges="1392084244#0 712245744#0 653727191#0 -653727191#1 -712245744#1 -564298126#9"/>
-    </vehicle>
 </routes>
