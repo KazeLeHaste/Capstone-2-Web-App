@@ -2052,6 +2052,7 @@ class SimulationManager:
         print(f"  Duration: {simulation_end_time - begin_time}s")
         print(f"  Step length: {step_length}s")
         print(f"  Time to teleport: {time_to_teleport}s")
+        print(f"  Lateral resolution: 0.8m (sublane model enabled for smooth lane changing)")
         print(f"  Traffic scale: {traffic_scale}x")
         if traffic_scale != 1.0:
             print(f"  Traffic scaling: enabled via --scale parameter")
@@ -2552,13 +2553,15 @@ class SimulationManager:
             sumo_cmd.extend([
                 "-c", config_file.name,  # Use just the filename since we set cwd=session_dir
                 "--time-to-teleport", "300",  # Prevent vehicles from getting stuck
-                "--no-warnings"  # Reduce console spam
+                "--no-warnings",  # Reduce console spam
+                "--lateral-resolution", "0.8"  # Enable sublane model for smooth lane changing
             ])
             
             # Add step-length parameter from user configuration
             step_length = config.get('sumo_step_length', 1.0)  # Default to 1.0 for normal time progression
             sumo_cmd.extend(["--step-length", str(step_length)])
             print(f"DEBUG: Using step-length: {step_length}s")
+            print(f"DEBUG: Sublane model enabled with lateral-resolution: 0.8m")
             
             # Extract end time from config and add --end parameter for automatic termination
             # This ensures SUMO will automatically terminate when the simulation time is reached
