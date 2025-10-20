@@ -1,15 +1,41 @@
 import React, { useState, useEffect } from 'react';
 import { apiClient } from '../utils/apiClient';
+import { ChevronDown, ChevronUp } from 'lucide-react';
 
 const SessionComparison = ({ selectedSessions, onClose }) => {
   const [comparisonData, setComparisonData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [expandedConfigs, setExpandedConfigs] = useState({}); // Track which configs are expanded
   
   const handleClose = () => {
     if (onClose && typeof onClose === 'function') {
       onClose();
     }
+  };
+
+  const toggleConfig = (sessionId) => {
+    setExpandedConfigs(prev => ({
+      ...prev,
+      [sessionId]: !prev[sessionId]
+    }));
+  };
+
+  // Helper function to format network name with traffic control method
+  const getSessionDisplayName = (sessionId) => {
+    const metadata = comparisonData?.session_metadata?.[sessionId];
+    if (!metadata) return sessionId.substring(0, 12);
+    
+    const networkName = metadata.network_name || metadata.network_id || 'Unknown Network';
+    const trafficMethod = metadata.configuration?.traffic_control_method || 'None';
+    
+    // Format the network name nicely (capitalize words)
+    const formattedNetwork = networkName
+      .split('_')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ');
+    
+    return `${formattedNetwork} (${trafficMethod})`;
   };
 
   // Load comparison data
@@ -116,7 +142,7 @@ const SessionComparison = ({ selectedSessions, onClose }) => {
                 🏆 Best Performing Session
               </h3>
               <p className="session-comparison-best-subtitle">
-                {bestSession.substring(0, 12)}... achieved the highest overall performance
+                {getSessionDisplayName(bestSession)} achieved the highest overall performance
               </p>
             </div>
           )}
@@ -127,6 +153,9 @@ const SessionComparison = ({ selectedSessions, onClose }) => {
               const sessionData = comparisonData.session_data?.[sessionId];
               const kpis = sessionData?.kpis || {};
               const isWinner = sessionId === bestSession;
+              const metadata = comparisonData?.session_metadata?.[sessionId];
+              const config = metadata?.configuration || {};
+              const isExpanded = expandedConfigs[sessionId];
               
               return (
                 <div 
@@ -134,13 +163,94 @@ const SessionComparison = ({ selectedSessions, onClose }) => {
                   className={`session-comparison-card ${isWinner ? 'winner' : ''}`}
                 >
                   <div className="session-comparison-card-header">
-                    <h4 className="session-comparison-card-title">
-                      Session {index + 1} {isWinner && '🏆'}
-                    </h4>
-                    <span className="session-comparison-card-id">
-                      {sessionId.substring(0, 8)}...
-                    </span>
+                    <div className="session-comparison-card-header-content">
+                      <h4 className="session-comparison-card-title">
+                        {getSessionDisplayName(sessionId)} {isWinner && '🏆'}
+                      </h4>
+                      <span className="session-comparison-card-id">
+                        Session ID: {sessionId.substring(0, 12)}...
+                      </span>
+                    </div>
+                    <button 
+                      className="session-config-toggle"
+                      onClick={() => toggleConfig(sessionId)}
+                      title={isExpanded ? "Hide configuration" : "Show configuration"}
+                    >
+                      {isExpanded ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
+                    </button>
                   </div>
+
+                  {/* Collapsible Configuration */}
+                  {isExpanded && (
+                    <div className="session-config-details">
+                      <div className="session-config-section">
+                        <h5 className="session-config-heading">SUMO Parameters</h5>
+                        <div className="session-config-grid">
+                          <div className="session-config-item">
+                            <span className="session-config-label">Begin Time:</span>
+                            <span className="session-config-value">{config.sumo_begin || 'N/A'}s</span>
+                          </div>
+                          <div className="session-config-item">
+                            <span className="session-config-label">End Time:</span>
+                            <span className="session-config-value">{config.sumo_end || 'N/A'}s</span>
+                          </div>
+                          <div className="session-config-item">
+                            <span className="session-config-label">Step Length:</span>
+                            <span className="session-config-value">{config.sumo_step_length || 'N/A'}s</span>
+                          </div>
+                          <div className="session-config-item">
+                            <span className="session-config-label">Time to Teleport:</span>
+                            <span className="session-config-value">{config.sumo_time_to_teleport || 'N/A'}s</span>
+                          </div>
+                          <div className="session-config-item">
+                            <span className="session-config-label">Traffic Intensity:</span>
+                            <span className="session-config-value">{config.sumo_traffic_intensity || 'N/A'}</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      {config.enabled_vehicles && config.enabled_vehicles.length > 0 && (
+                        <div className="session-config-section">
+                          <h5 className="session-config-heading">Enabled Vehicles</h5>
+                          <div className="session-config-tags">
+                            {config.enabled_vehicles.map((vehicle, idx) => (
+                              <span key={idx} className="session-config-tag">
+                                {vehicle}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {config.traffic_control_config && Object.keys(config.traffic_control_config).length > 0 && (
+                        <div className="session-config-section">
+                          <h5 className="session-config-heading">Traffic Control Settings</h5>
+                          <div className="session-config-grid">
+                            {Object.entries(config.traffic_control_config).map(([key, value]) => {
+                              // Skip if value is an object or array (render only primitive values)
+                              if (typeof value === 'object' && value !== null) {
+                                return null;
+                              }
+                              
+                              return (
+                                <div key={key} className="session-config-item">
+                                  <span className="session-config-label">
+                                    {key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}:
+                                  </span>
+                                  <span className="session-config-value">
+                                    {typeof value === 'boolean' 
+                                      ? (value ? 'Yes' : 'No') 
+                                      : String(value)
+                                    }
+                                  </span>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
                   
                   <div className="session-comparison-metrics">
                     <div className="session-comparison-metric">
@@ -208,9 +318,9 @@ const SessionComparison = ({ selectedSessions, onClose }) => {
                     <th className="session-comparison-metric-name">
                       Metric
                     </th>
-                    {sessions.map((session, index) => (
-                      <th key={session}>
-                        Session {index + 1}
+                    {sessions.map((sessionId) => (
+                      <th key={sessionId}>
+                        {getSessionDisplayName(sessionId)}
                       </th>
                     ))}
                     <th>
@@ -236,7 +346,7 @@ const SessionComparison = ({ selectedSessions, onClose }) => {
                         </td>
                       ))}
                       <td className="session-comparison-best-indicator">
-                        Session {sessions.findIndex(s => s === data.best_session) + 1 || 'N/A'}
+                        {getSessionDisplayName(data.best_session) || 'N/A'}
                       </td>
                     </tr>
                   ))}

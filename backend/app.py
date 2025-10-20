@@ -903,8 +903,10 @@ def compare_sessions():
                 'message': 'At least 2 sessions are required for comparison'
             }), 400
         
-        # Validate sessions exist
+        # Validate sessions exist and gather metadata
         session_paths = []
+        session_metadata = {}
+        
         for session_id in session_ids:
             session_path = sim_manager.sessions_dir / session_id
             if not session_path.exists():
@@ -913,9 +915,38 @@ def compare_sessions():
                     'message': f'Session {session_id} not found'
                 }), 404
             session_paths.append(str(session_path))
+            
+            # Get session metadata from database
+            db_session = db_service.get_session_by_id(session_id)
+            db_config = db_service.get_configuration(session_id)
+            
+            metadata = {
+                'network_id': db_session.network_id if db_session else 'Unknown',
+                'network_name': db_session.network_name if db_session else 'Unknown Network',
+                'configuration': {}
+            }
+            
+            # Add configuration details if available
+            if db_config:
+                metadata['configuration'] = {
+                    'traffic_control_method': db_config.traffic_control_method or 'None',
+                    'sumo_begin': db_config.sumo_begin,
+                    'sumo_end': db_config.sumo_end,
+                    'sumo_step_length': db_config.sumo_step_length,
+                    'sumo_time_to_teleport': db_config.sumo_time_to_teleport,
+                    'sumo_traffic_intensity': db_config.sumo_traffic_intensity,
+                    'enabled_vehicles': db_config.get_enabled_vehicles(),
+                    'traffic_control_config': db_config.get_traffic_control_config(),
+                    'vehicle_types_config': db_config.get_vehicle_types_config()
+                }
+            
+            session_metadata[session_id] = metadata
         
         # Perform comparison
         comparison_data = analytics_engine.compare_sessions(session_paths)
+        
+        # Add metadata to comparison data
+        comparison_data['session_metadata'] = session_metadata
         
         return jsonify({
             'success': True,
