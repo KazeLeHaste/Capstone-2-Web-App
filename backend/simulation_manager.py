@@ -1153,6 +1153,16 @@ class SimulationManager:
                                     with open(dest_file, 'w', encoding='utf-8') as f_out:
                                         f_out.write(f_in.read())
                             print(f"✅ Decompressed and preserved {vehicle_type} trip file (realistic patterns): {dest_file.name}")
+                            
+                            # Enhance trip file with colors and attributes
+                            try:
+                                tree = ET.parse(dest_file)
+                                root = tree.getroot()
+                                self._enhance_osm_vehicle_definitions(root, vehicle_type)
+                                tree.write(dest_file, encoding='utf-8', xml_declaration=True)
+                            except Exception as e:
+                                print(f"  ⚠️  Could not enhance {vehicle_type} trip file: {e}")
+                                
                         except Exception as e:
                             print(f"Failed to decompress {trip_file}: {e}, copying as-is")
                             dest_file = dest_dir / trip_file.name
@@ -1164,7 +1174,16 @@ class SimulationManager:
                             self._scale_route_file(trip_file, dest_file, traffic_density)
                         else:
                             shutil.copy2(trip_file, dest_file)
-                        print(f"✅ Preserved {vehicle_type} trip file (realistic patterns): {trip_file.name}")
+                        print(f"✅ Preserved {vehicle_type} trip file (realistic patterns): {dest_file.name}")
+                    
+                    # Enhance trip file with colors and attributes
+                    try:
+                        tree = ET.parse(dest_file)
+                        root = tree.getroot()
+                        self._enhance_osm_vehicle_definitions(root, vehicle_type)
+                        tree.write(dest_file, encoding='utf-8', xml_declaration=True)
+                    except Exception as e:
+                        print(f"  ⚠️  Could not enhance {vehicle_type} trip file: {e}")
                     
                     copied_types.add(vehicle_type)
                 elif vehicle_type:
@@ -1331,39 +1350,60 @@ class SimulationManager:
             vehicle_type: Type of vehicles being enhanced
         """
         try:
-            # Ensure vehicle type definition exists
-            vtype_id = f"veh_{vehicle_type}"
-            vtype_elem = root.find(f".//vType[@id='{vtype_id}']")
+            # Define color mapping for vehicle types
+            color_map = {
+                'passenger': 'yellow',
+                'bus': 'blue', 
+                'truck': 'orange',
+                'motorcycle': 'red'
+            }
             
+            # Find ALL vType elements that match this vehicle type (handle multiple ID patterns)
+            # Possible patterns: veh_{type}, {type}_{type}, {prefix}_{type}, etc.
+            all_vtypes = root.findall('.//vType')
+            vtype_elem = None
+            
+            for vtype in all_vtypes:
+                vtype_id = vtype.get('id', '')
+                vtype_class = vtype.get('vClass', '')
+                
+                # Match by vClass or if the vehicle_type is in the ID
+                if vtype_class == vehicle_type or vehicle_type in vtype_id.lower():
+                    vtype_elem = vtype
+                    # Add or update color attribute if missing or default
+                    current_color = vtype.get('color', '').lower()
+                    if not current_color or current_color in ['yellow', 'gray', '1,1,0', '']:
+                        vtype.set('color', color_map.get(vehicle_type, 'gray'))
+                        print(f"  🎨 Added color '{color_map.get(vehicle_type)}' to vType '{vtype_id}'")
+                    break
+            
+            # If no vType found, create one with standard naming
             if vtype_elem is None:
-                # Create vehicle type definition
+                vtype_id = f"veh_{vehicle_type}"
                 vtype_elem = ET.Element('vType')
                 vtype_elem.set('id', vtype_id)
                 vtype_elem.set('vClass', vehicle_type)
-                
-                # Set appropriate color for vehicle type
-                color_map = {
-                    'passenger': 'yellow',
-                    'bus': 'blue', 
-                    'truck': 'orange',
-                    'motorcycle': 'red'
-                }
                 vtype_elem.set('color', color_map.get(vehicle_type, 'gray'))
                 
                 # Insert at the beginning
                 root.insert(0, vtype_elem)
+                print(f"  ✨ Created new vType '{vtype_id}' with color '{color_map.get(vehicle_type)}'")
             
-            # Enhance individual vehicles
+            # Enhance individual vehicles and trips
             for vehicle in root.findall('.//vehicle'):
-                # Ensure vehicle uses the correct type
-                if not vehicle.get('type'):
-                    vehicle.set('type', vtype_id)
-                
                 # Add optimized departure attributes if missing
                 if not vehicle.get('departLane'):
                     vehicle.set('departLane', 'best')
                 if not vehicle.get('departSpeed'):
                     vehicle.set('departSpeed', 'max')
+            
+            # Also enhance trip elements
+            for trip in root.findall('.//trip'):
+                # Add optimized departure attributes if missing
+                if not trip.get('departLane'):
+                    trip.set('departLane', 'best')
+                if not trip.get('departSpeed'):
+                    trip.set('departSpeed', 'max')
                     
         except Exception as e:
             print(f"⚠️  Warning: Could not enhance vehicle definitions: {e}")

@@ -2,7 +2,7 @@
   "name": "st_dominic_area",
   "type": "osm_imported",
   "is_osm_scenario": true,
-  "import_date": "2025-10-02T19:21:06.478666",
+  "import_date": "2025-10-20T17:36:05.453785",
   "original_scenario": "St Dominic Area",
   "vehicle_types": [
     "passenger",
@@ -21,7 +21,7 @@
     "total_files": 30,
     "route_files": 0,
     "trip_files": 0,
-    "total_size": 112198771
+    "total_size": 112206963
   },
   "description": "Imported OSM scenario: St Dominic Area",
   "supports_realistic_traffic": true,
