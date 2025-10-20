@@ -74,7 +74,7 @@ const ConfigurationPage = ({ socket }) => {
     
     // Traffic Control Configuration
     trafficControl: {
-      method: 'existing', // Options: 'existing', 'fixed', 'adaptive'
+      method: 'existing', // Options: 'existing', 'fixed', 'adaptive', 'buhos'
       cycleTime: 90, // Fixed timing cycle time (seconds)
       addToHighPriority: false, // Toggle to add traffic lights to high priority intersections
       adaptiveSettings: {
@@ -83,6 +83,11 @@ const ConfigurationPage = ({ socket }) => {
         maxDuration: 50, // Maximum green phase duration (seconds)
         detectorGap: 2.0, // Distance between detector and stop line in time (seconds)
         speedThreshold: 50 // Speed threshold for adding TLS to priority junctions (km/h)
+      },
+      buhosSettings: {
+        phaseDuration: 600, // Duration for each direction's green phase (seconds) - default 10 minutes
+        allRedTime: 5, // All-red clearance time between phases (seconds)
+        phaseOrder: 'NS-EW' // Phase rotation order: NS-EW or EW-NS
       }
     },
     
@@ -142,6 +147,18 @@ const ConfigurationPage = ({ socket }) => {
         trafficControl: {
           ...prev.trafficControl,
           addToHighPriority: value
+        }
+      }));
+    } else if (['phaseDuration', 'allRedTime', 'phaseOrder'].includes(key)) {
+      // For buhos settings
+      setConfig(prev => ({
+        ...prev,
+        trafficControl: {
+          ...prev.trafficControl,
+          buhosSettings: {
+            ...prev.trafficControl.buhosSettings,
+            [key]: value
+          }
         }
       }));
     } else {
@@ -521,9 +538,10 @@ const ConfigurationPage = ({ socket }) => {
                     <option value="existing">Keep Existing Traffic Lights</option>
                     <option value="fixed">Fixed-Time Control</option>
                     <option value="adaptive">Adaptive Control (Recommended)</option>
+                    <option value="buhos">Buhos Method (Philippine Emergency Control)</option>
                   </select>
                   <span className="config-help-text">
-                    Adaptive control automatically gives more green time to roads with heavier traffic
+                    Adaptive control automatically gives more green time to roads with heavier traffic. Buhos method gives extended green time to one direction at a time.
                   </span>
                 </div>
 
@@ -640,6 +658,74 @@ const ConfigurationPage = ({ socket }) => {
                           <div>• Automatically prioritizes busier roads with longer green times</div>
                           <div>• Reduces waiting time by responding to actual traffic demand</div>
                           <div>• Improves traffic flow efficiency compared to fixed timing</div>
+                        </div>
+                      </div>
+                    </div>
+                  </>
+                )}
+
+                {config.trafficControl.method === 'buhos' && (
+                  <>
+                    <div className="config-form-group">
+                      <label className="config-label">Phase Duration (seconds)</label>
+                      <input
+                        type="number"
+                        value={config.trafficControl.buhosSettings.phaseDuration}
+                        onChange={(e) => handleTrafficControlChange('phaseDuration', parseInt(e.target.value) || 600)}
+                        className="config-input"
+                        min="180"
+                        max="1200"
+                        step="60"
+                      />
+                      <span className="config-help-text">
+                        Duration each direction gets continuous green light (typical: 5-15 minutes)
+                      </span>
+                      <div className="mt-1 text-xs text-secondary">
+                        Current: {Math.floor(config.trafficControl.buhosSettings.phaseDuration / 60)} minutes {config.trafficControl.buhosSettings.phaseDuration % 60} seconds
+                      </div>
+                    </div>
+
+                    <div className="config-form-group">
+                      <label className="config-label">All-Red Clearance Time (seconds)</label>
+                      <input
+                        type="number"
+                        value={config.trafficControl.buhosSettings.allRedTime}
+                        onChange={(e) => handleTrafficControlChange('allRedTime', parseInt(e.target.value) || 5)}
+                        className="config-input"
+                        min="2"
+                        max="10"
+                        step="1"
+                      />
+                      <span className="config-help-text">
+                        Safety clearance time when all lights are red between direction changes
+                      </span>
+                    </div>
+
+                    <div className="config-form-group">
+                      <label className="config-label">Phase Rotation Order</label>
+                      <select
+                        value={config.trafficControl.buhosSettings.phaseOrder}
+                        onChange={(e) => handleTrafficControlChange('phaseOrder', e.target.value)}
+                        className="config-input"
+                      >
+                        <option value="NS-EW">North-South First, then East-West</option>
+                        <option value="EW-NS">East-West First, then North-South</option>
+                      </select>
+                      <span className="config-help-text">
+                        Determines which direction gets the first extended green phase
+                      </span>
+                    </div>
+
+                    <div className="mt-3 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                      <div className="flex items-start text-sm text-yellow-800">
+                        <AlertCircle className="w-4 h-4 mr-2 mt-0.5 flex-shrink-0" />
+                        <div>
+                          <div><strong>Buhos Method (Emergency Traffic Control):</strong></div>
+                          <div className="mt-1">• Used in Philippine traffic management during severe congestion</div>
+                          <div>• One direction gets extended green time ({Math.floor(config.trafficControl.buhosSettings.phaseDuration / 60)} min) while others wait</div>
+                          <div>• Clears backed-up traffic quickly by "flooding" vehicles through</div>
+                          <div>• Cycle time: ~{Math.floor((config.trafficControl.buhosSettings.phaseDuration * 2 + config.trafficControl.buhosSettings.allRedTime * 4) / 60)} minutes total</div>
+                          <div className="mt-2 text-yellow-700"><strong>Note:</strong> Creates very long wait times for perpendicular directions - best for emergency situations!</div>
                         </div>
                       </div>
                     </div>
@@ -840,6 +926,7 @@ const ConfigurationPage = ({ socket }) => {
                   {config.trafficControl.method === 'fixed' && `Fixed (${config.trafficControl.cycleTime}s cycle)`}
                   {config.trafficControl.method === 'adaptive' && 'Adaptive Control'}
                   {config.trafficControl.method === 'add_adaptive' && 'Add Adaptive TLS'}
+                  {config.trafficControl.method === 'buhos' && `Buhos Method (${Math.floor(config.trafficControl.buhosSettings.phaseDuration / 60)}min phases)`}
                 </span>
               </div>
               <div className="config-preview-item">
@@ -885,6 +972,7 @@ const ConfigurationPage = ({ socket }) => {
                   config.trafficControl.method === 'fixed' ? `Fixed timing (${config.trafficControl.cycleTime}s cycle)` :
                   config.trafficControl.method === 'adaptive' ? `Adaptive control (${config.trafficControl.adaptiveSettings.minDuration}-${config.trafficControl.adaptiveSettings.maxDuration}s green)` :
                   config.trafficControl.method === 'add_adaptive' ? `Add adaptive TLS to priority junctions (>${config.trafficControl.adaptiveSettings.speedThreshold}km/h)` :
+                  config.trafficControl.method === 'buhos' ? `Buhos Method - ${Math.floor(config.trafficControl.buhosSettings.phaseDuration / 60)}min per direction, ${config.trafficControl.buhosSettings.phaseOrder} order` :
                   'Default behavior'
                 }</div>
               </div>

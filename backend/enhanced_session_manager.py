@@ -368,8 +368,33 @@ class EnhancedSessionManager:
             time_elem.set('begin', str(begin_time))
             time_elem.set('end', str(end_time))
             
+            # Add Buhos additional file if Buhos method is selected
+            traffic_control = config.get('trafficControl', {})
+            if traffic_control.get('method') == 'buhos':
+                input_elem = root.find('.//input')
+                if input_elem is not None:
+                    additional_files_elem = input_elem.find('.//additional-files')
+                    if additional_files_elem is not None:
+                        # Get existing additional files
+                        existing_files = additional_files_elem.get('value', '')
+                        # Add Buhos file to the list
+                        buhos_file = 'buhos_traffic_lights.add.xml'
+                        if buhos_file not in existing_files:
+                            if existing_files:
+                                new_files = f"{existing_files},{buhos_file}"
+                            else:
+                                new_files = buhos_file
+                            additional_files_elem.set('value', new_files)
+                            print(f"Added Buhos additional file to SUMO configuration: {buhos_file}")
+                    else:
+                        # Create additional-files element if it doesn't exist
+                        additional_files_elem = ET.SubElement(input_elem, 'additional-files')
+                        additional_files_elem.set('value', 'buhos_traffic_lights.add.xml')
+                        print(f"Created additional-files element with Buhos file")
+            
             # Save the updated config
             tree.write(config_file, encoding='utf-8', xml_declaration=True)
+            print(f"Updated SUMO configuration file: {config_file}")
             
         except Exception as e:
             print(f"Error updating SUMO config: {e}")
@@ -472,28 +497,52 @@ class EnhancedSessionManager:
                     adaptive_settings
                 )
             
-            # Execute netconvert
-            print(f"Running netconvert with command: {' '.join(cmd)}")
-            result = subprocess.run(cmd, capture_output=True, text=True, timeout=60)
+            elif method == 'buhos':
+                # Buhos Method: Create custom traffic light programs with long phases
+                # No netconvert modifications needed - we'll use additional file to override programs
+                buhos_settings = config.get('buhosSettings', {})
+                
+                # Create the Buhos additional file BEFORE running netconvert
+                # This will override the default programs
+                self._create_buhos_additional_file(
+                    network_file.parent,
+                    network_file,
+                    buhos_settings
+                )
+                
+                # We still run netconvert but just to process the network
+                # The additional file will be loaded separately
+                print(f"Buhos Method: Created additional file with {buhos_settings.get('phaseDuration', 600)}s phases")
+                
+                # Don't rebuild traffic lights - keep existing structure
+                # The additional file will override with Buhos programs
             
-            if result.returncode != 0:
-                print(f"netconvert stderr: {result.stderr}")
-                raise Exception(f"netconvert failed with return code {result.returncode}: {result.stderr}")
-            
-            # Replace original file with modified version
-            if str(network_file).endswith('.gz'):
-                # Compress the output and replace
-                with open(temp_output, 'rb') as f_in:
-                    with gzip.open(network_file, 'wb') as f_out:
-                        shutil.copyfileobj(f_in, f_out)
-                        
-                # Clean up temporary input file
-                if 'temp_input' in locals():
-                    temp_input.unlink()
+            # Execute netconvert only if we need to modify the network
+            if method != 'buhos':
+                print(f"Running netconvert with command: {' '.join(cmd)}")
+                result = subprocess.run(cmd, capture_output=True, text=True, timeout=60)
+                
+                if result.returncode != 0:
+                    print(f"netconvert stderr: {result.stderr}")
+                    raise Exception(f"netconvert failed with return code {result.returncode}: {result.stderr}")
+                
+                # Replace original file with modified version
+                if str(network_file).endswith('.gz'):
+                    # Compress the output and replace
+                    with open(temp_output, 'rb') as f_in:
+                        with gzip.open(network_file, 'wb') as f_out:
+                            shutil.copyfileobj(f_in, f_out)
+                            
+                    # Clean up temporary input file
+                    if 'temp_input' in locals():
+                        temp_input.unlink()
+                else:
+                    shutil.move(str(temp_output), str(network_file))
+                
+                print(f"Successfully applied {method} traffic control configuration")
             else:
-                shutil.move(str(temp_output), str(network_file))
-            
-            print(f"Successfully applied {method} traffic control configuration")
+                # For Buhos, we don't need to modify the network file
+                print(f"Buhos Method: Network file unchanged, using additional file for traffic light override")
             
         except subprocess.TimeoutExpired:
             raise Exception("netconvert operation timed out")
@@ -533,6 +582,198 @@ class EnhancedSessionManager:
             print(f"Created actuated traffic light parameters file: {additional_file}")
         except Exception as e:
             print(f"Warning: Could not create additional file: {e}")
+    
+    def _extract_tls_info_from_network(self, network_file: Path) -> List[Dict[str, Any]]:
+        """
+        Extract traffic light information from network file
+        
+        Returns:
+            List of dictionaries containing TLS ID and phase information
+        """
+        import xml.etree.ElementTree as ET
+        import gzip
+        
+        try:
+            # Read network file (handle both compressed and uncompressed)
+            if str(network_file).endswith('.gz'):
+                with gzip.open(network_file, 'rt', encoding='utf-8') as f:
+                    content = f.read()
+            else:
+                with open(network_file, 'r', encoding='utf-8') as f:
+                    content = f.read()
+            
+            root = ET.fromstring(content)
+            tls_info_list = []
+            
+            # Find all traffic light logics
+            for tl_logic in root.findall('.//tlLogic'):
+                tls_id = tl_logic.get('id')
+                tls_type = tl_logic.get('type', 'static')
+                program_id = tl_logic.get('programID', '0')
+                
+                # Get phases
+                phases = []
+                for phase in tl_logic.findall('.//phase'):
+                    phase_info = {
+                        'duration': phase.get('duration'),
+                        'state': phase.get('state'),
+                        'name': phase.get('name', '')
+                    }
+                    phases.append(phase_info)
+                
+                tls_info = {
+                    'id': tls_id,
+                    'type': tls_type,
+                    'programID': program_id,
+                    'phases': phases,
+                    'num_phases': len(phases),
+                    'state_length': len(phases[0]['state']) if phases else 0
+                }
+                tls_info_list.append(tls_info)
+            
+            print(f"Found {len(tls_info_list)} traffic light(s) in network")
+            for tls in tls_info_list:
+                print(f"  - TLS '{tls['id']}': {tls['num_phases']} phases, {tls['state_length']} connections")
+            
+            return tls_info_list
+            
+        except Exception as e:
+            print(f"Warning: Could not extract TLS info from network: {e}")
+            return []
+    
+    def _create_buhos_additional_file(self, session_dir: Path, network_file: Path, buhos_settings: Dict[str, Any]):
+        """
+        Create additional file with Buhos Method traffic light programs
+        
+        This creates extremely long green phases for each direction sequentially
+        """
+        import xml.etree.ElementTree as ET
+        
+        # Extract traffic light information from network
+        tls_info_list = self._extract_tls_info_from_network(network_file)
+        
+        if not tls_info_list:
+            print("Warning: No traffic lights found in network - Buhos method will not be applied")
+            return
+        
+        # Get Buhos settings
+        phase_duration = buhos_settings.get('phaseDuration', 600)  # Default 10 minutes
+        all_red_time = buhos_settings.get('allRedTime', 5)  # Default 5 seconds
+        phase_order = buhos_settings.get('phaseOrder', 'NS-EW')  # NS-EW or EW-NS
+        
+        # Create additional file
+        additional_file = session_dir / "buhos_traffic_lights.add.xml"
+        
+        # Build XML content
+        root = ET.Element('additional')
+        root.set('xmlns:xsi', 'http://www.w3.org/2001/XMLSchema-instance')
+        root.set('xsi:noNamespaceSchemaLocation', 'http://sumo.dlr.de/xsd/additional_file.xsd')
+        
+        # Add comment
+        comment = ET.Comment(f'''
+        Buhos Method Traffic Light Programs
+        - Phase Duration: {phase_duration}s ({phase_duration/60:.1f} minutes) per direction
+        - All-Red Time: {all_red_time}s clearance between phases
+        - Phase Order: {phase_order}
+        - Total Cycle: {(phase_duration * 2 + all_red_time * 4)}s (~{(phase_duration * 2 + all_red_time * 4)/60:.1f} minutes)
+        ''')
+        root.append(comment)
+        
+        # Create Buhos program for each traffic light
+        for tls_info in tls_info_list:
+            tls_id = tls_info['id']
+            state_length = tls_info['state_length']
+            
+            if state_length == 0:
+                print(f"Warning: TLS '{tls_id}' has no phases, skipping")
+                continue
+            
+            # Create Buhos-style states
+            # We need to determine which connections are NS and which are EW
+            # For simplicity, we'll split the state string roughly in half
+            half_point = state_length // 2
+            
+            # Create state patterns for Buhos method
+            # North-South green: First half green, second half red
+            ns_green_state = 'G' * half_point + 'r' * (state_length - half_point)
+            ns_yellow_state = 'y' * half_point + 'r' * (state_length - half_point)
+            
+            # East-West green: First half red, second half green
+            ew_green_state = 'r' * half_point + 'G' * (state_length - half_point)
+            ew_yellow_state = 'r' * half_point + 'y' * (state_length - half_point)
+            
+            # All red state
+            all_red_state = 'r' * state_length
+            
+            # Create tlLogic element
+            tl_logic = ET.SubElement(root, 'tlLogic')
+            tl_logic.set('id', tls_id)
+            tl_logic.set('type', 'static')
+            tl_logic.set('programID', 'buhos')
+            tl_logic.set('offset', '0')
+            
+            # Determine phase order
+            if phase_order == 'NS-EW':
+                first_green = ns_green_state
+                first_yellow = ns_yellow_state
+                first_name = 'NS_Buhos'
+                second_green = ew_green_state
+                second_yellow = ew_yellow_state
+                second_name = 'EW_Buhos'
+            else:  # EW-NS
+                first_green = ew_green_state
+                first_yellow = ew_yellow_state
+                first_name = 'EW_Buhos'
+                second_green = ns_green_state
+                second_yellow = ns_yellow_state
+                second_name = 'NS_Buhos'
+            
+            # Phase 1: First direction BUHOS (long green)
+            phase1 = ET.SubElement(tl_logic, 'phase')
+            phase1.set('duration', str(phase_duration))
+            phase1.set('state', first_green)
+            phase1.set('name', first_name)
+            
+            # Phase 2: First direction yellow
+            phase2 = ET.SubElement(tl_logic, 'phase')
+            phase2.set('duration', '5')
+            phase2.set('state', first_yellow)
+            phase2.set('name', f'{first_name}_Yellow')
+            
+            # Phase 3: All red clearance
+            phase3 = ET.SubElement(tl_logic, 'phase')
+            phase3.set('duration', str(all_red_time))
+            phase3.set('state', all_red_state)
+            phase3.set('name', 'All_Red_1')
+            
+            # Phase 4: Second direction BUHOS (long green)
+            phase4 = ET.SubElement(tl_logic, 'phase')
+            phase4.set('duration', str(phase_duration))
+            phase4.set('state', second_green)
+            phase4.set('name', second_name)
+            
+            # Phase 5: Second direction yellow
+            phase5 = ET.SubElement(tl_logic, 'phase')
+            phase5.set('duration', '5')
+            phase5.set('state', second_yellow)
+            phase5.set('name', f'{second_name}_Yellow')
+            
+            # Phase 6: All red clearance
+            phase6 = ET.SubElement(tl_logic, 'phase')
+            phase6.set('duration', str(all_red_time))
+            phase6.set('state', all_red_state)
+            phase6.set('name', 'All_Red_2')
+            
+            print(f"Created Buhos program for TLS '{tls_id}': {phase_duration}s per direction")
+        
+        # Write XML to file with pretty printing
+        tree = ET.ElementTree(root)
+        ET.indent(tree, space='  ')
+        tree.write(additional_file, encoding='utf-8', xml_declaration=True)
+        
+        print(f"Created Buhos traffic light programs file: {additional_file}")
+        print(f"  - Cycle time: {(phase_duration * 2 + all_red_time * 2 + 10)}s (~{(phase_duration * 2 + all_red_time * 2 + 10)/60:.1f} minutes)")
+        print(f"  - Each direction gets {phase_duration}s ({phase_duration/60:.1f} minutes) of continuous green")
     
     def _update_vehicle_types(self, session_dir: Path, enabled_vehicles: List[str]):
         """Update vehicle type configuration"""
