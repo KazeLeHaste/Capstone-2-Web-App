@@ -17,32 +17,20 @@ import {
   RefreshCw,
   ArrowLeft,
   FileText,
-  LineChart,
   AlertCircle,
   GitCompare,
   Eye,
   Calendar,
-  Database,
-  MapPin,
-  Leaf,
-  Shield,
-  Network
+  Database
 } from 'lucide-react';
 
 // Import our new components
 import KPIDashboard from '../components/KPIDashboard';
-import AnalyticsCharts from '../components/AnalyticsCharts';
 import RecommendationsPanel from '../components/RecommendationsPanel';
 import SessionComparison from '../components/SessionComparison';
-import NetworkHeatmap from '../components/NetworkHeatmap';
-import EmissionsAnalysis from '../components/EmissionsAnalysis';
-import SafetyAnalysis from '../components/SafetyAnalysis';
 import { 
   exportAnalyticsAsPDF, 
-  exportAdvancedAnalyticsAsCSV,
-  exportEmissionsDataAsCSV,
-  exportSafetyDataAsCSV,
-  exportNetworkDataAsCSV
+  exportAdvancedAnalyticsAsCSV
 } from '../utils/reportExport';
 
 const AnalyticsPage = ({ socket, simulationData, simulationStatus }) => {
@@ -305,36 +293,6 @@ const AnalyticsPage = ({ socket, simulationData, simulationStatus }) => {
     }
   };
 
-  const handleExportEmissions = () => {
-    if (!analyticsData) return;
-    
-    try {
-      exportEmissionsDataAsCSV(analyticsData, `emissions_${selectedSession}`);
-    } catch (error) {
-      console.error('Emissions export failed:', error);
-    }
-  };
-
-  const handleExportSafety = () => {
-    if (!analyticsData) return;
-    
-    try {
-      exportSafetyDataAsCSV(analyticsData, `safety_${selectedSession}`);
-    } catch (error) {
-      console.error('Safety export failed:', error);
-    }
-  };
-
-  const handleExportNetwork = () => {
-    if (!analyticsData) return;
-    
-    try {
-      exportNetworkDataAsCSV(analyticsData, `network_${selectedSession}`);
-    } catch (error) {
-      console.error('Network export failed:', error);
-    }
-  };
-
   // Export dropdown handlers
   const toggleExportDropdown = () => {
     setExportDropdownOpen(!exportDropdownOpen);
@@ -386,10 +344,6 @@ const AnalyticsPage = ({ socket, simulationData, simulationStatus }) => {
 
   const tabs = [
     { id: 'kpis', name: 'KPIs', icon: TrendingUp },
-    { id: 'charts', name: 'Charts', icon: LineChart },
-    { id: 'emissions', name: 'Environmental', icon: Leaf },
-    { id: 'safety', name: 'Safety', icon: Shield },
-    { id: 'network', name: 'Network', icon: MapPin },
     { id: 'recommendations', name: 'Recommendations', icon: AlertCircle },
   ];
 
@@ -487,34 +441,6 @@ const AnalyticsPage = ({ socket, simulationData, simulationStatus }) => {
                       <div>
                         <div className="font-medium">JSON Data</div>
                         <div className="text-xs text-gray-500">Raw analytics data</div>
-                      </div>
-                    </button>
-                  </li>
-                  <div className="divider my-1"></div>
-                  <li>
-                    <button onClick={() => handleExportClick(handleExportEmissions)} disabled={!analyticsData} className="text-sm">
-                      <Leaf className="w-4 h-4" />
-                      <div>
-                        <div className="font-medium">Emissions Data</div>
-                        <div className="text-xs text-gray-500">Environmental impact CSV</div>
-                      </div>
-                    </button>
-                  </li>
-                  <li>
-                    <button onClick={() => handleExportClick(handleExportSafety)} disabled={!analyticsData} className="text-sm">
-                      <Shield className="w-4 h-4" />
-                      <div>
-                        <div className="font-medium">Safety Data</div>
-                        <div className="text-xs text-gray-500">Safety metrics CSV</div>
-                      </div>
-                    </button>
-                  </li>
-                  <li>
-                    <button onClick={() => handleExportClick(handleExportNetwork)} disabled={!analyticsData} className="text-sm">
-                      <Network className="w-4 h-4" />
-                      <div>
-                        <div className="font-medium">Network Data</div>
-                        <div className="text-xs text-gray-500">Network performance CSV</div>
                       </div>
                     </button>
                   </li>
@@ -720,22 +646,6 @@ const AnalyticsPage = ({ socket, simulationData, simulationStatus }) => {
               <div className="card-body">
                 {activeTab === 'kpis' && (
                   <KPIDashboard kpis={analyticsData.kpis} loading={false} />
-                )}
-
-                {activeTab === 'charts' && (
-                  <AnalyticsCharts analyticsData={analyticsData} loading={false} />
-                )}
-
-                {activeTab === 'emissions' && (
-                  <EmissionsAnalysis analyticsData={analyticsData} loading={false} />
-                )}
-
-                {activeTab === 'safety' && (
-                  <SafetyAnalysis analyticsData={analyticsData} loading={false} />
-                )}
-
-                {activeTab === 'network' && (
-                  <NetworkHeatmap analyticsData={analyticsData} loading={false} />
                 )}
 
                 {activeTab === 'recommendations' && (
