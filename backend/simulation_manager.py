@@ -2238,6 +2238,9 @@ class SimulationManager:
             elif method == 'adaptive':
                 # Generate adaptive traffic lights with detectors
                 tl_xml_parts.extend(self._generate_adaptive_tls(tl_signals, traffic_control_config))
+            elif method == 'custom':
+                # Generate custom timer traffic lights with user-specified durations
+                tl_xml_parts.extend(self._generate_custom_timer_tls(tl_signals, traffic_control_config))
             
             # Only return traffic light XML if there are new configurations to add
             if not tl_xml_parts or len(tl_xml_parts) <= 1:  # Only the comment line
@@ -2449,6 +2452,73 @@ class SimulationManager:
             print(f"DEBUG: Generated {len(tl_xml_parts)} adaptive traffic light configurations with detectors")
         
         return all_parts
+
+    def _generate_custom_timer_tls(self, tl_signals: dict, traffic_control_config: Dict[str, Any]) -> list:
+        """
+        Generate custom timer traffic light logic with user-specified phase durations
+        
+        Args:
+            tl_signals: Dictionary mapping tl_id -> {'num_links': int, 'connections': list, 'existing_logic': bool}
+            traffic_control_config: Traffic control configuration
+            
+        Returns:
+            List of XML strings for custom timer traffic light logic
+        """
+        custom_config = traffic_control_config.get('customSettings', {})
+        main_green = custom_config.get('mainGreenDuration', 30)
+        cross_green = custom_config.get('crossGreenDuration', 30)
+        yellow_phase = custom_config.get('yellowDuration', 3)
+        all_red_phase = custom_config.get('allRedDuration', 2)
+        
+        print(f"DEBUG: Custom timing - Main green: {main_green}s, Cross green: {cross_green}s, Yellow: {yellow_phase}s, All-red: {all_red_phase}s")
+        
+        tl_xml_parts = []
+        
+        for tl_id, signal_info in tl_signals.items():
+            # Skip if traffic light logic already exists in the network file
+            if signal_info.get('existing_logic', False):
+                print(f"DEBUG: Skipping {tl_id} - logic already exists in network file")
+                continue
+                
+            num_links = signal_info['num_links']
+            connections = signal_info['connections']
+            
+            # Generate state strings based on actual number of links
+            # Create a simple 2-phase system: main direction green, then cross direction green
+            state_main_green = self._generate_state_string(connections, num_links, 'main_green')
+            state_main_yellow = self._generate_state_string(connections, num_links, 'main_yellow')
+            state_cross_green = self._generate_state_string(connections, num_links, 'cross_green')
+            state_cross_yellow = self._generate_state_string(connections, num_links, 'cross_yellow')
+            state_all_red = 'r' * num_links
+            
+            # Calculate total cycle time for logging
+            cycle_time = (main_green + yellow_phase + all_red_phase + 
+                         cross_green + yellow_phase + all_red_phase)
+            
+            tl_logic = f'''<tlLogic id="{tl_id}" type="static" programID="0" offset="0">
+        <!-- Custom timing configuration - Total cycle: {cycle_time}s -->
+        <!-- Main direction green phase -->
+        <phase duration="{main_green}" state="{state_main_green}"/>
+        <!-- Main direction yellow transition -->
+        <phase duration="{yellow_phase}" state="{state_main_yellow}"/>
+        <!-- All-red safety clearance -->
+        <phase duration="{all_red_phase}" state="{state_all_red}"/>
+        <!-- Cross direction green phase -->
+        <phase duration="{cross_green}" state="{state_cross_green}"/>
+        <!-- Cross direction yellow transition -->
+        <phase duration="{yellow_phase}" state="{state_cross_yellow}"/>
+        <!-- All-red safety clearance -->
+        <phase duration="{all_red_phase}" state="{state_all_red}"/>
+    </tlLogic>'''
+            
+            tl_xml_parts.append(tl_logic)
+        
+        if not tl_xml_parts:
+            print("DEBUG: No new traffic light configurations generated - all signals already have logic in network file")
+        else:
+            print(f"DEBUG: Generated {len(tl_xml_parts)} custom timer traffic light configurations")
+        
+        return tl_xml_parts
 
     def _generate_state_string(self, connections, num_links, phase_type):
         """

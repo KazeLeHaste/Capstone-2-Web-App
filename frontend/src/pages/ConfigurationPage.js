@@ -74,7 +74,7 @@ const ConfigurationPage = ({ socket }) => {
     
     // Traffic Control Configuration
     trafficControl: {
-      method: 'existing', // Options: 'existing', 'fixed', 'adaptive', 'buhos'
+      method: 'existing', // Options: 'existing', 'fixed', 'adaptive', 'buhos', 'custom'
       cycleTime: 90, // Fixed timing cycle time (seconds)
       addToHighPriority: false, // Toggle to add traffic lights to high priority intersections
       adaptiveSettings: {
@@ -88,6 +88,12 @@ const ConfigurationPage = ({ socket }) => {
         phaseDuration: 600, // Duration for each direction's green phase (seconds) - default 10 minutes
         allRedTime: 5, // All-red clearance time between phases (seconds)
         phaseOrder: 'NS-EW' // Phase rotation order: NS-EW or EW-NS
+      },
+      customSettings: {
+        mainGreenDuration: 30, // Green phase duration for main direction (seconds)
+        crossGreenDuration: 30, // Green phase duration for cross direction (seconds)
+        yellowDuration: 3, // Yellow phase duration for transitions (seconds)
+        allRedDuration: 2 // All-red clearance time between phases (seconds)
       }
     },
     
@@ -157,6 +163,18 @@ const ConfigurationPage = ({ socket }) => {
           ...prev.trafficControl,
           buhosSettings: {
             ...prev.trafficControl.buhosSettings,
+            [key]: value
+          }
+        }
+      }));
+    } else if (['mainGreenDuration', 'crossGreenDuration', 'yellowDuration', 'allRedDuration'].includes(key)) {
+      // For custom timing settings
+      setConfig(prev => ({
+        ...prev,
+        trafficControl: {
+          ...prev.trafficControl,
+          customSettings: {
+            ...prev.trafficControl.customSettings,
             [key]: value
           }
         }
@@ -539,9 +557,10 @@ const ConfigurationPage = ({ socket }) => {
                     <option value="fixed">Fixed-Time Control</option>
                     <option value="adaptive">Adaptive Control (Recommended)</option>
                     <option value="buhos">Buhos Method (Philippine Emergency Control)</option>
+                    <option value="custom">Custom Timing</option>
                   </select>
                   <span className="config-help-text">
-                    Adaptive control automatically gives more green time to roads with heavier traffic. Buhos method gives extended green time to one direction at a time.
+                    Adaptive control automatically gives more green time to roads with heavier traffic. Custom timing allows you to specify exact phase durations.
                   </span>
                 </div>
 
@@ -726,6 +745,108 @@ const ConfigurationPage = ({ socket }) => {
                           <div>• Clears backed-up traffic quickly by "flooding" vehicles through</div>
                           <div>• Cycle time: ~{Math.floor((config.trafficControl.buhosSettings.phaseDuration * 2 + config.trafficControl.buhosSettings.allRedTime * 4) / 60)} minutes total</div>
                           <div className="mt-2 text-yellow-700"><strong>Note:</strong> Creates very long wait times for perpendicular directions - best for emergency situations!</div>
+                        </div>
+                      </div>
+                    </div>
+                  </>
+                )}
+
+                {config.trafficControl.method === 'custom' && (
+                  <>
+                    <div className="config-form-group">
+                      <label className="config-label">Main Direction Green Time (seconds)</label>
+                      <input
+                        type="number"
+                        value={config.trafficControl.customSettings.mainGreenDuration}
+                        onChange={(e) => handleTrafficControlChange('mainGreenDuration', parseInt(e.target.value) || 30)}
+                        className="config-input"
+                        min="5"
+                        max="180"
+                        step="1"
+                      />
+                      <span className="config-help-text">
+                        Duration of green light for the main direction (typically North-South)
+                      </span>
+                    </div>
+
+                    <div className="config-form-group">
+                      <label className="config-label">Cross Direction Green Time (seconds)</label>
+                      <input
+                        type="number"
+                        value={config.trafficControl.customSettings.crossGreenDuration}
+                        onChange={(e) => handleTrafficControlChange('crossGreenDuration', parseInt(e.target.value) || 30)}
+                        className="config-input"
+                        min="5"
+                        max="180"
+                        step="1"
+                      />
+                      <span className="config-help-text">
+                        Duration of green light for the cross direction (typically East-West)
+                      </span>
+                    </div>
+
+                    <div className="config-form-group">
+                      <label className="config-label">Yellow Phase Duration (seconds)</label>
+                      <input
+                        type="number"
+                        value={config.trafficControl.customSettings.yellowDuration}
+                        onChange={(e) => handleTrafficControlChange('yellowDuration', parseInt(e.target.value) || 3)}
+                        className="config-input"
+                        min="2"
+                        max="6"
+                        step="1"
+                      />
+                      <span className="config-help-text">
+                        Duration of yellow (amber) light during transitions between green phases
+                      </span>
+                    </div>
+
+                    <div className="config-form-group">
+                      <label className="config-label">All-Red Clearance Time (seconds)</label>
+                      <input
+                        type="number"
+                        value={config.trafficControl.customSettings.allRedDuration}
+                        onChange={(e) => handleTrafficControlChange('allRedDuration', parseInt(e.target.value) || 2)}
+                        className="config-input"
+                        min="0"
+                        max="10"
+                        step="1"
+                      />
+                      <span className="config-help-text">
+                        Safety clearance time when all lights are red between phase transitions
+                      </span>
+                    </div>
+
+                    <div className="mt-3 p-3 info-block rounded-lg">
+                      <div className="flex items-start text-sm text-info-dark">
+                        <Info className="w-4 h-4 mr-2 mt-0.5 flex-shrink-0" />
+                        <div>
+                          <div><strong>Custom Timing Configuration:</strong></div>
+                          <div className="mt-2">
+                            <div><strong>Total Cycle Time:</strong> {
+                              config.trafficControl.customSettings.mainGreenDuration +
+                              config.trafficControl.customSettings.yellowDuration +
+                              config.trafficControl.customSettings.allRedDuration +
+                              config.trafficControl.customSettings.crossGreenDuration +
+                              config.trafficControl.customSettings.yellowDuration +
+                              config.trafficControl.customSettings.allRedDuration
+                            } seconds</div>
+                          </div>
+                          <div className="mt-2">
+                            <div><strong>Phase Sequence:</strong></div>
+                            <div className="mt-1">
+                              1. Main Direction Green: {config.trafficControl.customSettings.mainGreenDuration}s<br/>
+                              2. Yellow Transition: {config.trafficControl.customSettings.yellowDuration}s<br/>
+                              3. All-Red Clearance: {config.trafficControl.customSettings.allRedDuration}s<br/>
+                              4. Cross Direction Green: {config.trafficControl.customSettings.crossGreenDuration}s<br/>
+                              5. Yellow Transition: {config.trafficControl.customSettings.yellowDuration}s<br/>
+                              6. All-Red Clearance: {config.trafficControl.customSettings.allRedDuration}s
+                            </div>
+                          </div>
+                          <div className="mt-2 text-info">
+                            <strong>Note:</strong> These timings will be applied to all traffic lights in the network. 
+                            Ensure phase durations are appropriate for your traffic conditions.
+                          </div>
                         </div>
                       </div>
                     </div>
