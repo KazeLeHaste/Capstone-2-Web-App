@@ -577,7 +577,7 @@ const SimulationPage = ({ socket }) => {
                     ? Math.floor(((config.config.sumo_end || 0) - (config.config.sumo_begin || 0)) / 60)
                     : Math.floor((config.config.duration || 0) / 60)
                   } min
-                  <span className="config-description">Simulated time to cover</span>
+        
                 </div>
                 {simulationState === 'running' && realTimeStats.startTime && (
                   <div>
@@ -613,18 +613,7 @@ const SimulationPage = ({ socket }) => {
                     </>
                   )}
                 </div>
-                <div>
-                  {config.config.original_config ? (
-                    <span className="font-medium">Configuration:</span>
-                  ) : (
-                    <span className="font-medium">Modifications:</span>
-                  )}
-                  {" "}
-                  {config.config.original_config 
-                    ? "Simplified (Essential parameters only)"
-                    : `${(config.config.speedLimits || []).length + (config.config.roadClosures || []).length} items`
-                  }
-                </div>
+      
               </div>
             </div>
 

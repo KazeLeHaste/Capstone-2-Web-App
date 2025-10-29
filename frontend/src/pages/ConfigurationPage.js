@@ -39,6 +39,8 @@ const getVehicleTypeIcon = (vehicleType) => {
       return <Car {...iconProps} />;
     case 'bus':
       return <Bus {...iconProps} />;
+    case 'jeepney':
+      return <Bus {...iconProps} />;  // Use Bus icon for jeepneys (similar shape)
     case 'truck':
       return <Truck {...iconProps} />;
     case 'motorcycle':
@@ -100,7 +102,8 @@ const ConfigurationPage = ({ socket }) => {
     // Vehicle Types Configuration - Controls which vehicle types are included in simulation
     vehicleTypes: {
       passenger: { enabled: true, name: 'Private Vehicles' },
-      bus: { enabled: true, name: 'Buses/Jeepneys' },
+      bus: { enabled: true, name: 'Buses' },
+      jeepney: { enabled: true, name: 'Jeepneys' },
       truck: { enabled: true, name: 'Trucks' },
       motorcycle: { enabled: true, name: 'Motorcycles' }
     },
@@ -305,6 +308,12 @@ const ConfigurationPage = ({ socket }) => {
         length: '12.0 m',
         access: 'Roads + bus lanes',
         description: 'Urban line traffic - larger public utility vehicles'
+      },
+      jeepney: {
+        maxSpeed: '25.0 m/s (90 km/h)',
+        length: '8.0 m',
+        access: 'Roads + bus lanes',
+        description: 'Philippine public transport - flexible public utility vehicles (Pink color, vClass: coach)'
       },
       truck: {
         maxSpeed: '25.0 m/s (90 km/h)',

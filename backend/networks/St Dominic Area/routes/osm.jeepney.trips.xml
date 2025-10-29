@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='utf-8'?>
+<routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/routes_file.xsd">
+    <vType id="jeepney_jeepney" vClass="coach" guiShape="bus/flexible" length="8.0" maxSpeed="25.0" color="255,192,203" />
+    <trip id="jeepney0" depart="0.00" from="555020953#0" to="1326404883" type="jeepney_jeepney" />
+    <trip id="jeepney1" depart="213.70" from="564298145" to="-564298126#9" type="jeepney_jeepney" />
+    <trip id="jeepney2" depart="427.40" from="-1392084250" to="-564298126#9" type="jeepney_jeepney" />
+    <trip id="jeepney3" depart="641.09" from="1392084244#0" to="1326404883" type="jeepney_jeepney" />
+    <trip id="jeepney4" depart="854.79" from="564298145" to="-564298126#9" type="jeepney_jeepney" />
+    <trip id="jeepney5" depart="1068.49" from="564298145" to="1054315845#0" type="jeepney_jeepney" />
+    <trip id="jeepney6" depart="1282.19" from="-1392084250" to="-564298126#9" type="jeepney_jeepney" />
+    <trip id="jeepney7" depart="1495.89" from="1392084244#0" to="653727191#0" type="jeepney_jeepney" />
+    <trip id="jeepney8" depart="1709.58" from="1054315844#0" to="1326404883" type="jeepney_jeepney" />
+    <trip id="jeepney9" depart="1923.28" from="-1392084250" to="1054315845#0" type="jeepney_jeepney" />
+    <trip id="jeepney10" depart="2136.98" from="-1392084250" to="-712245744#1" type="jeepney_jeepney" />
+    <trip id="jeepney11" depart="2350.68" from="-1392084250" to="1054315845#0" type="jeepney_jeepney" />
+    <trip id="jeepney12" depart="2564.38" from="1054315844#0" to="653727191#0" type="jeepney_jeepney" />
+    <trip id="jeepney13" depart="2778.07" from="1392084244#0" to="1326404883" type="jeepney_jeepney" />
+    <trip id="jeepney14" depart="2991.77" from="-1392084250" to="1054315845#0" type="jeepney_jeepney" />
+    <trip id="jeepney15" depart="3205.47" from="712245744#0" to="1326404883" type="jeepney_jeepney" />
+    <trip id="jeepney16" depart="3419.17" from="1392084244#0" to="1326404883" type="jeepney_jeepney" />
+</routes>

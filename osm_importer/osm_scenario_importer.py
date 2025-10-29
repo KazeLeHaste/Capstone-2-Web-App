@@ -62,13 +62,15 @@ class OSMScenarioImporter:
             'netccfg': ['osm.netccfg'],
             'routes': {
                 'passenger': ['osm.passenger.rou.xml', 'osm.passenger.rou'],
-                'bus': ['osm.bus.rou.xml', 'osm.bus.rou'], 
+                'bus': ['osm.bus.rou.xml', 'osm.bus.rou'],
+                'jeepney': ['osm.jeepney.rou.xml', 'osm.jeepney.rou'],
                 'truck': ['osm.truck.rou.xml', 'osm.truck.rou'],
                 'motorcycle': ['osm.motorcycle.rou.xml', 'osm.motorcycle.rou']
             },
             'trips': {
                 'passenger': ['osm.passenger.trips.xml', 'osm.passenger.trips'],
                 'bus': ['osm.bus.trips.xml', 'osm.bus.trips'],
+                'jeepney': ['osm.jeepney.trips.xml', 'osm.jeepney.trips'],
                 'truck': ['osm.truck.trips.xml', 'osm.truck.trips'], 
                 'motorcycle': ['osm.motorcycle.trips.xml', 'osm.motorcycle.trips']
             },
@@ -274,9 +276,10 @@ class OSMScenarioImporter:
                 'error': f'Invalid OSM scenario: {scenario_name}'
             }
         
-        # Determine target name
+        # Determine target name - convert to formal format (Title Case with spaces)
         if not target_name:
-            target_name = f"osm_{scenario_name}"
+            # Use the scenario name as-is (already has proper formatting)
+            target_name = scenario_name
         
         target_path = self.target_networks_dir / target_name
         
@@ -294,6 +297,7 @@ class OSMScenarioImporter:
                 'success': True,
                 'message': f'Successfully imported OSM scenario "{scenario_name}" as "{target_name}"',
                 'target_path': str(target_path),
+                'network_name': target_name,
                 'vehicle_types': scenario_info['vehicle_types'],
                 'network_info': scenario_info['network_info']
             }
@@ -415,6 +419,14 @@ class OSMScenarioImporter:
             if not copied:
                 print(f"Warning: No route or trip file found for {vehicle_type}")
         
+        # Generate jeepney routes from bus routes (separate vClass)
+        print("\n🚌 Generating jeepney routes from bus routes...")
+        self._generate_jeepney_routes_from_bus(routes_dir)
+        
+        # Update config file to include jeepney routes
+        target_config = target_path / f"{network_name}.sumocfg"
+        self._update_config_for_jeepney_routes(target_config)
+        
         # Preserve original OSM Web Wizard route patterns by default for realistic traffic
         if enhance_diversity:
             print("⚠️  Route diversity enhancement requested...")
@@ -469,7 +481,7 @@ class OSMScenarioImporter:
                 route_files = []
                 
                 # Use vehicle_types parameter if provided, otherwise default to common types
-                types_to_check = vehicle_types if vehicle_types else ['passenger', 'bus', 'truck', 'motorcycle']
+                types_to_check = vehicle_types if vehicle_types else ['passenger', 'bus', 'jeepney', 'truck', 'motorcycle']
                 
                 # If diversity enhancement is enabled, use merged enhanced route file
                 if enhance_diversity:
@@ -1510,6 +1522,39 @@ class OSMScenarioImporter:
         except Exception as e:
             print(f"    Warning: Could not update config for enhanced routes: {e}")
 
+    def _update_config_for_jeepney_routes(self, config_file: Path):
+        """
+        Update SUMO config file to include jeepney route files
+        
+        Args:
+            config_file: Path to SUMO config file
+        """
+        try:
+            tree = ET.parse(config_file)
+            root = tree.getroot()
+            
+            # Find the route-files element
+            route_input = root.find('.//route-files')
+            if route_input is not None:
+                current_value = route_input.get('value', '')
+                route_files = [rf.strip() for rf in current_value.split(',') if rf.strip()]
+                
+                # Check if jeepney route file already exists in the list
+                jeepney_route = 'routes/osm.jeepney.trips.xml'
+                if jeepney_route not in route_files:
+                    # Add jeepney route file to the list
+                    route_files.append(jeepney_route)
+                    route_input.set('value', ','.join(route_files))
+                    print(f"✅ Added jeepney routes to config file")
+                else:
+                    print(f"ℹ️  Jeepney routes already in config file")
+            
+            # Save updated config
+            tree.write(config_file, encoding='utf-8', xml_declaration=True)
+            
+        except Exception as e:
+            print(f"    Warning: Could not update config for jeepney routes: {e}")
+
     def _apply_enhanced_randomization(self, trips: List[ET.Element], vehicle_type: str, 
                                     original_stats: Dict[str, Any]) -> List[ET.Element]:
         """
@@ -1633,7 +1678,8 @@ class OSMScenarioImporter:
         """
         shapes = {
             'passenger': 'passenger',
-            'bus': 'bus', 
+            'bus': 'bus',
+            'jeepney': 'bus/flexible',  # Use flexible bus shape for jeepneys
             'truck': 'truck',
             'motorcycle': 'motorcycle'
         }
@@ -1649,7 +1695,7 @@ class OSMScenarioImporter:
         
         # Determine base vehicle type from ID or class
         base_type = 'passenger'
-        for vtype in ['passenger', 'bus', 'truck', 'motorcycle']:
+        for vtype in ['passenger', 'bus', 'jeepney', 'truck', 'motorcycle']:
             if vtype in vtype_id.lower() or vtype in vehicle_class.lower():
                 base_type = vtype
                 break
@@ -1662,6 +1708,7 @@ class OSMScenarioImporter:
         default_colors = {
             'passenger': '128,128,128',  # Gray default
             'bus': '255,255,0',          # Yellow default
+            'jeepney': '255,192,203',    # Pink default (distinctive for jeepneys)
             'truck': '255,255,255',      # White default
             'motorcycle': '255,0,0'      # Red default
         }
@@ -1717,6 +1764,128 @@ class OSMScenarioImporter:
         except Exception as e:
             print(f"    Warning: Failed to compress {trip_file.name}: {e}")
             return None
+    
+    def _generate_jeepney_routes_from_bus(self, routes_dir: Path) -> bool:
+        """
+        Generate jeepney route files from bus routes with modified vType and vClass.
+        Jeepneys use vClass='coach' and guiShape='bus/flexible' to distinguish them from buses.
+        
+        Args:
+            routes_dir: Directory containing route files
+            
+        Returns:
+            True if jeepney routes were generated successfully, False otherwise
+        """
+        try:
+            # Find bus trip or route file
+            bus_trip_file = routes_dir / "osm.bus.trips.xml"
+            bus_route_file = routes_dir / "osm.bus.rou.xml"
+            
+            source_file = None
+            if bus_trip_file.exists():
+                source_file = bus_trip_file
+                output_file = routes_dir / "osm.jeepney.trips.xml"
+                print(f"  📝 Generating jeepney routes from bus trips file...")
+            elif bus_route_file.exists():
+                source_file = bus_route_file
+                output_file = routes_dir / "osm.jeepney.rou.xml"
+                print(f"  📝 Generating jeepney routes from bus routes file...")
+            else:
+                print(f"  ⚠️  No bus route/trip files found to generate jeepney routes")
+                return False
+            
+            # Parse the source file
+            tree = ET.parse(source_file)
+            root = tree.getroot()
+            
+            # Create or modify vType for jeepney
+            found_vtype = False
+            for vtype in root.findall('.//vType'):
+                if 'bus' in vtype.get('id', '').lower():
+                    # Create a new jeepney vType based on bus
+                    jeepney_vtype = ET.Element('vType')
+                    jeepney_vtype.set('id', vtype.get('id').replace('bus', 'jeepney'))
+                    jeepney_vtype.set('vClass', 'coach')  # Use coach vClass for jeepneys
+                    jeepney_vtype.set('guiShape', 'bus/flexible')  # Flexible bus shape
+                    jeepney_vtype.set('length', '8.0')  # Jeepneys are shorter than buses
+                    jeepney_vtype.set('maxSpeed', '25.0')  # 90 km/h max speed
+                    jeepney_vtype.set('color', '255,192,203')  # Pink color for jeepneys
+                    
+                    # Copy other attributes from bus vType if they exist
+                    for attr in ['accel', 'decel', 'sigma', 'tau', 'minGap']:
+                        if vtype.get(attr):
+                            jeepney_vtype.set(attr, vtype.get(attr))
+                    
+                    # Set proper indentation for XML formatting
+                    jeepney_vtype.tail = '\n    '  # Newline + 4 spaces for next element
+                    
+                    # Insert jeepney vType after bus vType
+                    vtype_index = list(root).index(vtype)
+                    root.insert(vtype_index + 1, jeepney_vtype)
+                    found_vtype = True
+            
+            # If no vType was found, create a default jeepney vType
+            if not found_vtype:
+                jeepney_vtype = ET.Element('vType')
+                jeepney_vtype.set('id', 'jeepney_default')
+                jeepney_vtype.set('vClass', 'coach')
+                jeepney_vtype.set('guiShape', 'bus/flexible')
+                jeepney_vtype.set('length', '8.0')
+                jeepney_vtype.set('maxSpeed', '25.0')
+                jeepney_vtype.set('color', '255,192,203')
+                jeepney_vtype.set('accel', '1.2')
+                jeepney_vtype.set('decel', '4.5')
+                jeepney_vtype.set('sigma', '0.5')
+                # Set proper indentation for XML formatting
+                jeepney_vtype.tail = '\n    '  # Newline + 4 spaces for next element
+                root.insert(0, jeepney_vtype)
+            
+            # Update all trips/vehicles to use jeepney type
+            for trip in root.findall('.//trip'):
+                old_type = trip.get('type', '')
+                if 'bus' in old_type.lower():
+                    new_type = old_type.replace('bus', 'jeepney')
+                    trip.set('type', new_type)
+                    
+                    # Update trip ID to indicate it's a jeepney
+                    old_id = trip.get('id', '')
+                    if 'bus' in old_id.lower():
+                        new_id = old_id.replace('bus', 'jeepney')
+                        trip.set('id', new_id)
+            
+            for vehicle in root.findall('.//vehicle'):
+                old_type = vehicle.get('type', '')
+                if 'bus' in old_type.lower():
+                    new_type = old_type.replace('bus', 'jeepney')
+                    vehicle.set('type', new_type)
+                    
+                    # Update vehicle ID to indicate it's a jeepney
+                    old_id = vehicle.get('id', '')
+                    if 'bus' in old_id.lower():
+                        new_id = old_id.replace('bus', 'jeepney')
+                        vehicle.set('id', new_id)
+            
+            # Remove the original bus_bus vType to avoid duplicate vType errors
+            # when both bus and jeepney route files are loaded together
+            elements_to_remove = []
+            for vtype in root.findall('.//vType'):
+                if vtype.get('id') == 'bus_bus':
+                    elements_to_remove.append(vtype)
+            
+            for elem in elements_to_remove:
+                root.remove(elem)
+                print(f"  🗑️  Removed duplicate bus_bus vType from jeepney file")
+            
+            # Write the new jeepney file
+            tree.write(output_file, encoding='utf-8', xml_declaration=True)
+            print(f"  ✅ Generated jeepney routes: {output_file.name}")
+            return True
+            
+        except Exception as e:
+            print(f"  ❌ Failed to generate jeepney routes: {e}")
+            import traceback
+            traceback.print_exc()
+            return False
 
 def main():
     """

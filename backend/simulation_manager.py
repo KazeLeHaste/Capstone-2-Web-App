@@ -302,7 +302,7 @@ class SimulationManager:
             List of vehicle types found
         """
         vehicle_types = []
-        vehicle_patterns = ['passenger', 'bus', 'truck', 'motorcycle']
+        vehicle_patterns = ['passenger', 'bus', 'jeepney', 'truck', 'motorcycle']
         
         for route_file in route_files:
             for vehicle_type in vehicle_patterns:
@@ -457,7 +457,7 @@ class SimulationManager:
                 routes_dest_dir.mkdir(exist_ok=True)
                 
                 # Apply vehicle type filtering
-                enabled_vehicles = config.get('enabledVehicles', ['passenger', 'bus', 'truck', 'motorcycle'])
+                enabled_vehicles = config.get('enabledVehicles', ['passenger', 'bus', 'jeepney', 'truck', 'motorcycle'])
                 
                 # Safeguard: ensure at least one vehicle type is enabled
                 if not enabled_vehicles:
@@ -520,7 +520,7 @@ class SimulationManager:
                     net_input.set('value', f"{network_id}.net.xml")
             
             # Update route files based on enabled vehicles - prioritize enhanced.rou.xml, then .trips.xml for realistic patterns
-            enabled_vehicles = config.get('enabledVehicles', ['passenger', 'bus', 'truck', 'motorcycle'])
+            enabled_vehicles = config.get('enabledVehicles', ['passenger', 'bus', 'jeepney', 'truck', 'motorcycle'])
             route_files = []
             
             # Check for enhanced route file first (best option with our improvements)
@@ -805,7 +805,7 @@ class SimulationManager:
             for route_file in source_dir.glob("*.rou.xml"):
                 # Determine vehicle type from filename
                 vehicle_type = None
-                for vtype in ['passenger', 'bus', 'truck', 'motorcycle']:
+                for vtype in ['passenger', 'bus', 'jeepney', 'truck', 'motorcycle']:
                     if vtype in route_file.name.lower():
                         vehicle_type = vtype
                         break
@@ -828,7 +828,7 @@ class SimulationManager:
             trip_files = list(source_dir.glob("*.trips.xml")) + list(source_dir.glob("*.trips.xml.gz"))
             for trip_file in trip_files:
                 vehicle_type = None
-                for vtype in ['passenger', 'bus', 'truck', 'motorcycle']:
+                for vtype in ['passenger', 'bus', 'jeepney', 'truck', 'motorcycle']:
                     if vtype in trip_file.name.lower():
                         vehicle_type = vtype
                         break
@@ -1131,7 +1131,7 @@ class SimulationManager:
             for trip_file in trip_files:
                 # Determine vehicle type from filename
                 vehicle_type = None
-                for vtype in ['passenger', 'bus', 'truck', 'motorcycle']:
+                for vtype in ['passenger', 'bus', 'jeepney', 'truck', 'motorcycle']:
                     if vtype in trip_file.name.lower():
                         vehicle_type = vtype
                         break
@@ -1193,7 +1193,7 @@ class SimulationManager:
             for route_file in source_dir.glob("*.rou.xml"):
                 # Determine vehicle type from filename
                 vehicle_type = None
-                for vtype in ['passenger', 'bus', 'truck', 'motorcycle']:
+                for vtype in ['passenger', 'bus', 'jeepney', 'truck', 'motorcycle']:
                     if vtype in route_file.name.lower():
                         vehicle_type = vtype
                         break
@@ -1470,7 +1470,7 @@ class SimulationManager:
         for trip_file in trip_files:
             # Determine vehicle type from filename
             vehicle_type = None
-            for vtype in ['passenger', 'bus', 'truck', 'motorcycle']:
+            for vtype in ['passenger', 'bus', 'jeepney', 'truck', 'motorcycle']:
                 if vtype in trip_file.name.lower():
                     vehicle_type = vtype
                     break
@@ -1512,7 +1512,7 @@ class SimulationManager:
         for route_file in source_dir.glob("*.rou.xml"):
             # Determine vehicle type from filename
             vehicle_type = None
-            for vtype in ['passenger', 'bus', 'truck', 'motorcycle']:
+            for vtype in ['passenger', 'bus', 'jeepney', 'truck', 'motorcycle']:
                 if vtype in route_file.name.lower():
                     vehicle_type = vtype
                     break

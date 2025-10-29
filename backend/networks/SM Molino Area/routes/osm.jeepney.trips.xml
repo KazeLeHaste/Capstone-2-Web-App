@@ -1,0 +1,34 @@
+<?xml version='1.0' encoding='utf-8'?>
+<routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/routes_file.xsd">
+    <vType id="jeepney_jeepney" vClass="coach" guiShape="bus/flexible" length="8.0" maxSpeed="25.0" color="255,192,203" />
+    <trip id="jeepney0" depart="0.00" from="580815653#0" to="183689805#0" departLane="best" type="jeepney_jeepney" departSpeed="max" />
+    <trip id="jeepney1" depart="122.51" from="580815653#0" to="624604434" departLane="best" type="jeepney_jeepney" departSpeed="max" />
+    <trip id="jeepney2" depart="245.02" from="870991319#0" to="683268248#0" departLane="best" type="jeepney_jeepney" departSpeed="max" />
+    <trip id="jeepney3" depart="367.53" from="870991319#0" to="683268248#0" departLane="best" type="jeepney_jeepney" departSpeed="max" />
+    <trip id="jeepney4" depart="490.05" from="870991319#0" to="683268248#0" departLane="best" type="jeepney_jeepney" departSpeed="max" />
+    <trip id="jeepney5" depart="612.56" from="-678188678" to="683268248#0" departLane="best" type="jeepney_jeepney" departSpeed="max" />
+    <trip id="jeepney6" depart="735.07" from="366949696" to="683268248#0" departLane="best" type="jeepney_jeepney" departSpeed="max" />
+    <trip id="jeepney7" depart="857.58" from="580815653#0" to="624604434" departLane="best" type="jeepney_jeepney" departSpeed="max" />
+    <trip id="jeepney8" depart="980.09" from="580815653#0" to="624604434" departLane="best" type="jeepney_jeepney" departSpeed="max" />
+    <trip id="jeepney9" depart="1102.60" from="580815653#0" to="427550891#0" departLane="best" type="jeepney_jeepney" departSpeed="max" />
+    <trip id="jeepney10" depart="1225.11" from="580815653#0" to="427550891#0" departLane="best" type="jeepney_jeepney" departSpeed="max" />
+    <trip id="jeepney11" depart="1347.62" from="870991319#0" to="683268248#0" departLane="best" type="jeepney_jeepney" departSpeed="max" />
+    <trip id="jeepney12" depart="1470.14" from="580815653#0" to="183689805#0" departLane="best" type="jeepney_jeepney" departSpeed="max" />
+    <trip id="jeepney13" depart="1592.65" from="366949696" to="683268248#0" departLane="best" type="jeepney_jeepney" departSpeed="max" />
+    <trip id="jeepney14" depart="1715.16" from="580815653#0" to="427550891#0" departLane="best" type="jeepney_jeepney" departSpeed="max" />
+    <trip id="jeepney15" depart="1837.67" from="-678188678" to="683268248#0" departLane="best" type="jeepney_jeepney" departSpeed="max" />
+    <trip id="jeepney16" depart="1960.18" from="366949696" to="683268248#0" departLane="best" type="jeepney_jeepney" departSpeed="max" />
+    <trip id="jeepney17" depart="2082.69" from="580815653#0" to="183689805#0" departLane="best" type="jeepney_jeepney" departSpeed="max" />
+    <trip id="jeepney18" depart="2205.20" from="580815653#0" to="427550891#0" departLane="best" type="jeepney_jeepney" departSpeed="max" />
+    <trip id="jeepney19" depart="2327.72" from="366949696" to="683268248#0" departLane="best" type="jeepney_jeepney" departSpeed="max" />
+    <trip id="jeepney20" depart="2450.23" from="580815653#0" to="624604434" departLane="best" type="jeepney_jeepney" departSpeed="max" />
+    <trip id="jeepney21" depart="2572.74" from="580815653#0" to="183689805#0" departLane="best" type="jeepney_jeepney" departSpeed="max" />
+    <trip id="jeepney22" depart="2695.25" from="580815653#0" to="624604434" departLane="best" type="jeepney_jeepney" departSpeed="max" />
+    <trip id="jeepney23" depart="2817.76" from="-678188678" to="683268248#0" departLane="best" type="jeepney_jeepney" departSpeed="max" />
+    <trip id="jeepney24" depart="2940.27" from="580815653#0" to="427550891#0" departLane="best" type="jeepney_jeepney" departSpeed="max" />
+    <trip id="jeepney25" depart="3062.78" from="366949696" to="683268248#0" departLane="best" type="jeepney_jeepney" departSpeed="max" />
+    <trip id="jeepney26" depart="3185.29" from="366949696" to="683268248#0" departLane="best" type="jeepney_jeepney" departSpeed="max" />
+    <trip id="jeepney27" depart="3307.81" from="580815653#0" to="183689805#0" departLane="best" type="jeepney_jeepney" departSpeed="max" />
+    <trip id="jeepney28" depart="3430.32" from="366949696" to="683268248#0" departLane="best" type="jeepney_jeepney" departSpeed="max" />
+    <trip id="jeepney29" depart="3552.83" from="580815653#0" to="624604434" departLane="best" type="jeepney_jeepney" departSpeed="max" />
+</routes>
