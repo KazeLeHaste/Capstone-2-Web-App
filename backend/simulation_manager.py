@@ -372,12 +372,18 @@ class SimulationManager:
                 self._generate_route_file(session_dir, network_id, config)
                 self._generate_sumo_config(session_dir, network_id, config)
             
+            # Extract traffic control method from config
+            traffic_control_method = "existing"  # Default value
+            if config and 'trafficControl' in config:
+                traffic_control_method = config['trafficControl'].get('method', 'existing')
+            
             # Create session metadata
             session_metadata = {
                 "session_id": session_id,
                 "network_id": network_id,
                 "network_path": str(network_dest),
                 "is_osm_scenario": is_osm_scenario,
+                "traffic_control_method": traffic_control_method,
                 "config_applied": True,
                 "created_at": datetime.now().isoformat(),
                 "files": {

@@ -994,7 +994,8 @@ def list_analyzed_sessions():
                     'can_analyze': has_tripinfo or has_summary,
                     'metadata': metadata,
                     'created_at': metadata.get('created_at'),
-                    'network_id': metadata.get('network_id')
+                    'network_id': metadata.get('network_id'),
+                    'traffic_control_method': metadata.get('traffic_control_method', 'unknown')
                 }
                 
                 sessions.append(session_info)

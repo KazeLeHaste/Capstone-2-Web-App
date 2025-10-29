@@ -368,6 +368,22 @@ const AnalyticsPage = ({ socket, simulationData, simulationStatus }) => {
 
   const canStartComparison = selectedSessionsForComparison.length >= 2;
 
+  // Helper function to format traffic control method name
+  const formatTrafficControlMethod = (method) => {
+    if (!method || method === 'unknown') return 'Unknown';
+    
+    const methodNames = {
+      'existing': 'Existing TLS',
+      'fixed': 'Fixed Timer',
+      'adaptive': 'Adaptive',
+      'actuated': 'Actuated',
+      'custom': 'Custom Timer',
+      'buhos': 'Buhos Algorithm'
+    };
+    
+    return methodNames[method] || method;
+  };
+
   const tabs = [
     { id: 'kpis', name: 'KPIs', icon: TrendingUp },
     { id: 'charts', name: 'Charts', icon: LineChart },
@@ -408,7 +424,7 @@ const AnalyticsPage = ({ socket, simulationData, simulationStatus }) => {
                   .filter(session => session.can_analyze)
                   .map(session => (
                     <option key={session.session_id} value={session.session_id}>
-                      {session.network_id || 'Unknown Network'} - {
+                      {session.network_id || 'Unknown Network'} - {formatTrafficControlMethod(session.traffic_control_method)} - {
                         new Date(session.created_at).toLocaleDateString()
                       }
                     </option>
@@ -533,7 +549,7 @@ const AnalyticsPage = ({ socket, simulationData, simulationStatus }) => {
                           className="form-control"
                         />
                         <span className="text-sm">
-                          {session.network_id || 'Unknown'} - {new Date(session.created_at).toLocaleDateString()}
+                          {session.network_id || 'Unknown'} - {formatTrafficControlMethod(session.traffic_control_method)} - {new Date(session.created_at).toLocaleDateString()}
                         </span>
                       </label>
                     ))}
