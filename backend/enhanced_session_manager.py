@@ -22,6 +22,9 @@ from pathlib import Path
 from typing import Dict, Any, List, Optional, Set
 import shutil
 
+# Import configuration system
+from config import config, get_sumo_binary
+
 class EnhancedSessionManager:
     """Enhanced session manager supporting multiple concurrent simulations"""
     
@@ -783,14 +786,15 @@ class EnhancedSessionManager:
     
     def _build_sumo_command(self, session_info: Dict[str, Any]) -> List[str]:
         """Build SUMO command line based on session configuration"""
-        config = session_info['config']
+        config_obj = session_info['config']
         
-        # Base command
-        sumo_path = "C:\\Program Files (x86)\\Eclipse\\Sumo\\bin"
-        if session_info['enable_gui']:
-            cmd = [os.path.join(sumo_path, "sumo-gui.exe")]
-        else:
-            cmd = [os.path.join(sumo_path, "sumo.exe")]
+        # Base command using config system
+        try:
+            sumo_binary = get_sumo_binary(use_gui=session_info['enable_gui'])
+            cmd = [sumo_binary]
+        except FileNotFoundError as e:
+            print(f"ERROR: {e}")
+            raise
         
         # Configuration file
         sumocfg_files = list(session_info['session_dir'].glob("*.sumocfg"))
@@ -806,7 +810,7 @@ class EnhancedSessionManager:
             "--no-warnings"
         ])
         
-        traffic_scale = config.get('sumo_traffic_scale', config.get('traffic_scale', config.get('sumo_traffic_intensity', 1.0)))  # Legacy fallback
+        traffic_scale = config_obj.get('sumo_traffic_scale', config_obj.get('traffic_scale', config_obj.get('sumo_traffic_intensity', 1.0)))  # Legacy fallback
         if traffic_scale != 1.0:
             cmd.extend(["--scale", str(traffic_scale)])
         

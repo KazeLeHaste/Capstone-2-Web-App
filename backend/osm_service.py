@@ -21,6 +21,8 @@ from pathlib import Path
 from typing import Dict, Any, List, Optional, Tuple
 import threading
 
+# Import configuration system
+from config import config as app_config
 
 class OSMService:
     """
@@ -71,33 +73,13 @@ class OSMService:
     
     def get_sumo_tools_path(self) -> Optional[Path]:
         """
-        Find SUMO tools directory from environment or common locations
+        Find SUMO tools directory using config system
         
         Returns:
             Path to SUMO tools directory or None if not found
         """
-        # Check SUMO_HOME environment variable
-        sumo_home = os.environ.get('SUMO_HOME')
-        if sumo_home:
-            tools_path = Path(sumo_home) / "tools"
-            if tools_path.exists():
-                return tools_path
-        
-        # Common SUMO installation paths
-        common_paths = [
-            r"C:\Program Files (x86)\Eclipse\Sumo\tools",
-            r"C:\Program Files\Eclipse\Sumo\tools",
-            r"/usr/share/sumo/tools",
-            r"/opt/sumo/tools",
-            r"/usr/local/share/sumo/tools"
-        ]
-        
-        for path_str in common_paths:
-            path = Path(path_str)
-            if path.exists():
-                return path
-        
-        return None
+        # Use the config system's SUMO tools detection
+        return app_config.sumo_tools_path
     
     def launch_osm_wizard(self) -> Dict[str, Any]:
         """

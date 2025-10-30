@@ -29,6 +29,9 @@ from pathlib import Path
 from typing import Dict, Any, List, Optional
 import xml.etree.ElementTree as ET
 
+# Import configuration system
+from config import config, get_sumo_binary
+
 # TraCI functionality has been removed to prevent configuration conflicts with SUMO GUI
 # The system now operates in pure GUI mode for better user control
 
@@ -897,14 +900,11 @@ class SimulationManager:
                 route_file = routes_dir / f"osm.{vehicle_type}.rou.xml"
                 
                 try:
-                    # Use enhanced randomTrips.py for this vehicle type
+                    # Use randomTrips.py from config system
                     import subprocess
-                    import os
                     
-                    sumo_home = os.environ.get('SUMO_HOME', 'C:\\Program Files (x86)\\Eclipse\\Sumo')
-                    randomtrips_script = os.path.join(sumo_home, 'tools', 'randomTrips.py')
-                    
-                    if not os.path.exists(randomtrips_script):
+                    randomtrips_script = config.get_sumo_tool('randomTrips.py')
+                    if not randomtrips_script or not randomtrips_script.exists():
                         print(f"⚠️  randomTrips.py not found, falling back to simple generation for {vehicle_type}")
                         self._create_simple_osm_route_file(route_file, vehicle_type, adjusted_count)
                         continue
@@ -1835,13 +1835,16 @@ class SimulationManager:
         route_file = session_dir / f"{network_id}.rou.xml"
         
         try:
-            # Find SUMO tools directory
-            sumo_home = os.environ.get('SUMO_HOME', 'C:\\Program Files (x86)\\Eclipse\\Sumo')
-            randomtrips_script = os.path.join(sumo_home, 'tools', 'randomTrips.py')
+            # Find SUMO randomTrips.py using config system
+            randomtrips_script = config.get_sumo_tool('randomTrips.py')
+            if not randomtrips_script:
+                print(f"WARNING: randomTrips.py not found, using simplified route generation")
+                self._create_simple_route_file(network_file, route_file, config)
+                return route_file
             
             # Enhanced randomTrips.py with parameters for realistic diversity
             randomtrips_cmd = [
-                "python", randomtrips_script,
+                "python", str(randomtrips_script),
                 "-n", str(network_file),
                 "-o", str(route_file),
                 "--route-file", str(route_file),  # Generate routes directly
@@ -2659,12 +2662,13 @@ class SimulationManager:
             # Extract network_id from config file name (remove .sumocfg extension)
             network_id = config_file.stem if config_file.suffix == '.sumocfg' else config_file.name.replace('.sumocfg', '')
             
-            # Prepare SUMO command
-            sumo_path = "C:\\Program Files (x86)\\Eclipse\\Sumo\\bin"
-            if enable_gui:
-                sumo_cmd = [os.path.join(sumo_path, "sumo-gui.exe")]
-            else:
-                sumo_cmd = [os.path.join(sumo_path, "sumo.exe")]
+            # Prepare SUMO command using config system
+            try:
+                sumo_binary = get_sumo_binary(use_gui=enable_gui)
+                sumo_cmd = [sumo_binary]
+            except FileNotFoundError as e:
+                print(f"ERROR: {e}")
+                return None
             
             sumo_cmd.extend([
                 "-c", config_file.name,  # Use just the filename since we set cwd=session_dir
@@ -2737,7 +2741,14 @@ class SimulationManager:
             # Add gaming mode settings for GUI (automatic start and better UX)
             if enable_gui:
                 # Use GUI settings file for proper input handling
-                gui_settings_path = os.path.join(os.path.dirname(__file__), "gui_settings.xml")
+                # In frozen app, gui_settings.xml is in sys._MEIPASS root, otherwise in backend dir
+                from config import config as app_config
+                if app_config.is_frozen:
+                    import sys
+                    gui_settings_path = os.path.join(sys._MEIPASS, "gui_settings.xml")
+                else:
+                    gui_settings_path = os.path.join(os.path.dirname(__file__), "gui_settings.xml")
+                
                 sumo_cmd.extend([
                     "--gui-settings-file", gui_settings_path,  # Use custom GUI settings
                     "--game",        # Enable gaming mode

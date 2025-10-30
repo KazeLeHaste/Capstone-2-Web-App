@@ -23,15 +23,39 @@ from analytics_engine import TrafficAnalyticsEngine
 from database.service import DatabaseService
 from enhanced_session_manager import EnhancedSessionManager
 
-# Initialize Flask app
-app = Flask(__name__)
+# Configure static files for React build (will be updated in production)
+from config import config as app_config
+print(f"DEBUG: frontend_build_dir={app_config.frontend_build_dir}")
+print(f"DEBUG: frontend_build_dir exists? {app_config.frontend_build_dir.exists()}")
+
+# Flask's static_folder should point to the 'static' subdirectory inside the React build
+static_folder_path = app_config.frontend_build_dir / 'static' if app_config.frontend_build_dir.exists() else None
+print(f"DEBUG: static_folder_path={static_folder_path}")
+print(f"DEBUG: static_folder_path exists? {static_folder_path.exists() if static_folder_path else 'N/A'}")
+
+static_folder = str(static_folder_path) if static_folder_path and static_folder_path.exists() else None
+print(f"DEBUG: Initializing Flask with static_folder={static_folder}")
+
+# Initialize Flask app with React build's static subdirectory as static folder
+app = Flask(__name__, 
+            static_folder=static_folder,
+            static_url_path='/static')
 app.config['SECRET_KEY'] = 'traffic_simulator_secret_key_2025'
 
+print(f"DEBUG: Flask app.static_folder={app.static_folder}")
+
 # Enable CORS for React frontend
-CORS(app, origins=["http://localhost:3000", "http://127.0.0.1:3000"], supports_credentials=True)
+# Support both development (port 3000) and production (port 5000) origins
+allowed_origins = [
+    "http://localhost:3000", 
+    "http://127.0.0.1:3000",
+    "http://localhost:5000", 
+    "http://127.0.0.1:5000"
+]
+CORS(app, origins=allowed_origins, supports_credentials=True)
 
 # Initialize SocketIO for real-time communication
-socketio = SocketIO(app, cors_allowed_origins=["http://localhost:3000", "http://127.0.0.1:3000"], async_mode='threading')
+socketio = SocketIO(app, cors_allowed_origins=allowed_origins, async_mode='threading')
 
 # Initialize database service
 db_service = DatabaseService()
@@ -68,26 +92,35 @@ def log_request_info():
 
 # Legacy simulation state removed - now using multi-session architecture
 
-@app.route('/')
-def home():
+# NOTE: Root route moved to bottom of file for React frontend serving
+
+@app.route('/api/health')
+def api_health():
     """
-    API health check endpoint
+    API health check endpoint (moved from / to avoid conflict with React frontend)
     Returns basic application information
     """
-    # Check SUMO availability using the enhanced session manager
+    # Check SUMO availability using the config's detected SUMO path
     sumo_available = False
+    sumo_version = None
     try:
+        sumo_binary = app_config.get_sumo_binary(use_gui=False)  # Use method instead of attribute
         import subprocess
-        result = subprocess.run(['sumo', '--help'], capture_output=True, text=True, timeout=5)
+        result = subprocess.run([str(sumo_binary), '--version'], capture_output=True, text=True, timeout=5)
         sumo_available = result.returncode == 0
-    except:
+        if sumo_available and result.stdout:
+            # Extract version from output
+            sumo_version = result.stdout.strip().split('\n')[0] if result.stdout else None
+    except Exception as e:
+        print(f"DEBUG: SUMO check failed: {e}")
         sumo_available = False
     
     return jsonify({
         'message': 'Traffic Simulator Backend API',
         'version': '2.0.0',  # Updated version for multi-session architecture
         'status': 'running',
-        'sumo_available': sumo_available
+        'sumo_available': sumo_available,
+        'sumo_version': sumo_version
     })
 
 @app.route('/api/status')
@@ -95,22 +128,19 @@ def api_status():
     """
     Get current application and simulation status
     """
-    # Check SUMO availability
+    # Check SUMO availability using the config's detected SUMO path
     sumo_available = False
+    sumo_version = None
     try:
+        sumo_binary = app_config.get_sumo_binary(use_gui=False)  # Use method instead of attribute
         import subprocess
-        result = subprocess.run(['sumo', '--help'], capture_output=True, text=True, timeout=5)
+        result = subprocess.run([str(sumo_binary), '--version'], capture_output=True, text=True, timeout=5)
         sumo_available = result.returncode == 0
-    except:
-        sumo_available = False
-    
-    # Check SUMO availability
-    sumo_available = False
-    try:
-        import subprocess
-        result = subprocess.run(['sumo', '--help'], capture_output=True, text=True, timeout=5)
-        sumo_available = result.returncode == 0
-    except:
+        if sumo_available and result.stdout:
+            # Extract version from output
+            sumo_version = result.stdout.strip().split('\n')[0] if result.stdout else None
+    except Exception as e:
+        print(f"DEBUG: SUMO check failed in status: {e}")
         sumo_available = False
     
     return jsonify({
@@ -118,6 +148,7 @@ def api_status():
         'simulation_active': len(enhanced_session_manager.active_sessions) > 0,
         'active_sessions': len(enhanced_session_manager.active_sessions),
         'sumo_available': sumo_available,
+        'sumo_version': sumo_version,
         'connected_clients': len(websocket_handler.connected_clients)
     })
 
@@ -1667,27 +1698,164 @@ def preview_scenario():
         }), 500
 
 # ============================================================================
+# ============================================================================
 # END OSM WEB WIZARD INTEGRATION ENDPOINTS
 # ============================================================================
 
+# ============================================================================
+# STATIC FILE SERVING FOR PRODUCTION
+# ============================================================================
+
+print("DEBUG: Registering serve_react_app route...")
+
+@app.route('/', defaults={'path': ''})
+@app.route('/<path:path>')
+def serve_react_app(path):
+    """
+    Serve React frontend in production mode
+    
+    When packaged with PyInstaller or running in production, this serves
+    the React build files directly from the backend.
+    """
+    from config import config
+    
+    # Debug logging
+    print(f"DEBUG serve_react_app: path='{path}'")
+    print(f"DEBUG frontend_build_dir: {config.frontend_build_dir}")
+    print(f"DEBUG frontend_build_dir.exists(): {config.frontend_build_dir.exists()}")
+    
+    if not config.frontend_build_dir.exists():
+        return jsonify({
+            'error': 'Frontend build not found',
+            'message': f'Looking for: {config.frontend_build_dir}',
+            'dev_mode': True
+        }), 404
+    
+    # Serve static files
+    if path and (config.frontend_build_dir / path).exists():
+        print(f"DEBUG: Serving static file: {path}")
+        return send_from_directory(config.frontend_build_dir, path)
+    
+    # Serve index.html for all other routes (SPA)
+    index_path = config.frontend_build_dir / 'index.html'
+    print(f"DEBUG: index_path = {index_path}")
+    print(f"DEBUG: index_path.exists() = {index_path.exists()}")
+    
+    if index_path.exists():
+        print(f"DEBUG: Serving index.html")
+        return send_from_directory(config.frontend_build_dir, 'index.html')
+    
+    return jsonify({
+        'error': 'Frontend index.html not found',
+        'path_checked': str(index_path)
+    }), 404
+
+print("DEBUG: serve_react_app route registered!")
+
+# ============================================================================
+# BROWSER AUTO-LAUNCH FOR PACKAGED APP
+# ============================================================================
+
+def open_browser():
+    """Open system browser after Flask server starts"""
+    import webbrowser
+    import time
+    
+    # Wait for Flask to start
+    time.sleep(2)
+    
+    # Open browser to the app
+    webbrowser.open('http://localhost:5000')
+    print("\n✅ Browser opened to http://localhost:5000")
+
+# ============================================================================
+# MAIN ENTRY POINT
+# ============================================================================
+
 if __name__ == '__main__':
-    print("Starting Traffic Simulator Backend...")
-    print("Backend API: http://localhost:5000")
-    print("WebSocket: ws://localhost:5000")
-    print("Make sure SUMO is installed and accessible from PATH")
+    import sys
+    from config import config, validate_installation
+    
+    print("=" * 70)
+    print("🚗 Traffic Simulator - SUMO Integration Platform")
+    print("=" * 70)
+    print()
+    
+    # Validate installation
+    validation = validate_installation()
+    
+    print("📋 System Status:")
+    print("-" * 70)
+    print(f"  Mode: {'PACKAGED' if config.is_frozen else 'DEVELOPMENT'}")
+    print(f"  App Directory: {config.app_dir}")
+    
+    if validation['info'].get('sumo_home'):
+        print(f"  SUMO Home: {validation['info']['sumo_home']}")
+        print(f"  SUMO Version: {validation['info'].get('sumo_version', 'unknown')}")
+    
+    if validation['info'].get('networks'):
+        print(f"  Networks: {validation['info']['networks']} available")
+    
+    print()
+    
+    # Show errors and warnings
+    if validation['errors']:
+        print("❌ ERRORS:")
+        for error in validation['errors']:
+            print(f"  • {error}")
+        print()
+        print("Please fix these errors before running the application.")
+        print("Download SUMO from: https://sumo.dlr.de/docs/Installing/index.html")
+        input("\nPress Enter to exit...")
+        sys.exit(1)
+    
+    if validation['warnings']:
+        print("⚠️  WARNINGS:")
+        for warning in validation['warnings']:
+            print(f"  • {warning}")
+        print()
+    
+    print("✅ All systems operational!")
+    print("-" * 70)
+    print()
+    print("🌐 Starting server...")
+    print(f"  Backend API: http://localhost:{config.port}")
+    print(f"  WebSocket: ws://localhost:{config.port}")
+    print()
+    
+    if config.is_frozen:
+        print("🚀 Opening browser automatically...")
+        # Start browser opener in background thread
+        import threading
+        threading.Thread(target=open_browser, daemon=True).start()
+    else:
+        print("💡 Development mode - access at http://localhost:5000")
+    
+    print()
+    print("=" * 70)
+    print()
+    
+    # Debug: Print all registered routes
+    print("🔍 Registered Flask routes:")
+    for rule in app.url_map.iter_rules():
+        print(f"  {rule.endpoint}: {rule.rule}")
+    print()
     
     try:
         # Start Flask-SocketIO server
         socketio.run(
             app,
-            host='0.0.0.0',
-            port=5000,
-            debug=True,
+            host=config.host,
+            port=config.port,
+            debug=config.debug,
             allow_unsafe_werkzeug=True
         )
+    except KeyboardInterrupt:
+        print("\n\n🛑 Shutting down gracefully...")
     finally:
         # Cleanup OSM service on shutdown
         try:
             osm_service.cleanup_wizard()
         except:
             pass
+        print("👋 Goodbye!")
