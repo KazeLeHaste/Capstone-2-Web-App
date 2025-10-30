@@ -329,27 +329,38 @@ const SessionComparison = ({ selectedSessions, onClose }) => {
                   </tr>
                 </thead>
                 <tbody>
-                  {Object.entries(kpiComparison).map(([kpi, data]) => (
-                    <tr key={kpi}>
-                      <td className="session-comparison-metric-name">
-                        {kpi.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
-                      </td>
-                      {sessions.map(session => (
-                        <td key={session}>
-                          {(() => {
-                            const value = data.values?.[session];
-                            if (value === null || value === undefined) return 'N/A';
-                            if (typeof value === 'number') return value.toFixed(2);
-                            if (typeof value === 'string' && !isNaN(parseFloat(value))) return parseFloat(value).toFixed(2);
-                            return String(value);
-                          })()}
+                  {Object.entries(kpiComparison)
+                    .filter(([kpi, data]) => {
+                      // Filter out metrics where ALL values are zero or missing
+                      const values = sessions.map(session => data.values?.[session]);
+                      const hasNonZeroValue = values.some(value => {
+                        if (value === null || value === undefined) return false;
+                        const numValue = typeof value === 'number' ? value : parseFloat(value);
+                        return !isNaN(numValue) && numValue !== 0;
+                      });
+                      return hasNonZeroValue;
+                    })
+                    .map(([kpi, data]) => (
+                      <tr key={kpi}>
+                        <td className="session-comparison-metric-name">
+                          {kpi.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
                         </td>
-                      ))}
-                      <td className="session-comparison-best-indicator">
-                        {getSessionDisplayName(data.best_session) || 'N/A'}
-                      </td>
-                    </tr>
-                  ))}
+                        {sessions.map(session => (
+                          <td key={session}>
+                            {(() => {
+                              const value = data.values?.[session];
+                              if (value === null || value === undefined) return 'N/A';
+                              if (typeof value === 'number') return value.toFixed(2);
+                              if (typeof value === 'string' && !isNaN(parseFloat(value))) return parseFloat(value).toFixed(2);
+                              return String(value);
+                            })()}
+                          </td>
+                        ))}
+                        <td className="session-comparison-best-indicator">
+                          {getSessionDisplayName(data.best_session) || 'N/A'}
+                        </td>
+                      </tr>
+                    ))}
                 </tbody>
               </table>
             </div>
