@@ -903,8 +903,197 @@ class TrafficAnalyticsEngine:
         
         return trips
     
+    def _calculate_severity_score(self, kpi_value: float, threshold: float, condition: str) -> float:
+        """Calculate severity score (0-100) based on how much a KPI exceeds threshold"""
+        if condition in ['throughput', 'flow_rate', 'avg_speed', 'avg_network_speed', 'safety_score']:
+            # Lower is worse for these metrics
+            if kpi_value >= threshold:
+                return 0  # No issue
+            deviation = (threshold - kpi_value) / threshold
+        else:
+            # Higher is worse for these metrics
+            if kpi_value <= threshold:
+                return 0  # No issue
+            deviation = (kpi_value - threshold) / threshold
+        
+        # Map deviation to severity (0-100)
+        return min(100, deviation * 100)
+    
+    def _generate_contextual_message(self, rule: RecommendationRule, kpi_value: float, 
+                                    severity: float, kpis: TrafficKPIs) -> str:
+        """Generate contextual, data-driven message based on multiple KPIs"""
+        
+        # Base message with actual value
+        base_msg = rule.message.format(value=kpi_value)
+        
+        # Add contextual insights based on related metrics
+        context_parts = []
+        
+        if rule.condition == 'avg_waiting_time':
+            if kpis.avg_edge_occupancy > 50:
+                context_parts.append(f"High network occupancy ({kpis.avg_edge_occupancy:.1f}%) is contributing to delays.")
+            if kpis.bottleneck_edges > 3:
+                context_parts.append(f"Detected {kpis.bottleneck_edges} bottleneck locations causing queuing.")
+            if kpis.throughput < 1000:
+                context_parts.append("Low throughput suggests capacity constraints.")
+                
+        elif rule.condition == 'avg_time_loss':
+            efficiency_loss = (kpi_value / (kpis.avg_travel_time + kpi_value)) * 100 if kpis.avg_travel_time > 0 else 0
+            context_parts.append(f"Vehicles are spending {efficiency_loss:.1f}% of their travel time in delays.")
+            if kpis.congestion_index > 0.7:
+                context_parts.append(f"Congestion index of {kpis.congestion_index:.2f} indicates severe traffic conditions.")
+                
+        elif rule.condition == 'avg_speed':
+            speed_kmh = kpi_value * 3.6
+            context_parts.append(f"Average speed of {speed_kmh:.1f} km/h is below efficient flow levels.")
+            if kpis.avg_network_speed > 0 and kpi_value < kpis.avg_network_speed * 0.5:
+                context_parts.append("Vehicle speeds are significantly below network speed limits.")
+                
+        elif rule.condition == 'total_co2':
+            per_vehicle = kpi_value / kpis.total_vehicles_completed if kpis.total_vehicles_completed > 0 else 0
+            context_parts.append(f"Average of {per_vehicle/1000:.2f}kg CO₂ per completed trip.")
+            if kpis.avg_speed < 8.0:
+                context_parts.append("Low average speeds are increasing fuel consumption and emissions.")
+                
+        elif rule.condition == 'total_nox':
+            if kpis.total_co2 > 1000000:
+                context_parts.append("Both NOx and CO₂ emissions are elevated, suggesting need for comprehensive emission controls.")
+                
+        elif rule.condition == 'total_fuel_consumption':
+            per_vehicle = kpi_value / kpis.total_vehicles_completed if kpis.total_vehicles_completed > 0 else 0
+            context_parts.append(f"Average fuel consumption: {per_vehicle:.1f}g per vehicle.")
+            if kpis.avg_waiting_time > 30:
+                context_parts.append("Extended waiting times are causing excessive idling and fuel waste.")
+                
+        elif rule.condition == 'avg_edge_density':
+            if kpis.max_edge_density > kpi_value * 2:
+                context_parts.append(f"Peak density reaches {kpis.max_edge_density:.1f} veh/km at critical locations.")
+                
+        elif rule.condition == 'avg_edge_occupancy':
+            if severity > 50:
+                context_parts.append("Network is approaching saturation - consider demand management strategies.")
+            if kpis.bottleneck_edges > 5:
+                context_parts.append(f"Multiple bottlenecks ({kpis.bottleneck_edges}) are limiting network capacity.")
+                
+        elif rule.condition == 'safety_score':
+            if kpis.total_teleports > 0:
+                context_parts.append(f"Safety concerns include {kpis.total_teleports} teleport events (gridlock indicators).")
+            if kpis.total_collisions > 0:
+                context_parts.append(f"{kpis.total_collisions} collision events were recorded.")
+                
+        elif rule.condition == 'bottleneck_edges':
+            if kpis.max_edge_occupancy > 70:
+                context_parts.append(f"Bottlenecks show {kpis.max_edge_occupancy:.1f}% occupancy at peak times.")
+                
+        elif rule.condition == 'throughput':
+            vehicles_per_minute = kpi_value / 60
+            context_parts.append(f"Current rate: {vehicles_per_minute:.1f} vehicles/minute.")
+            if kpis.total_vehicles_completed > 0 and kpis.total_distance_traveled > 0:
+                avg_distance = kpis.total_distance_traveled / kpis.total_vehicles_completed
+                context_parts.append(f"Average trip distance: {avg_distance:.0f}m.")
+        
+        # Combine base message with context
+        if context_parts:
+            return base_msg + " " + " ".join(context_parts)
+        return base_msg
+    
+    def _generate_detailed_actions(self, rule: RecommendationRule, severity: float, kpis: TrafficKPIs) -> List[str]:
+        """Generate specific, prioritized actions based on rule and severity"""
+        actions = []
+        
+        if rule.category == 'congestion':
+            if severity > 70:
+                actions.append("IMMEDIATE: Implement adaptive traffic signal control at major intersections")
+                actions.append("IMMEDIATE: Consider temporary lane modifications or contraflow systems")
+                actions.append("SHORT-TERM: Deploy traffic management personnel at critical bottlenecks")
+            if severity > 40:
+                actions.append("SHORT-TERM: Optimize signal timing and coordination along main corridors")
+                actions.append("SHORT-TERM: Implement dynamic routing and traveler information systems")
+                actions.append("MEDIUM-TERM: Analyze peak hour patterns and implement time-based restrictions")
+            actions.append("LONG-TERM: Evaluate infrastructure capacity expansion needs")
+            actions.append("LONG-TERM: Develop demand management strategies (congestion pricing, parking policies)")
+            
+        elif rule.category == 'safety':
+            if kpis.total_collisions > 0:
+                actions.append("CRITICAL: Immediate safety audit of high-collision locations")
+                actions.append("IMMEDIATE: Review and adjust vehicle behavior parameters")
+            if kpis.total_teleports > 10:
+                actions.append("HIGH: Investigate gridlock-prone intersections - may need geometric redesign")
+            actions.append("SHORT-TERM: Enhance visibility and signage at conflict points")
+            actions.append("SHORT-TERM: Implement speed management measures in high-risk areas")
+            actions.append("MEDIUM-TERM: Consider protected intersection designs or roundabouts")
+            actions.append("LONG-TERM: Develop comprehensive safety education and enforcement programs")
+            
+        elif rule.category == 'efficiency':
+            if kpis.throughput < 500:
+                actions.append("IMMEDIATE: Check for capacity bottlenecks and clear any blockages")
+                actions.append("SHORT-TERM: Review and optimize traffic signal timing plans")
+            if kpis.avg_time_loss > 60:
+                actions.append("SHORT-TERM: Implement intelligent transportation systems (ITS) for real-time optimization")
+                actions.append("MEDIUM-TERM: Develop alternative route options and guide systems")
+            actions.append("MEDIUM-TERM: Coordinate signals along arterial corridors for progression")
+            actions.append("LONG-TERM: Evaluate transit alternatives to reduce vehicle dependency")
+            actions.append("LONG-TERM: Implement smart city technologies for predictive traffic management")
+            
+        elif rule.category == 'environmental':
+            co2_per_vehicle = kpis.total_co2 / kpis.total_vehicles_completed if kpis.total_vehicles_completed > 0 else 0
+            if co2_per_vehicle > 5000:  # 5kg per vehicle
+                actions.append("HIGH: Promote electric vehicle adoption through incentives and infrastructure")
+                actions.append("HIGH: Enhance public transportation as low-emission alternative")
+            actions.append("SHORT-TERM: Optimize traffic flow to reduce stop-and-go conditions")
+            actions.append("SHORT-TERM: Implement low-emission zones in high-pollution areas")
+            actions.append("MEDIUM-TERM: Develop car-sharing and ride-pooling programs")
+            actions.append("MEDIUM-TERM: Create dedicated bus and HOV lanes to encourage shared transport")
+            actions.append("LONG-TERM: Transition public vehicle fleets to zero-emission technologies")
+            actions.append("LONG-TERM: Implement comprehensive active transportation infrastructure (cycling, walking)")
+        
+        return actions[:7]  # Return top 7 most relevant actions
+    
+    def _generate_impact_assessment(self, rule: RecommendationRule, severity: float, kpis: TrafficKPIs) -> Dict[str, Any]:
+        """Generate expected impact assessment for implementing recommendations"""
+        impact = {
+            'severity_level': 'critical' if severity > 70 else 'high' if severity > 40 else 'moderate' if severity > 20 else 'low',
+            'affected_metrics': [],
+            'estimated_improvement': '',
+            'implementation_complexity': '',
+            'cost_category': ''
+        }
+        
+        # Identify affected metrics
+        if rule.category == 'congestion':
+            impact['affected_metrics'] = ['avg_waiting_time', 'avg_time_loss', 'throughput', 'avg_speed']
+            if severity > 50:
+                impact['estimated_improvement'] = '25-40% reduction in delays with comprehensive measures'
+            else:
+                impact['estimated_improvement'] = '15-25% reduction in delays with targeted improvements'
+            impact['implementation_complexity'] = 'Medium to High'
+            impact['cost_category'] = '$$$ - Significant infrastructure investment may be needed'
+            
+        elif rule.category == 'safety':
+            impact['affected_metrics'] = ['safety_score', 'total_collisions', 'total_teleports']
+            impact['estimated_improvement'] = '30-50% reduction in safety incidents with proper interventions'
+            impact['implementation_complexity'] = 'Medium'
+            impact['cost_category'] = '$$ - Moderate investment in safety infrastructure'
+            
+        elif rule.category == 'efficiency':
+            impact['affected_metrics'] = ['throughput', 'avg_travel_time', 'flow_rate']
+            if severity > 50:
+                impact['estimated_improvement'] = '20-35% improvement in network efficiency'
+            else:
+                impact['estimated_improvement'] = '10-20% improvement in network efficiency'
+            impact['implementation_complexity'] = 'Low to Medium'
+            impact['cost_category'] = '$ to $$ - Technology and optimization focused'
+            
+        elif rule.category == 'environmental':
+            impact['affected_metrics'] = ['total_co2', 'total_nox', 'total_fuel_consumption']
+            impact['estimated_improvement'] = '15-30% reduction in emissions with modal shift and efficiency gains'
+            impact['implementation_complexity'] = 'High'
+            impact['cost_category'] = '$$$ - Long-term policy and infrastructure changes'
+        
+        return impact
+    
     def _generate_recommendations(self, kpis: TrafficKPIs) -> List[Dict[str, Any]]:
-        """Generate recommendations based on KPIs and rules"""
+        """Generate enhanced, contextual recommendations based on KPIs and multi-metric analysis"""
         recommendations = []
         
         for rule in self.recommendation_rules:
@@ -926,23 +1115,46 @@ class TrafficAnalyticsEngine:
                         condition_met = kpi_value < rule.threshold
                 
                 if condition_met:
+                    # Calculate severity score
+                    severity = self._calculate_severity_score(kpi_value, rule.threshold, rule.condition)
+                    
+                    # Generate contextual message
+                    contextual_message = self._generate_contextual_message(rule, kpi_value, severity, kpis)
+                    
+                    # Generate detailed actions
+                    detailed_actions = self._generate_detailed_actions(rule, severity, kpis)
+                    
+                    # Generate impact assessment
+                    impact_assessment = self._generate_impact_assessment(rule, severity, kpis)
+                    
+                    # Adjust priority based on severity
+                    adjusted_priority = rule.priority
+                    if severity > 70 and rule.priority == 'medium':
+                        adjusted_priority = 'high'
+                    elif severity < 30 and rule.priority == 'high':
+                        adjusted_priority = 'medium'
+                    
                     recommendation = {
                         'id': rule.rule_id,
-                        'message': rule.message.format(value=kpi_value),
-                        'priority': rule.priority,
+                        'message': contextual_message,
+                        'priority': adjusted_priority,
                         'category': rule.category,
                         'kpi': rule.condition,
                         'threshold': rule.threshold,
-                        'actual_value': kpi_value
+                        'actual_value': kpi_value,
+                        'severity_score': round(severity, 1),
+                        'detailed_actions': detailed_actions,
+                        'impact_assessment': impact_assessment,
+                        'deviation_percentage': round(abs(kpi_value - rule.threshold) / rule.threshold * 100, 1) if rule.threshold != 0 else 0
                     }
                     recommendations.append(recommendation)
             
             except Exception as e:
                 print(f"Error evaluating rule {rule.rule_id}: {e}")
         
-        # Sort by priority
+        # Sort by severity score first, then priority
         priority_order = {'high': 0, 'medium': 1, 'low': 2}
-        recommendations.sort(key=lambda x: priority_order.get(x['priority'], 2))
+        recommendations.sort(key=lambda x: (priority_order.get(x['priority'], 2), -x['severity_score']))
         
         return recommendations
     

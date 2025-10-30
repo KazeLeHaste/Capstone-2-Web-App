@@ -19,7 +19,13 @@ import {
   ChevronRight,
   AlertCircle,
   Target,
-  Settings
+  Settings,
+  BarChart3,
+  Activity,
+  TrendingDown,
+  Clock,
+  DollarSign,
+  Zap
 } from 'lucide-react';
 
 const RecommendationsPanel = ({ recommendations = [], loading = false }) => {
@@ -267,20 +273,50 @@ const RecommendationsPanel = ({ recommendations = [], loading = false }) => {
                   </p>
                 </div>
 
+                {/* Enhanced Metrics Display */}
                 {recommendation.kpi && (
                   <div className="analytics-recommendation-details">
                     <div className="analytics-recommendation-kpi-grid">
                       <div>
                         <span className="analytics-recommendation-label">KPI:</span>
-                        <p className="analytics-recommendation-value">{recommendation.kpi}</p>
+                        <p className="analytics-recommendation-value">{recommendation.kpi.replace(/_/g, ' ')}</p>
                       </div>
-                      {recommendation.actual_value && (
+                      {recommendation.actual_value !== undefined && (
                         <div>
                           <span className="analytics-recommendation-label">Value:</span>
                           <p className="analytics-recommendation-value">{recommendation.actual_value.toFixed(2)}</p>
                         </div>
                       )}
+                      {recommendation.threshold !== undefined && (
+                        <div>
+                          <span className="analytics-recommendation-label">Threshold:</span>
+                          <p className="analytics-recommendation-value">{recommendation.threshold.toFixed(2)}</p>
+                        </div>
+                      )}
                     </div>
+                    
+                    {/* Severity and Deviation Indicators */}
+                    {recommendation.severity_score !== undefined && (
+                      <div className="analytics-recommendation-metrics">
+                        <div className="analytics-metric-badge">
+                          <Activity className="w-3 h-3" />
+                          <span className="metric-label">Severity:</span>
+                          <span className={`metric-value ${
+                            recommendation.severity_score > 70 ? 'text-error' : 
+                            recommendation.severity_score > 40 ? 'text-warning' : 'text-info'
+                          }`}>
+                            {recommendation.severity_score.toFixed(0)}%
+                          </span>
+                        </div>
+                        {recommendation.deviation_percentage !== undefined && (
+                          <div className="analytics-metric-badge">
+                            <TrendingUp className="w-3 h-3" />
+                            <span className="metric-label">Deviation:</span>
+                            <span className="metric-value">{recommendation.deviation_percentage.toFixed(0)}%</span>
+                          </div>
+                        )}
+                      </div>
+                    )}
                   </div>
                 )}
 
@@ -297,18 +333,99 @@ const RecommendationsPanel = ({ recommendations = [], loading = false }) => {
               {/* Expanded Details */}
               {isExpanded && (
                 <div className="analytics-recommendation-expanded">
+                  {/* Impact Assessment Section */}
+                  {recommendation.impact_assessment && (
+                    <div className="analytics-recommendation-impact">
+                      <h4 className="analytics-recommendation-section-title">
+                        <BarChart3 className="w-4 h-4 mr-2" />
+                        Impact Assessment
+                      </h4>
+                      <div className="analytics-impact-grid">
+                        <div className="analytics-impact-item">
+                          <Activity className="w-4 h-4 text-primary" />
+                          <div>
+                            <span className="impact-label">Severity Level</span>
+                            <span className={`impact-value ${
+                              recommendation.impact_assessment.severity_level === 'critical' ? 'text-error' :
+                              recommendation.impact_assessment.severity_level === 'high' ? 'text-warning' :
+                              recommendation.impact_assessment.severity_level === 'moderate' ? 'text-info' : 'text-success'
+                            }`}>
+                              {recommendation.impact_assessment.severity_level.toUpperCase()}
+                            </span>
+                          </div>
+                        </div>
+                        
+                        {recommendation.impact_assessment.affected_metrics && recommendation.impact_assessment.affected_metrics.length > 0 && (
+                          <div className="analytics-impact-item">
+                            <TrendingDown className="w-4 h-4 text-primary" />
+                            <div>
+                              <span className="impact-label">Affected Metrics</span>
+                              <span className="impact-value">{recommendation.impact_assessment.affected_metrics.length} metrics</span>
+                            </div>
+                          </div>
+                        )}
+                        
+                        {recommendation.impact_assessment.implementation_complexity && (
+                          <div className="analytics-impact-item">
+                            <Settings className="w-4 h-4 text-primary" />
+                            <div>
+                              <span className="impact-label">Complexity</span>
+                              <span className="impact-value">{recommendation.impact_assessment.implementation_complexity}</span>
+                            </div>
+                          </div>
+                        )}
+                        
+                        {recommendation.impact_assessment.cost_category && (
+                          <div className="analytics-impact-item">
+                            <DollarSign className="w-4 h-4 text-primary" />
+                            <div>
+                              <span className="impact-label">Cost</span>
+                              <span className="impact-value">{recommendation.impact_assessment.cost_category}</span>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                      
+                      {recommendation.impact_assessment.estimated_improvement && (
+                        <div className="analytics-impact-highlight">
+                          <Zap className="w-4 h-4 text-success" />
+                          <p className="impact-highlight-text">{recommendation.impact_assessment.estimated_improvement}</p>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                  
+                  {/* Detailed Actions Section */}
                   <div className="analytics-recommendation-actions">
-                    <h4 className="analytics-recommendation-actions-title">
+                    <h4 className="analytics-recommendation-section-title">
                       <Target className="w-4 h-4 mr-2" />
-                      Suggested Actions
+                      Prioritized Action Plan
                     </h4>
                     <ul className="analytics-recommendation-actions-list">
-                      {getDetailedRecommendations(recommendation).map((detail, idx) => (
-                        <li key={idx} className="analytics-recommendation-action-item">
-                          <span className="analytics-recommendation-bullet">•</span>
-                          {detail}
-                        </li>
-                      ))}
+                      {(recommendation.detailed_actions || getDetailedRecommendations(recommendation)).map((detail, idx) => {
+                        // Parse priority from action text if it starts with CRITICAL/IMMEDIATE/HIGH/SHORT-TERM/MEDIUM-TERM/LONG-TERM
+                        const priorityMatch = detail.match(/^(CRITICAL|IMMEDIATE|HIGH|SHORT-TERM|MEDIUM-TERM|LONG-TERM):\s*(.+)/);
+                        const hasPriority = !!priorityMatch;
+                        const actionPriority = priorityMatch ? priorityMatch[1] : null;
+                        const actionText = priorityMatch ? priorityMatch[2] : detail;
+                        
+                        return (
+                          <li key={idx} className={`analytics-recommendation-action-item ${hasPriority ? 'has-priority' : ''}`}>
+                            {hasPriority && (
+                              <span className={`action-priority-badge ${
+                                actionPriority === 'CRITICAL' ? 'critical' :
+                                actionPriority === 'IMMEDIATE' || actionPriority === 'HIGH' ? 'high' :
+                                actionPriority === 'SHORT-TERM' ? 'medium' : 'low'
+                              }`}>
+                                <Clock className="w-3 h-3" />
+                                {actionPriority}
+                              </span>
+                            )}
+                            <span className="analytics-recommendation-bullet">•</span>
+                            {actionText}
+                          </li>
+                        );
+                      })}
                     </ul>
                   </div>
                 </div>
