@@ -101,11 +101,11 @@ const ConfigurationPage = ({ socket }) => {
     
     // Vehicle Types Configuration - Controls which vehicle types are included in simulation
     vehicleTypes: {
-      passenger: { enabled: true, name: 'Private Vehicles' },
-      bus: { enabled: true, name: 'Buses' },
-      jeepney: { enabled: true, name: 'Jeepneys' },
-      truck: { enabled: true, name: 'Trucks' },
-      motorcycle: { enabled: true, name: 'Motorcycles' }
+      passenger: { enabled: true, name: 'Private Vehicles', volume: 50 },
+      bus: { enabled: true, name: 'Buses', volume: 20 },
+      jeepney: { enabled: true, name: 'Jeepneys', volume: 30 },
+      truck: { enabled: true, name: 'Trucks', volume: 10 },
+      motorcycle: { enabled: true, name: 'Motorcycles', volume: 15 }
     },
     
   });
@@ -125,6 +125,20 @@ const ConfigurationPage = ({ socket }) => {
         [vehicleType]: {
           ...prev.vehicleTypes[vehicleType],
           enabled: enabled
+        }
+      }
+    }));
+  };
+
+  // Handler for vehicle volume/proportion changes
+  const handleVehicleVolumeChange = (vehicleType, volume) => {
+    setConfig(prev => ({
+      ...prev,
+      vehicleTypes: {
+        ...prev.vehicleTypes,
+        [vehicleType]: {
+          ...prev.vehicleTypes[vehicleType],
+          volume: parseInt(volume)
         }
       }
     }));
@@ -493,7 +507,7 @@ const ConfigurationPage = ({ socket }) => {
                 <h2 className="config-section-title">Traffic Scale</h2>
                 <div className="config-section-help">
                   <HelpCircle className="w-4 h-4 text-muted" />
-                  <span className="config-help-text">Control the traffic density multiplier in the simulation</span>
+                  <span className="config-help-text">Controls the vehicles spawned per instance</span>
                 </div>
               </div>
               <div className="space-y-4">
@@ -512,23 +526,7 @@ const ConfigurationPage = ({ socket }) => {
                     step="0.1"
                     placeholder="1.0"
                   />
-                  <span className="config-help-text">
-                    Traffic density multiplier. 1.0 = normal traffic, 2.0 = double traffic, 0.5 = half traffic. Range: 0.1-10.0.
-                  </span>
-                  <div className="mt-2 p-3 info-block rounded-lg">
-                    <div className="flex items-center text-sm text-info-dark">
-                      <Info className="w-4 h-4 mr-2" />
-                      <div>
-                        <div><strong>Current Setting:</strong> {config.trafficScale}x traffic scale</div>
-                        <div className="text-info">
-                          {config.trafficScale <= 0.5 ? "Light traffic" :
-                           config.trafficScale <= 1.5 ? "Normal traffic" :
-                           config.trafficScale <= 3.0 ? "Heavy traffic" :
-                           "Very heavy traffic"}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+                  
                 </div>
               </div>
             </div>
@@ -934,6 +932,27 @@ const ConfigurationPage = ({ socket }) => {
                             <div className="config-vehicle-description">
                               {vehicleInfo.description}
                             </div>
+                            
+                            {/* Volume/Proportion Slider */}
+                            {enabled && (
+                              <div className="config-vehicle-volume">
+                                <div className="config-vehicle-volume-header">
+                                  <span className="config-vehicle-volume-label">Traffic Volume</span>
+                                  <span className="config-vehicle-volume-value">{typeConfig.volume}%</span>
+                                </div>
+                                <input
+                                  type="range"
+                                  min="0"
+                                  max="100"
+                                  value={typeConfig.volume}
+                                  onChange={(e) => handleVehicleVolumeChange(vehicleType, e.target.value)}
+                                  className="config-vehicle-volume-slider"
+                                />
+                                <div className="config-vehicle-volume-hint">
+                                  Relative proportion of this vehicle type in the simulation
+                                </div>
+                              </div>
+                            )}
                           </div>
                         </div>
                       </div>
@@ -972,6 +991,23 @@ const ConfigurationPage = ({ socket }) => {
                             .filter(t => config.vehicleTypes[t].enabled)
                             .map(t => `osm.${t}.rou.xml`)
                             .join(', ')}
+                        </div>
+                      </div>
+                    )}
+                    
+                    {/* Volume Distribution Summary */}
+                    {Object.values(config.vehicleTypes).filter(t => t.enabled).length > 0 && (
+                      <div className="config-vehicle-summary-row">
+                        <span className="config-vehicle-summary-label">Volume Distribution:</span>
+                        <div className="config-vehicle-volume-distribution">
+                          {Object.entries(config.vehicleTypes)
+                            .filter(([_, typeConfig]) => typeConfig.enabled)
+                            .map(([type, typeConfig]) => (
+                              <div key={type} className="config-volume-item">
+                                <span className="config-volume-name">{typeConfig.name}:</span>
+                                <span className="config-volume-percent">{typeConfig.volume}%</span>
+                              </div>
+                            ))}
                         </div>
                       </div>
                     )}
