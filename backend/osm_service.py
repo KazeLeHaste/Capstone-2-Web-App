@@ -81,6 +81,48 @@ class OSMService:
         # Use the config system's SUMO tools detection
         return app_config.sumo_tools_path
     
+    def get_python_executable(self) -> str:
+        """
+        Get the appropriate Python executable for running SUMO tools
+        
+        In frozen/packaged apps, sys.executable points to the app executable,
+        not a Python interpreter. We need to find the system Python.
+        
+        Returns:
+            Path to Python executable
+        """
+        # Check if running in frozen/packaged mode
+        if app_config.is_frozen:
+            # In frozen mode, sys.executable is the app .exe, not Python
+            # Try to find system Python
+            python_exe = shutil.which('python.exe') or shutil.which('python')
+            
+            if python_exe:
+                print(f"Found system Python for frozen app: {python_exe}")
+                return python_exe
+            else:
+                # Fallback: try common Python installation paths
+                common_python_paths = [
+                    Path(r"C:\Users") / os.environ.get('USERNAME', '') / "AppData" / "Local" / "Programs" / "Python" / "Python313" / "python.exe",
+                    Path(r"C:\Users") / os.environ.get('USERNAME', '') / "AppData" / "Local" / "Programs" / "Python" / "Python312" / "python.exe",
+                    Path(r"C:\Users") / os.environ.get('USERNAME', '') / "AppData" / "Local" / "Programs" / "Python" / "Python311" / "python.exe",
+                    Path(r"C:\Python313\python.exe"),
+                    Path(r"C:\Python312\python.exe"),
+                    Path(r"C:\Python311\python.exe"),
+                ]
+                
+                for py_path in common_python_paths:
+                    if py_path.exists():
+                        print(f"Found Python at common path: {py_path}")
+                        return str(py_path)
+                
+                raise FileNotFoundError(
+                    "Could not find Python executable. Please ensure Python is installed and added to PATH."
+                )
+        else:
+            # In development mode, use the current Python interpreter
+            return sys.executable
+    
     def launch_osm_wizard(self) -> Dict[str, Any]:
         """
         Launch OSM Web Wizard in the osm_scenarios directory
@@ -117,15 +159,43 @@ class OSMService:
                     'details': 'SUMO installation may be incomplete or corrupted.'
                 }
             
+            # Get the appropriate Python executable
+            try:
+                python_exe = self.get_python_executable()
+            except FileNotFoundError as e:
+                return {
+                    'success': False,
+                    'error': str(e),
+                    'details': 'Python is required to run OSM Web Wizard'
+                }
+            
             # Prepare command to launch OSM Web Wizard
             cmd = [
-                sys.executable,  # Use current Python interpreter
+                python_exe,  # Use appropriate Python interpreter
                 str(wizard_script),
                 "--port", str(self.wizard_port)
             ]
             
             print(f"Launching OSM Web Wizard with command: {' '.join(cmd)}")
             print(f"Working directory: {self.osm_scenarios_dir}")
+            print(f"Python executable: {python_exe}")
+            print(f"Is frozen: {app_config.is_frozen}")
+            
+            # Prepare environment variables
+            # Add SUMO_HOME to environment so osmWebWizard.py can find SUMO tools
+            env = os.environ.copy()
+            if app_config.sumo_home:
+                env['SUMO_HOME'] = str(app_config.sumo_home)
+                print(f"Set SUMO_HOME: {app_config.sumo_home}")
+            
+            # Add SUMO tools to PYTHONPATH so imports work
+            if app_config.sumo_tools_path:
+                python_path = env.get('PYTHONPATH', '')
+                if python_path:
+                    env['PYTHONPATH'] = f"{app_config.sumo_tools_path}{os.pathsep}{python_path}"
+                else:
+                    env['PYTHONPATH'] = str(app_config.sumo_tools_path)
+                print(f"Set PYTHONPATH: {env['PYTHONPATH']}")
             
             # Launch the process in the osm_scenarios directory
             self.wizard_process = subprocess.Popen(
@@ -134,6 +204,7 @@ class OSMService:
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
                 text=True,
+                env=env,  # Pass environment with SUMO_HOME and PYTHONPATH
                 creationflags=subprocess.CREATE_NEW_PROCESS_GROUP if os.name == 'nt' else 0
             )
             

@@ -1,0 +1,420 @@
+CORRECTED SECTIONS - Based on Actual System Implementation
+========================================================================
+
+2.7.2.2.8 Algorithm Structure
+The Traffic Simulation System adopts a modular orchestration-based algorithmic structure centered on workflow management, data processing, and SUMO integration, rather than custom vehicle behavior models. It leverages the Simulation of Urban MObility (SUMO) engine for microscopic traffic computation and focuses on efficient coordination of simulation execution, real-time monitoring, KPI computation, and automated recommendation generation.
+This design ensures reliable, reproducible traffic analysis for Bacoor City and supports flexible experimentation with different management strategies through a web-based platform.
+
+2.7.2.2.8.1 Simulation Workflow Orchestration
+The core simulation process follows a workflow-based algorithm that manages the lifecycle of each simulation session. The algorithm performs the following functions:
+•	Initializes session data and temporary directories
+•	Generates SUMO configuration files based on user-defined parameters and selected network scenarios
+•	Launches the SUMO process using the TraCI (Traffic Control Interface) protocol for live data exchange
+•	Executes iterative simulation steps, collecting and broadcasting live traffic metrics in real time
+•	Parses SUMO's output files (tripinfo, summary, emissions) upon completion
+•	Computes analytics and KPIs from the gathered data and stores them in the system database
+•	Sends live updates and final results to the user interface via WebSocket communication
+This modular workflow ensures process isolation, robust error handling, and efficient data transfer between the backend and the SUMO engine.
+
+2.7.2.2.8.2 Key Performance Indicator (KPI) Computation
+Following each simulation, the backend algorithm calculates Key Performance Indicators that quantify the overall traffic efficiency and sustainability.
+Metrics include:
+•	Average Travel Delay – Derived from total time loss per trip
+•	Throughput – Number of successfully completed trips
+•	Average Queue Length – Based on cumulative waiting steps over simulation intervals
+•	Average Speed – Mean velocity across all vehicles per interval
+•	Congestion Index – Ratio of time loss to total trip duration
+•	Emission Levels – Aggregated CO₂, NOx, PMx, and fuel consumption from SUMO's emission reports
+•	Safety Score – Computed inversely from total collisions and teleports recorded
+These KPIs form the analytical foundation for generating actionable insights and strategy recommendations.
+
+2.7.2.2.8.3 Recommendation Generation Engine
+The system integrates a rule-based recommendation algorithm that analyzes KPI results and automatically suggests optimal interventions for congestion management, safety improvement, and environmental sustainability.
+Each recommendation entry includes a type, priority, description, target metric, and expected impact.
+Sample decision rules include:
+•	Triggering adaptive signal control when congestion exceeds 30%
+•	Suggesting road capacity improvements when average speed drops below 20 km/h
+•	Encouraging eco-routing or public transport adoption for high emission outputs
+•	Optimizing signal timing when queue lengths become excessive
+•	Recommending speed limit reviews for low safety scores
+All recommendations are prioritized according to impact severity, ensuring that the most critical interventions are presented first.
+
+2.7.2.2.8.4 Data Management and Communication
+The backend employs asynchronous data handling through WebSocket protocols for continuous real-time communication between the SUMO engine, the Flask server, and the frontend interface.
+During simulation:
+•	Live metrics are broadcast to the visualization dashboard
+•	Completed data are stored in structured databases for retrieval and reporting
+•	Intermediate data (tripinfo, summary, emissions) are parsed, transformed, and cached to minimize latency
+This data-centric approach ensures both performance efficiency and transparency throughout the simulation process.
+
+2.7.2.2.8.5 SUMO Integration and Control Interface
+The algorithmic structure relies on the TraCI (Traffic Control Interface) to control SUMO dynamically during execution. Through this interface, the backend can:
+•	Trigger simulation steps in real time
+•	Retrieve live vehicle, lane, and traffic light data
+•	Adjust configurations on-the-fly (e.g., phase timing, network changes)
+•	Gracefully terminate or resume sessions based on system commands
+This integration bridges the backend orchestration with SUMO's robust simulation capabilities, providing a flexible platform for experimentation and analysis.
+
+2.7.2.2.8.6 System Intelligence and Extensibility
+While the current implementation utilizes rule-based analytics, the architecture is modular and designed for future integration of AI-driven optimization modules, such as:
+•	Reinforcement learning for adaptive signal timing
+•	Predictive analytics for congestion forecasting
+•	Automated calibration of traffic parameters using machine learning
+This forward-compatible structure ensures long-term scalability and adaptability for research and urban planning applications.
+
+2.7.2.2.9 AI Tools and APIs
+To enhance analytics accuracy, recommendation generation, and modular system integration, the Traffic Simulator System incorporates artificial intelligence (AI) components and RESTful/WebSocket APIs within its backend architecture.
+
+2.7.2.2.9.1 AI-Assisted Development (ChatGPT & Copilot Integration)
+AI-assisted tools such as ChatGPT (OpenAI GPT-4) and GitHub Copilot supported the development lifecycle by assisting in:
+•	Refining algorithm workflows (simulation orchestration, KPI computation, recommendation logic)
+•	Auto-generating configuration templates and Python/React code snippets
+•	Optimizing database schema design
+•	Enhancing documentation and code readability
+
+While these AI tools were used only during the development phase, not at runtime, they significantly accelerated prototyping, debugging, and system design consistency.
+
+2.7.2.2.9.2 Rule-Based Recommendation Engine (AI Logic Layer)
+Instead of deploying complex machine learning models, the system integrates a rule-based AI logic that generates intelligent traffic management recommendations based on calculated KPIs.
+The algorithm evaluates metrics such as congestion index, average speed, emissions, queue length, and safety score.
+Sample AI-driven responses include:
+•	"High congestion detected — consider adaptive signal control."
+•	"Low average speed — evaluate road capacity or re-routing."
+•	"High CO₂ emissions — encourage eco-routing or public transport incentives."
+This AI component ensures explainable, transparent decision support aligned with real-world traffic management principles.
+
+2.7.2.2.9.3 RESTful and WebSocket APIs (Flask-based Backend)
+The Flask backend exposes RESTful APIs and real-time WebSocket endpoints to enable seamless data flow between the frontend, backend, and SUMO simulation engine.
+These services manage configuration, session control, analytics, and live simulation monitoring.
+RESTful API Endpoints include:
+•	Configuration management (/api/configurations)
+•	Network retrieval (/api/networks)
+•	Session control (/api/sessions, /api/simulations/start, /api/simulations/stop)
+•	Analytics retrieval (/api/analytics/...)
+•	Data export (/api/export)
+WebSocket Events (Socket.io) support:
+•	Real-time updates (live_data, simulation_status, simulation_complete)
+•	Multi-session management
+•	Live synchronization between SUMO engine and frontend dashboards
+This hybrid API structure ensures low-latency performance and modular scalability for future feature expansion.
+
+2.7.2.2.9.4 Visualization and Frontend Integration (React + Recharts)
+The React frontend integrates with backend APIs to visualize simulation outputs in real time.
+Using Recharts, the system renders dynamic dashboards showing:
+•	Live vehicle statistics (speed, waiting time, vehicle count)
+•	Emission trends and congestion indexes
+•	KPI dashboards and comparative charts
+WebSocket-driven updates guarantee continuous synchronization between SUMO simulation data and the displayed analytics without requiring page reloads.
+
+2.7.2.2.9.5 External Engine Integration (SUMO + TraCI API)
+The system's backend communicates with the Simulation of Urban MObility (SUMO) engine through the TraCI (Traffic Control Interface) API.
+This Python-based API enables real-time control and data collection from the simulation environment, such as:
+•	Vehicle speed, waiting time, and emissions retrieval
+•	Intersection signal control
+•	Step-by-step simulation management
+TraCI integration transforms SUMO into a controllable micro-simulation backend, allowing the AI and analytics modules to react dynamically to live traffic conditions.
+
+
+2.7.3 Testing Procedures
+A structured testing framework was employed to validate the Traffic Simulator's functionality, usability, data accuracy, and SUMO integration workflow. Testing ensures that the system performs reliably across all modules—from network selection and configuration to live analytics and recommendation generation.
+These procedures are designed to guide end-users such as traffic analysts, planners, and enforcement officers in accurately executing simulations of pre-configured traffic scenarios and interpreting simulation outcomes for data-driven decision-making.
+
+Phase 1: Configuration Setup
+1.	Launch the simulator via its designated web application URL (http://localhost:3000).
+2.	Navigate to the Configuration Page to define simulation parameters.
+3.	Set essential parameters including:
+    •	Begin time and end time (simulation duration)
+    •	Step length (simulation granularity)
+    •	Traffic scale (vehicle density multiplier)
+    •	Vehicle types (passenger cars, buses, jeepneys, trucks, motorcycles, bicycles)
+    •	Traffic control method (existing signals, fixed-timer, adaptive, buhos/counterflow, custom timing)
+4.	For fixed-timer control, configure cycle length, green time, yellow time, and all-red time.
+5.	Set advanced SUMO parameters such as lateral resolution (sublane model), seed value, collision action, and timeout thresholds.
+6.	Save the configuration for reuse in future simulations.
+7.	Verify that configuration parameters are stored correctly in the SQLite database and can be loaded for subsequent sessions.
+
+Phase 2: Network Selection
+1.	Navigate to the Network Selection Page to choose a traffic scenario.
+2.	Review the seven (7) pre-configured Philippine traffic networks representing Bacoor City locations:
+    •	Bayanan Area
+    •	Jollibee Molino Area
+    •	Perpetual Molino Area
+    •	SM Bacoor Area
+    •	SM Molino Area
+    •	St. Dominic Area
+    •	Statesfield Area
+3.	Examine network metadata including node count, edge count, and junction count.
+4.	Select the desired network for simulation.
+5.	Optionally, use the OSM Scenario Importer tool to add new networks created externally using SUMO's OSM Web Wizard.
+6.	Confirm that the selected network loads properly and all required SUMO files (.net.xml, .rou.xml, .sumocfg) are accessible.
+
+Phase 3: Simulation Execution and Monitoring
+1.	Navigate to the Simulation Page with the selected configuration and network.
+2.	Click "Launch Simulation" to initialize the SUMO process via the Flask backend.
+3.	Observe the SUMO GUI window opening on the desktop, displaying real-time vehicle movements and traffic signal operations.
+4.	Monitor real-time metrics in the web dashboard via WebSocket updates, including:
+    •	Current simulation time and step
+    •	Loaded, departed, running, and arrived vehicle counts
+    •	Mean speed, mean waiting time, and mean travel time
+    •	Collision events and teleported vehicles
+5.	Review live charts showing speed over time and vehicle count progression.
+6.	Optionally pause, resume, or stop the simulation using control buttons.
+7.	Wait for simulation completion, at which point SUMO terminates and output files are generated.
+8.	Verify that the session status updates to "completed" and analytics processing begins automatically.
+
+Phase 4: Analytics Review and Data Interpretation
+1.	Navigate to the Analytics Page to review post-simulation results.
+2.	Select the completed session from the session dropdown.
+3.	Review Key Performance Indicators (KPIs) displayed in dashboard cards:
+    •	Average Travel Delay (seconds)
+    •	Throughput (completed trips)
+    •	Average Queue Length (vehicles)
+    •	Average Speed (km/h)
+    •	Congestion Index (ratio)
+    •	Total Fuel Consumption (liters)
+    •	Total CO₂, NOx, and PM emissions (grams)
+    •	Safety Score (0-100 scale)
+4.	Examine analytical charts and graphs:
+    •	Line charts: Speed over time, waiting time trends
+    •	Bar charts: Vehicle arrivals per time interval
+    •	Pie charts: Vehicle type distribution
+    •	Area charts: Emissions accumulation over time
+5.	Review AI-generated recommendations sorted by priority, including:
+    •	Traffic control strategy suggestions
+    •	Signal timing optimization proposals
+    •	Capacity expansion evaluations
+    •	Environmental mitigation strategies
+    •	Safety improvement recommendations
+6.	Use the Session Comparison tool to compare KPIs across multiple simulation runs with different configurations or control methods.
+7.	Export simulation data in desired formats:
+    •	CSV: Trip data, time series data, KPI summaries
+    •	JSON: Complete session data with nested analytics
+    •	XML: Raw SUMO output files
+    •	PDF: Comprehensive report with charts and recommendations
+
+Phase 5: Session Management and Termination
+1.	Review active and completed sessions in the Home Page or Simulation Page.
+2.	For multi-session scenarios, verify that concurrent simulations operate on isolated resources with dedicated TraCI ports (8813, 8814, 8815, etc.).
+3.	Stop any running simulations from the backend interface, ensuring SUMO processes terminate cleanly.
+4.	Confirm that all session data, including configurations, live data, trips, time series, KPIs, and recommendations, are properly saved in the SQLite database.
+5.	Close the simulator application securely after ensuring all analytics and reports have been generated and exported as needed.
+
+This structured testing methodology validates each stage of the workflow, ensuring end-users can efficiently configure, execute, monitor, analyze, and export traffic simulation results for strategic management and policy formulation.
+
+2.7.3.1 System Test Plan
+The System Test Plan ensures that the Traffic Simulator: Analysis and Recommendation of Effect in Traffic Management Strategies performs accurately, efficiently, and reliably under realistic traffic conditions. Since the system integrates the SUMO microscopic simulation engine, Flask-based backend, and React-based frontend, testing activities validate all stages of the workflow—from configuration and simulation execution to analytics, visualization, and recommendation generation.
+
+2.7.3.1.1 Test Objectives
+The main objectives of system testing are:
+•	To verify that the SUMO integration workflow operates correctly through Flask and TraCI, launching and managing simulations without process failure.
+•	To confirm that the simulation pipeline—session creation, data collection, XML parsing, KPI computation, and recommendation generation—runs efficiently and produces consistent outputs.
+•	To validate the accuracy of KPI calculations, including average travel delay, throughput, queue length, congestion index, and emission totals, ensuring consistency between SUMO-generated XML outputs and displayed analytics.
+•	To ensure that the Visualization Engine (React + WebSocket) provides dynamic, real-time updates of simulation progress, vehicle statistics, and performance indicators.
+•	To evaluate the usability and stability of the end-to-end workflow (Configuration → Network Selection → Simulation → Analytics → Report Export) for all stakeholder types.
+•	To confirm that the AI-based Recommendation Engine generates logical, context-relevant, and data-driven suggestions derived from KPI thresholds.
+•	To verify error handling, ensuring that system faults (e.g., missing SUMO files, invalid configurations, or WebSocket interruptions) are detected, logged, and reported gracefully.
+
+2.7.3.1.2 Scope of Testing
+The scope of testing spans all modules, aligned with the Algorithm Structure and workflow:
+•	Configuration Module – Verifies form validation, parameter persistence, and correct generation of SUMO-compatible configuration files (.sumocfg). Ensures the integrity of reusable simulation settings.
+•	Network Selection Module – Tests loading of seven (7) predefined Bacoor City scenarios and OSM-imported networks, confirming proper metadata display and selection functionality.
+•	Simulation Manager (Flask + SUMO) – Validates subprocess launching, TraCI port allocation, and real-time data collection. Stress tests resilience under multiple concurrent sessions and high vehicle density.
+•	Analytics Engine – Confirms accuracy of aggregated metrics (average speed, travel delay, congestion index, emissions, and safety score) and consistency between parsed XML data and database entries.
+•	Recommendation Engine – Evaluates rule-based generation and prioritization of actionable recommendations (traffic control, signal timing, safety, environment).
+•	Frontend Visualization (React + WebSocket) – Tests synchronization between backend events and frontend rendering, ensuring that live simulation data, charts, and KPIs update within acceptable latency (<500ms).
+•	Data Export Module – Verifies proper generation of CSV, JSON, XML, and PDF reports with consistent formatting and complete datasets.
+•	User Interface (UI/UX) – Assesses responsiveness across browsers and devices, ensuring accessibility for BTMD officers, planners, and analysts.
+
+2.7.3.1.3 Test Environment
+
+Component | Specification
+----------|---------------
+Operating Systems | Windows 10/11, Ubuntu 20.04+, macOS 10.15+
+Browser | Google Chrome (latest), Firefox (latest), Edge (latest)
+Frontend Stack | React 18.2, npm, Recharts 2.8.0, Leaflet 1.9.4, Socket.io-client 4.7.2, Lucide-react 0.263.1
+Backend Stack | Flask 2.3.3, Flask-CORS 4.0.0, Flask-SocketIO 5.3.6, python-socketio 5.8.0, SQLite, SQLAlchemy 2.0.23+, Python 3.8+
+SUMO Integration | SUMO 1.19.0+, TraCI 1.19.0, sumolib 1.19.0
+Testing Tools | Jest (via React Testing Library - frontend only)
+Version Control | Git
+Development Environment | VS Code, Chrome DevTools
+Deployment | Desktop application (localhost:3000 frontend, localhost:5000 backend)
+
+
+2.7.4 Deployment
+Deployment of the Traffic Simulator system follows a phased rollout to guarantee operational stability, performance consistency, and user adaptability within the Bacoor Traffic Management Department (BTMD).
+
+Initial Setup:
+•	The backend (Flask + SUMO) and frontend (React) components are installed on local desktop or laptop machines, operating as a localhost-based web application.
+•	Users access the frontend via web browser at http://localhost:3000 while the Flask backend runs on http://localhost:5000.
+•	SUMO 1.19.0+ is installed system-wide with GUI support, and Python dependencies are installed via pip install -r requirements.txt.
+•	Node.js dependencies are installed via npm install in the frontend directory.
+•	TraCI modules are configured with dynamic port allocation (8813+) for multi-session execution.
+•	The SQLite database (traffic_simulator.db) is initialized automatically on first run, creating all necessary tables.
+•	Controlled pilot simulations are conducted to validate SUMO-Flask-React synchronization through WebSocket channels.
+•	Health checks (API endpoints /api/health and WebSocket connections) ensure that session management, simulation control, and real-time analytics pipelines function correctly.
+
+User Training:
+Comprehensive user orientation sessions are conducted to equip stakeholders with hands-on familiarity in all operation phases:
+•	Configuration Page – Defining simulation parameters (time range, traffic scale, vehicle types, control methods, and SUMO settings).
+•	Network Selection Page – Choosing from seven (7) built-in Bacoor traffic scenarios or importing OSM networks using the scenario importer tool.
+•	Simulation Page – Executing live SUMO simulations, monitoring progress via SUMO GUI and web dashboard, and analyzing live data charts with WebSocket updates.
+•	Analytics Page – Interpreting KPIs (delay, throughput, speed, congestion, emissions, safety), reviewing time-series charts, and reading system-generated recommendations.
+•	Data Export Section – Generating and exporting CSV, JSON, XML, or PDF reports for planning presentations and documentation.
+
+Feedback Integration:
+•	Pilot feedback from BTMD officers, traffic enforcers, and IT experts is collected through structured evaluation forms based on ISO/IEC 25010:2011 quality criteria.
+•	Reported issues involving UI clarity, simulation speed, data accuracy, or WebSocket connectivity are analyzed and addressed via incremental software updates.
+•	Backend performance (session management, TraCI communication, XML parsing) and frontend reactivity (chart rendering, real-time updates) are optimized for smoother visualization and reduced latency.
+
+Full Deployment:
+•	The system is officially deployed on BTMD workstations for operational use in evaluating and simulating real-world traffic control strategies.
+•	Desktop deployment enables direct access to SUMO GUI for detailed traffic visualization while maintaining web-based analytics dashboards.
+•	For future expansion, cloud-based or LAN server deployment options may be considered to enable multi-departmental and academic collaboration.
+•	Scheduled maintenance covers updates to SUMO versions, Python dependencies (via pip), npm packages, and database schema migrations (via Alembic if needed).
+•	Continuous user support and re-training programs ensure sustained adoption, system reliability, and effective utilization of simulation-based decision support tools.
+
+2.8 Testing and Evaluation
+To validate the Traffic Simulator's functionality, reliability, usability, and performance, a structured testing and evaluation methodology was applied. Testing covered technical robustness and end-user experience across various environments and workflows, with evaluation aligned to industry-standard quality criteria.
+
+2.8.1 Unit Testing
+Unit testing validates the correctness and stability of individual code components. While comprehensive automated unit testing is planned for future development phases, initial development focused on manual testing and integration validation:
+•	Frontend component testing framework available through Jest and React Testing Library (included in React scripts).
+•	Backend functions manually tested including API endpoints, KPI computation logic, database transactions, and recommendation generation.
+•	SUMO configuration file generation and XML parsing validated using sample datasets and test scenarios.
+•	Session lifecycle functions (create, update, terminate) verified through integration testing.
+•	TraCI communication handlers tested with SUMO process launches and data collection cycles.
+•	Real-time metric aggregation and WebSocket broadcast logic validated during simulation runs.
+•	UI rendering of live charts, statistics, and dashboard components tested across multiple browsers.
+
+Future development will implement comprehensive automated unit testing using pytest for backend modules and expanded Jest test suites for frontend components.
+
+Focus areas for future unit testing:
+•	API endpoint response validation
+•	KPI calculation accuracy with edge cases
+•	Database query performance and transaction integrity
+•	WebSocket event handling and error recovery
+•	Configuration file generation with various parameter combinations
+
+2.8.2 Usability Testing
+Usability testing measured the system's intuitiveness, clarity, and accessibility for non-technical users. Participants included one (1) BTMD officer, one (1) traffic enforcer, and one (1) IT expert, providing both operational and technical perspectives.
+
+Key tasks performed:
+•	Creating and saving simulation configurations with various parameter combinations
+•	Selecting from seven (7) pre-configured Philippine traffic scenarios
+•	Launching and monitoring SUMO simulations via web dashboard and GUI
+•	Interpreting real-time metrics, charts, and WebSocket updates during simulation execution
+•	Reviewing KPIs and AI-generated recommendations in the Analytics Page
+•	Comparing multiple simulation sessions with different control strategies
+•	Exporting analytics reports in CSV, JSON, and PDF formats
+
+The test employed a 5-point Likert questionnaire aligned with ISO/IEC 25010:2011 usability criteria: Learnability, Operability, User Error Protection, User Interface Aesthetics, and Accessibility.
+
+Feedback indicated that users found the system intuitive, visually organized, and responsive. Participants particularly appreciated:
+•	Clear navigation between Configuration, Network Selection, Simulation, and Analytics pages
+•	Real-time visualization of simulation progress via WebSocket
+•	Comprehensive KPI dashboards with color-coded performance indicators
+•	Actionable AI-generated recommendations with priority classification
+•	Flexible data export options for documentation and reporting
+
+Minor revisions were made based on feedback, including:
+•	Enhanced tooltip visibility and placement for configuration parameters
+•	Improved labeling consistency across forms and dashboards
+•	Optimized chart rendering performance for smoother real-time updates
+•	Clarified terminology for traffic control methods and SUMO-specific parameters
+
+2.8.3 System Testing
+System testing validated the complete simulation workflow and data flow integrity across all components.
+
+Test Scenarios:
+1.	Basic Simulation Execution – Confirmed full workflow from configuration creation through network selection, SUMO simulation execution, real-time monitoring via WebSocket, to final KPI calculation and recommendation display.
+
+2.	Configuration Comparison – Verified KPI differential analysis between fixed-timer and adaptive signal control simulations on the same network, validating the Session Comparison tool's ability to highlight performance differences.
+
+3.	Multi-Session Management – Tested simultaneous SUMO simulations on separate TraCI ports (8813, 8814, 8815) with isolated temporary directories, confirming no resource conflicts, data mixing, or database transaction issues.
+
+4.	Error Handling – Assessed system resilience under various failure conditions:
+    •	Missing SUMO installation or incorrect PATH configuration
+    •	Invalid network file paths or corrupted .net.xml files
+    •	Premature simulation termination via user stop command
+    •	WebSocket connection loss and automatic reconnection attempts
+    •	Database query failures and transaction rollback handling
+
+Evaluation Criteria:
+•	Simulation execution speed and SUMO process stability (real-time factor 4-12x on standard hardware)
+•	Real-time data update latency (<500ms for WebSocket events)
+•	KPI calculation accuracy within <1% variance of SUMO XML output data
+•	Cross-browser compatibility (Chrome, Firefox, Edge on Windows/macOS/Linux)
+•	Cross-OS compatibility (Windows 10/11, Ubuntu 20.04+, macOS 10.15+)
+•	Database consistency and integrity after multiple concurrent sessions
+•	Memory usage efficiency (200-500MB backend, 300-800MB SUMO per session)
+•	Clean resource cleanup (temporary directories, process termination, port release)
+
+All test scenarios achieved expected outcomes, confirming system robustness, data accuracy, multi-session capability, and readiness for operational deployment.
+
+2.8.4 Pilot Run
+A pilot run was conducted in collaboration with the Bacoor Traffic Management Department (BTMD) to validate the Traffic Simulator's operational realism, usability, and practical relevance in real-world traffic management contexts. The pilot served as the final validation phase before full deployment, ensuring that the system's simulated outputs aligned with actual traffic patterns and management practices.
+
+Participants and Setting
+The pilot group consisted of three (3) participants with diverse expertise: one (1) BTMD officer with strategic traffic management responsibilities, one (1) traffic enforcer with field operation experience, and one (1) IT expert with software evaluation background. Three (3) additional traffic enforcers participated in preliminary interviews to provide operational context and requirements input.
+
+The session was held in a controlled testing environment equipped with standard desktop systems (Windows 10/11, Google Chrome browser) running the Traffic Simulator as a localhost web application (frontend on port 3000, backend on port 5000) with SUMO 1.19.0+ installed.
+
+Pilot Activities
+Participants were guided through structured hands-on tasks designed to simulate real operational workflows:
+
+1.	Configuration and Network Selection
+•	Users accessed the Configuration Page to define simulation parameters for a known Bacoor intersection scenario (notably the Aguinaldo Highway – Molino Boulevard corridor area).
+•	They configured essential parameters including simulation duration (3600 seconds), traffic scale (1.0 for normal conditions), vehicle type distribution (passenger cars, jeepneys, motorcycles matching local mix), and control method selection.
+•	Participants then navigated to the Network Selection Page and chose from the seven (7) available pre-configured Philippine traffic scenarios, selecting networks that represented familiar Bacoor locations.
+•	Selected networks were validated through backend verification (Flask + SQLite session management) before simulation execution.
+
+2.	Simulation of Standard Traffic Scheme
+•	Participants switched to the Simulation Page and launched simulations with their standard BTMD operational traffic scheme (fixed-timer control with typical cycle lengths used in Bacoor).
+•	They adjusted parameters such as traffic scale and vehicle composition to reflect peak-hour and off-peak conditions.
+•	Real-time updates were monitored via the React dashboard, showing metrics such as current simulation time, running vehicle count, average speed, mean waiting time, congestion index, and queue length.
+•	SUMO GUI windows opened on the desktop, allowing participants to visually observe vehicle movements, lane changes with sublane model behavior, and traffic signal phase transitions.
+•	WebSocket connectivity ensured live synchronization between SUMO simulation state and web dashboard analytics.
+
+3.	Adaptive Signal Strategy Testing
+•	Users enabled the Adaptive Signal Control option to observe the impact of traffic-responsive signal timing on congestion and throughput.
+•	System-generated Key Performance Indicators (KPIs), including travel delay reduction, throughput improvement, queue length changes, and emission variations, were automatically computed from SUMO output files and displayed through the analytics dashboard.
+•	Participants compared adaptive control results with fixed-timer baseline simulations using the Session Comparison tool.
+
+4.	Review of Recommendations and Analytics
+•	After each simulation, users navigated to the Analytics Page to review comprehensive results.
+•	They examined AI-generated recommendations (e.g., signal timing optimization, capacity evaluation, safety enhancements, environmental mitigation strategies) and compared these with their operational knowledge to assess accuracy, clarity, and practical applicability.
+•	Participants evaluated the relevance of recommendations to actual Bacoor traffic conditions and decision-making needs.
+•	Data exports (CSV for detailed trip data, PDF reports with charts and KPI summaries) were generated to evaluate reporting completeness, formatting quality, and suitability for documentation and presentation purposes.
+
+Feedback and Observations
+After completing the pilot tasks, all participants filled out a structured evaluation form aligned with ISO/IEC 25010:2011 usability metrics, focusing on the following aspects:
+•	System usability and learnability (ease of navigation, clarity of configuration interface, intuitiveness of workflow)
+•	Realism of simulation behavior (vehicle dynamics with sublane model, signal timing accuracy, congestion buildup patterns)
+•	Usefulness of generated KPIs and recommendations for traffic decision-making and policy formulation
+•	Responsiveness and visual clarity of the dashboard, real-time charts, and analytics visualization
+•	Reliability of WebSocket communication and SUMO integration during simulation execution
+
+Key findings from the pilot run include:
+•	Participants confirmed that the simulator realistically represented congestion buildup, vehicle flow patterns, and queue formation under both fixed and adaptive control schemes, matching their field observations of Bacoor traffic conditions.
+•	The Adaptive Signal Control mode was perceived as effective in reducing simulated congestion and improving flow rates in the analytics dashboard, validating the system's decision-support potential for evaluating traffic management interventions.
+•	Users appreciated the real-time data visualization via WebSocket, SUMO GUI integration for detailed traffic observation, and comprehensive AI-generated recommendations that simplified performance analysis and provided actionable guidance.
+•	The ability to compare multiple simulation sessions with different configurations was highlighted as valuable for evidence-based policy evaluation.
+•	Participants found the configuration-first workflow (set parameters → select network → launch simulation → analyze results) logical and well-structured.
+
+Minor feedback was recorded on the following aspects, which were addressed in the final UI revision:
+•	Placement and visibility of interface tooltips for SUMO-specific parameters (lateral resolution, seed, collision action)
+•	Terminology consistency between traffic management field practice and SUMO technical terminology
+•	Chart color schemes for better differentiation in emission and safety metric visualizations
+
+Outcome and System Refinement
+Insights from the pilot run were crucial in refining the simulator's parameters, visual cues, reporting outputs, and overall user experience. Specific improvements implemented post-pilot include:
+•	Enhanced color-coded congestion visualization for improved interpretability (green for good flow, yellow for moderate congestion, red for severe congestion)
+•	Optimized WebSocket refresh rate and event throttling for smoother live data updates without overwhelming the frontend
+•	Adjusted default vehicle spawn rates and signal timing parameters in pre-configured networks for more accurate representation of urban Bacoor traffic conditions
+•	Revised terminology and labeling in the analytics dashboard for better clarity among non-technical users, aligning SUMO metrics with familiar traffic management concepts
+•	Improved recommendation priority classification and expected impact descriptions for more actionable decision support
+
+Overall, the pilot confirmed that the Traffic Simulator effectively mirrors Bacoor's real-world traffic behavior through SUMO integration, supports data-driven traffic management decisions through comprehensive analytics, and provides a user-friendly platform for both technical planners and field enforcers. The system successfully enables evidence-based evaluation of traffic control strategies without requiring deep technical knowledge of SUMO or traffic simulation methodology.
+
+========================================================================
+END OF CORRECTED SECTIONS

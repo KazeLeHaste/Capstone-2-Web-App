@@ -1,5 +1,5 @@
 {
-  "comparison_timestamp": "2025-10-30T13:22:00.639037",
+  "comparison_timestamp": "2025-11-02T21:23:32.492641",
   "sessions": [
     "session_1761754891534_yo6d2jlk4",
     "session_1761754769007_xbs6hk9cn",
@@ -9,7 +9,7 @@
     "session_1761754891534_yo6d2jlk4": {
       "session_path": "C:\\Users\\kgaqu\\OneDrive\\Documents\\4th Year\\Capstone 2\\v10\\backend\\sessions\\session_1761754891534_yo6d2jlk4",
       "session_id": "session_1761754891534_yo6d2jlk4",
-      "analysis_timestamp": "2025-10-30T13:20:52.752990",
+      "analysis_timestamp": "2025-11-02T21:22:31.625073",
       "kpis": {
         "total_vehicles_loaded": 211,
         "total_vehicles_completed": 211,
@@ -41911,30 +41911,93 @@
       "recommendations": [
         {
           "id": "high_co2_emissions",
-          "message": "High CO2 emissions detected (890135.9g). Consider promoting public transport or electric vehicles.",
-          "priority": "medium",
+          "message": "High CO2 emissions detected (890135.9g). Consider promoting public transport or electric vehicles. Average of 4.22kg CO\u2082 per completed trip.",
+          "priority": "high",
           "category": "environmental",
           "kpi": "total_co2",
           "threshold": 1000,
-          "actual_value": 890135.8888000032
+          "actual_value": 890135.8888000032,
+          "severity_score": 100,
+          "detailed_actions": [
+            "SHORT-TERM: Optimize traffic flow to reduce stop-and-go conditions",
+            "SHORT-TERM: Implement low-emission zones in high-pollution areas",
+            "MEDIUM-TERM: Develop car-sharing and ride-pooling programs",
+            "MEDIUM-TERM: Create dedicated bus and HOV lanes to encourage shared transport",
+            "LONG-TERM: Transition public vehicle fleets to zero-emission technologies",
+            "LONG-TERM: Implement comprehensive active transportation infrastructure (cycling, walking)"
+          ],
+          "impact_assessment": {
+            "severity_level": "critical",
+            "affected_metrics": [
+              "total_co2",
+              "total_nox",
+              "total_fuel_consumption"
+            ],
+            "estimated_improvement": "15-30% reduction in emissions with modal shift and efficiency gains",
+            "implementation_complexity": "High",
+            "cost_category": "$$$ - Long-term policy and infrastructure changes"
+          },
+          "deviation_percentage": 88913.6
         },
         {
           "id": "high_nox_emissions",
           "message": "High NOx emissions detected (363.1g). Consider diesel vehicle restrictions or emission standards.",
-          "priority": "medium",
+          "priority": "high",
           "category": "environmental",
           "kpi": "total_nox",
           "threshold": 50,
-          "actual_value": 363.07949999984504
+          "actual_value": 363.07949999984504,
+          "severity_score": 100,
+          "detailed_actions": [
+            "SHORT-TERM: Optimize traffic flow to reduce stop-and-go conditions",
+            "SHORT-TERM: Implement low-emission zones in high-pollution areas",
+            "MEDIUM-TERM: Develop car-sharing and ride-pooling programs",
+            "MEDIUM-TERM: Create dedicated bus and HOV lanes to encourage shared transport",
+            "LONG-TERM: Transition public vehicle fleets to zero-emission technologies",
+            "LONG-TERM: Implement comprehensive active transportation infrastructure (cycling, walking)"
+          ],
+          "impact_assessment": {
+            "severity_level": "critical",
+            "affected_metrics": [
+              "total_co2",
+              "total_nox",
+              "total_fuel_consumption"
+            ],
+            "estimated_improvement": "15-30% reduction in emissions with modal shift and efficiency gains",
+            "implementation_complexity": "High",
+            "cost_category": "$$$ - Long-term policy and infrastructure changes"
+          },
+          "deviation_percentage": 626.2
         },
         {
           "id": "high_fuel_consumption",
-          "message": "High fuel consumption detected (286461.8g). Optimize traffic flow to reduce stop-and-go driving.",
-          "priority": "medium",
+          "message": "High fuel consumption detected (286461.8g). Optimize traffic flow to reduce stop-and-go driving. Average fuel consumption: 1357.6g per vehicle.",
+          "priority": "high",
           "category": "environmental",
           "kpi": "total_fuel_consumption",
           "threshold": 500,
-          "actual_value": 286461.76344004535
+          "actual_value": 286461.76344004535,
+          "severity_score": 100,
+          "detailed_actions": [
+            "SHORT-TERM: Optimize traffic flow to reduce stop-and-go conditions",
+            "SHORT-TERM: Implement low-emission zones in high-pollution areas",
+            "MEDIUM-TERM: Develop car-sharing and ride-pooling programs",
+            "MEDIUM-TERM: Create dedicated bus and HOV lanes to encourage shared transport",
+            "LONG-TERM: Transition public vehicle fleets to zero-emission technologies",
+            "LONG-TERM: Implement comprehensive active transportation infrastructure (cycling, walking)"
+          ],
+          "impact_assessment": {
+            "severity_level": "critical",
+            "affected_metrics": [
+              "total_co2",
+              "total_nox",
+              "total_fuel_consumption"
+            ],
+            "estimated_improvement": "15-30% reduction in emissions with modal shift and efficiency gains",
+            "implementation_complexity": "High",
+            "cost_category": "$$$ - Long-term policy and infrastructure changes"
+          },
+          "deviation_percentage": 57192.4
         },
         {
           "id": "good_flow",
@@ -41943,7 +42006,25 @@
           "category": "efficiency",
           "kpi": "flow_rate",
           "threshold": 0.5,
-          "actual_value": 3.6913925822253324
+          "actual_value": 3.6913925822253324,
+          "severity_score": 0,
+          "detailed_actions": [
+            "MEDIUM-TERM: Coordinate signals along arterial corridors for progression",
+            "LONG-TERM: Evaluate transit alternatives to reduce vehicle dependency",
+            "LONG-TERM: Implement smart city technologies for predictive traffic management"
+          ],
+          "impact_assessment": {
+            "severity_level": "low",
+            "affected_metrics": [
+              "throughput",
+              "avg_travel_time",
+              "flow_rate"
+            ],
+            "estimated_improvement": "10-20% improvement in network efficiency",
+            "implementation_complexity": "Low to Medium",
+            "cost_category": "$ to $$ - Technology and optimization focused"
+          },
+          "deviation_percentage": 638.3
         }
       ],
       "vehicle_type_breakdown": {
@@ -42274,7 +42355,7 @@
     "session_1761754769007_xbs6hk9cn": {
       "session_path": "C:\\Users\\kgaqu\\OneDrive\\Documents\\4th Year\\Capstone 2\\v10\\backend\\sessions\\session_1761754769007_xbs6hk9cn",
       "session_id": "session_1761754769007_xbs6hk9cn",
-      "analysis_timestamp": "2025-10-30T13:21:29.318134",
+      "analysis_timestamp": "2025-11-02T21:23:19.041860",
       "kpis": {
         "total_vehicles_loaded": 472,
         "total_vehicles_completed": 472,
@@ -133991,30 +134072,93 @@
       "recommendations": [
         {
           "id": "high_co2_emissions",
-          "message": "High CO2 emissions detected (1915425.0g). Consider promoting public transport or electric vehicles.",
-          "priority": "medium",
+          "message": "High CO2 emissions detected (1915425.0g). Consider promoting public transport or electric vehicles. Average of 4.06kg CO\u2082 per completed trip.",
+          "priority": "high",
           "category": "environmental",
           "kpi": "total_co2",
           "threshold": 1000,
-          "actual_value": 1915425.0182300187
+          "actual_value": 1915425.0182300187,
+          "severity_score": 100,
+          "detailed_actions": [
+            "SHORT-TERM: Optimize traffic flow to reduce stop-and-go conditions",
+            "SHORT-TERM: Implement low-emission zones in high-pollution areas",
+            "MEDIUM-TERM: Develop car-sharing and ride-pooling programs",
+            "MEDIUM-TERM: Create dedicated bus and HOV lanes to encourage shared transport",
+            "LONG-TERM: Transition public vehicle fleets to zero-emission technologies",
+            "LONG-TERM: Implement comprehensive active transportation infrastructure (cycling, walking)"
+          ],
+          "impact_assessment": {
+            "severity_level": "critical",
+            "affected_metrics": [
+              "total_co2",
+              "total_nox",
+              "total_fuel_consumption"
+            ],
+            "estimated_improvement": "15-30% reduction in emissions with modal shift and efficiency gains",
+            "implementation_complexity": "High",
+            "cost_category": "$$$ - Long-term policy and infrastructure changes"
+          },
+          "deviation_percentage": 191442.5
         },
         {
           "id": "high_nox_emissions",
-          "message": "High NOx emissions detected (715.2g). Consider diesel vehicle restrictions or emission standards.",
-          "priority": "medium",
+          "message": "High NOx emissions detected (715.2g). Consider diesel vehicle restrictions or emission standards. Both NOx and CO\u2082 emissions are elevated, suggesting need for comprehensive emission controls.",
+          "priority": "high",
           "category": "environmental",
           "kpi": "total_nox",
           "threshold": 50,
-          "actual_value": 715.1760599996375
+          "actual_value": 715.1760599996375,
+          "severity_score": 100,
+          "detailed_actions": [
+            "SHORT-TERM: Optimize traffic flow to reduce stop-and-go conditions",
+            "SHORT-TERM: Implement low-emission zones in high-pollution areas",
+            "MEDIUM-TERM: Develop car-sharing and ride-pooling programs",
+            "MEDIUM-TERM: Create dedicated bus and HOV lanes to encourage shared transport",
+            "LONG-TERM: Transition public vehicle fleets to zero-emission technologies",
+            "LONG-TERM: Implement comprehensive active transportation infrastructure (cycling, walking)"
+          ],
+          "impact_assessment": {
+            "severity_level": "critical",
+            "affected_metrics": [
+              "total_co2",
+              "total_nox",
+              "total_fuel_consumption"
+            ],
+            "estimated_improvement": "15-30% reduction in emissions with modal shift and efficiency gains",
+            "implementation_complexity": "High",
+            "cost_category": "$$$ - Long-term policy and infrastructure changes"
+          },
+          "deviation_percentage": 1330.4
         },
         {
           "id": "high_fuel_consumption",
-          "message": "High fuel consumption detected (616506.5g). Optimize traffic flow to reduce stop-and-go driving.",
-          "priority": "medium",
+          "message": "High fuel consumption detected (616506.5g). Optimize traffic flow to reduce stop-and-go driving. Average fuel consumption: 1306.2g per vehicle.",
+          "priority": "high",
           "category": "environmental",
           "kpi": "total_fuel_consumption",
           "threshold": 500,
-          "actual_value": 616506.4603903376
+          "actual_value": 616506.4603903376,
+          "severity_score": 100,
+          "detailed_actions": [
+            "SHORT-TERM: Optimize traffic flow to reduce stop-and-go conditions",
+            "SHORT-TERM: Implement low-emission zones in high-pollution areas",
+            "MEDIUM-TERM: Develop car-sharing and ride-pooling programs",
+            "MEDIUM-TERM: Create dedicated bus and HOV lanes to encourage shared transport",
+            "LONG-TERM: Transition public vehicle fleets to zero-emission technologies",
+            "LONG-TERM: Implement comprehensive active transportation infrastructure (cycling, walking)"
+          ],
+          "impact_assessment": {
+            "severity_level": "critical",
+            "affected_metrics": [
+              "total_co2",
+              "total_nox",
+              "total_fuel_consumption"
+            ],
+            "estimated_improvement": "15-30% reduction in emissions with modal shift and efficiency gains",
+            "implementation_complexity": "High",
+            "cost_category": "$$$ - Long-term policy and infrastructure changes"
+          },
+          "deviation_percentage": 123201.3
         },
         {
           "id": "good_flow",
@@ -134023,7 +134167,25 @@
           "category": "efficiency",
           "kpi": "flow_rate",
           "threshold": 0.5,
-          "actual_value": 7.67729342875732
+          "actual_value": 7.67729342875732,
+          "severity_score": 0,
+          "detailed_actions": [
+            "MEDIUM-TERM: Coordinate signals along arterial corridors for progression",
+            "LONG-TERM: Evaluate transit alternatives to reduce vehicle dependency",
+            "LONG-TERM: Implement smart city technologies for predictive traffic management"
+          ],
+          "impact_assessment": {
+            "severity_level": "low",
+            "affected_metrics": [
+              "throughput",
+              "avg_travel_time",
+              "flow_rate"
+            ],
+            "estimated_improvement": "10-20% improvement in network efficiency",
+            "implementation_complexity": "Low to Medium",
+            "cost_category": "$ to $$ - Technology and optimization focused"
+          },
+          "deviation_percentage": 1435.5
         }
       ],
       "vehicle_type_breakdown": {
@@ -134353,7 +134515,7 @@
     "session_1761754483469_qnf969i9r": {
       "session_path": "C:\\Users\\kgaqu\\OneDrive\\Documents\\4th Year\\Capstone 2\\v10\\backend\\sessions\\session_1761754483469_qnf969i9r",
       "session_id": "session_1761754483469_qnf969i9r",
-      "analysis_timestamp": "2025-10-30T13:22:00.606950",
+      "analysis_timestamp": "2025-11-02T21:23:32.460718",
       "kpis": {
         "total_vehicles_loaded": 600,
         "total_vehicles_completed": 600,
@@ -158489,30 +158651,93 @@
       "recommendations": [
         {
           "id": "high_co2_emissions",
-          "message": "High CO2 emissions detected (518498.6g). Consider promoting public transport or electric vehicles.",
-          "priority": "medium",
+          "message": "High CO2 emissions detected (518498.6g). Consider promoting public transport or electric vehicles. Average of 0.86kg CO\u2082 per completed trip.",
+          "priority": "high",
           "category": "environmental",
           "kpi": "total_co2",
           "threshold": 1000,
-          "actual_value": 518498.57240000257
+          "actual_value": 518498.57240000257,
+          "severity_score": 100,
+          "detailed_actions": [
+            "SHORT-TERM: Optimize traffic flow to reduce stop-and-go conditions",
+            "SHORT-TERM: Implement low-emission zones in high-pollution areas",
+            "MEDIUM-TERM: Develop car-sharing and ride-pooling programs",
+            "MEDIUM-TERM: Create dedicated bus and HOV lanes to encourage shared transport",
+            "LONG-TERM: Transition public vehicle fleets to zero-emission technologies",
+            "LONG-TERM: Implement comprehensive active transportation infrastructure (cycling, walking)"
+          ],
+          "impact_assessment": {
+            "severity_level": "critical",
+            "affected_metrics": [
+              "total_co2",
+              "total_nox",
+              "total_fuel_consumption"
+            ],
+            "estimated_improvement": "15-30% reduction in emissions with modal shift and efficiency gains",
+            "implementation_complexity": "High",
+            "cost_category": "$$$ - Long-term policy and infrastructure changes"
+          },
+          "deviation_percentage": 51749.9
         },
         {
           "id": "high_nox_emissions",
           "message": "High NOx emissions detected (196.2g). Consider diesel vehicle restrictions or emission standards.",
-          "priority": "medium",
+          "priority": "high",
           "category": "environmental",
           "kpi": "total_nox",
           "threshold": 50,
-          "actual_value": 196.21084999994204
+          "actual_value": 196.21084999994204,
+          "severity_score": 100,
+          "detailed_actions": [
+            "SHORT-TERM: Optimize traffic flow to reduce stop-and-go conditions",
+            "SHORT-TERM: Implement low-emission zones in high-pollution areas",
+            "MEDIUM-TERM: Develop car-sharing and ride-pooling programs",
+            "MEDIUM-TERM: Create dedicated bus and HOV lanes to encourage shared transport",
+            "LONG-TERM: Transition public vehicle fleets to zero-emission technologies",
+            "LONG-TERM: Implement comprehensive active transportation infrastructure (cycling, walking)"
+          ],
+          "impact_assessment": {
+            "severity_level": "critical",
+            "affected_metrics": [
+              "total_co2",
+              "total_nox",
+              "total_fuel_consumption"
+            ],
+            "estimated_improvement": "15-30% reduction in emissions with modal shift and efficiency gains",
+            "implementation_complexity": "High",
+            "cost_category": "$$$ - Long-term policy and infrastructure changes"
+          },
+          "deviation_percentage": 292.4
         },
         {
           "id": "high_fuel_consumption",
-          "message": "High fuel consumption detected (166903.3g). Optimize traffic flow to reduce stop-and-go driving.",
-          "priority": "medium",
+          "message": "High fuel consumption detected (166903.3g). Optimize traffic flow to reduce stop-and-go driving. Average fuel consumption: 278.2g per vehicle.",
+          "priority": "high",
           "category": "environmental",
           "kpi": "total_fuel_consumption",
           "threshold": 500,
-          "actual_value": 166903.27399996427
+          "actual_value": 166903.27399996427,
+          "severity_score": 100,
+          "detailed_actions": [
+            "SHORT-TERM: Optimize traffic flow to reduce stop-and-go conditions",
+            "SHORT-TERM: Implement low-emission zones in high-pollution areas",
+            "MEDIUM-TERM: Develop car-sharing and ride-pooling programs",
+            "MEDIUM-TERM: Create dedicated bus and HOV lanes to encourage shared transport",
+            "LONG-TERM: Transition public vehicle fleets to zero-emission technologies",
+            "LONG-TERM: Implement comprehensive active transportation infrastructure (cycling, walking)"
+          ],
+          "impact_assessment": {
+            "severity_level": "critical",
+            "affected_metrics": [
+              "total_co2",
+              "total_nox",
+              "total_fuel_consumption"
+            ],
+            "estimated_improvement": "15-30% reduction in emissions with modal shift and efficiency gains",
+            "implementation_complexity": "High",
+            "cost_category": "$$$ - Long-term policy and infrastructure changes"
+          },
+          "deviation_percentage": 33280.7
         },
         {
           "id": "good_flow",
@@ -158521,7 +158746,25 @@
           "category": "efficiency",
           "kpi": "flow_rate",
           "threshold": 0.5,
-          "actual_value": 8.882309400444116
+          "actual_value": 8.882309400444116,
+          "severity_score": 0,
+          "detailed_actions": [
+            "MEDIUM-TERM: Coordinate signals along arterial corridors for progression",
+            "LONG-TERM: Evaluate transit alternatives to reduce vehicle dependency",
+            "LONG-TERM: Implement smart city technologies for predictive traffic management"
+          ],
+          "impact_assessment": {
+            "severity_level": "low",
+            "affected_metrics": [
+              "throughput",
+              "avg_travel_time",
+              "flow_rate"
+            ],
+            "estimated_improvement": "10-20% improvement in network efficiency",
+            "implementation_complexity": "Low to Medium",
+            "cost_category": "$ to $$ - Technology and optimization focused"
+          },
+          "deviation_percentage": 1676.5
         }
       ],
       "vehicle_type_breakdown": {
@@ -159183,30 +159426,93 @@
       "session_1761754891534_yo6d2jlk4": [
         {
           "id": "high_co2_emissions",
-          "message": "High CO2 emissions detected (890135.9g). Consider promoting public transport or electric vehicles.",
-          "priority": "medium",
+          "message": "High CO2 emissions detected (890135.9g). Consider promoting public transport or electric vehicles. Average of 4.22kg CO\u2082 per completed trip.",
+          "priority": "high",
           "category": "environmental",
           "kpi": "total_co2",
           "threshold": 1000,
-          "actual_value": 890135.8888000032
+          "actual_value": 890135.8888000032,
+          "severity_score": 100,
+          "detailed_actions": [
+            "SHORT-TERM: Optimize traffic flow to reduce stop-and-go conditions",
+            "SHORT-TERM: Implement low-emission zones in high-pollution areas",
+            "MEDIUM-TERM: Develop car-sharing and ride-pooling programs",
+            "MEDIUM-TERM: Create dedicated bus and HOV lanes to encourage shared transport",
+            "LONG-TERM: Transition public vehicle fleets to zero-emission technologies",
+            "LONG-TERM: Implement comprehensive active transportation infrastructure (cycling, walking)"
+          ],
+          "impact_assessment": {
+            "severity_level": "critical",
+            "affected_metrics": [
+              "total_co2",
+              "total_nox",
+              "total_fuel_consumption"
+            ],
+            "estimated_improvement": "15-30% reduction in emissions with modal shift and efficiency gains",
+            "implementation_complexity": "High",
+            "cost_category": "$$$ - Long-term policy and infrastructure changes"
+          },
+          "deviation_percentage": 88913.6
         },
         {
           "id": "high_nox_emissions",
           "message": "High NOx emissions detected (363.1g). Consider diesel vehicle restrictions or emission standards.",
-          "priority": "medium",
+          "priority": "high",
           "category": "environmental",
           "kpi": "total_nox",
           "threshold": 50,
-          "actual_value": 363.07949999984504
+          "actual_value": 363.07949999984504,
+          "severity_score": 100,
+          "detailed_actions": [
+            "SHORT-TERM: Optimize traffic flow to reduce stop-and-go conditions",
+            "SHORT-TERM: Implement low-emission zones in high-pollution areas",
+            "MEDIUM-TERM: Develop car-sharing and ride-pooling programs",
+            "MEDIUM-TERM: Create dedicated bus and HOV lanes to encourage shared transport",
+            "LONG-TERM: Transition public vehicle fleets to zero-emission technologies",
+            "LONG-TERM: Implement comprehensive active transportation infrastructure (cycling, walking)"
+          ],
+          "impact_assessment": {
+            "severity_level": "critical",
+            "affected_metrics": [
+              "total_co2",
+              "total_nox",
+              "total_fuel_consumption"
+            ],
+            "estimated_improvement": "15-30% reduction in emissions with modal shift and efficiency gains",
+            "implementation_complexity": "High",
+            "cost_category": "$$$ - Long-term policy and infrastructure changes"
+          },
+          "deviation_percentage": 626.2
         },
         {
           "id": "high_fuel_consumption",
-          "message": "High fuel consumption detected (286461.8g). Optimize traffic flow to reduce stop-and-go driving.",
-          "priority": "medium",
+          "message": "High fuel consumption detected (286461.8g). Optimize traffic flow to reduce stop-and-go driving. Average fuel consumption: 1357.6g per vehicle.",
+          "priority": "high",
           "category": "environmental",
           "kpi": "total_fuel_consumption",
           "threshold": 500,
-          "actual_value": 286461.76344004535
+          "actual_value": 286461.76344004535,
+          "severity_score": 100,
+          "detailed_actions": [
+            "SHORT-TERM: Optimize traffic flow to reduce stop-and-go conditions",
+            "SHORT-TERM: Implement low-emission zones in high-pollution areas",
+            "MEDIUM-TERM: Develop car-sharing and ride-pooling programs",
+            "MEDIUM-TERM: Create dedicated bus and HOV lanes to encourage shared transport",
+            "LONG-TERM: Transition public vehicle fleets to zero-emission technologies",
+            "LONG-TERM: Implement comprehensive active transportation infrastructure (cycling, walking)"
+          ],
+          "impact_assessment": {
+            "severity_level": "critical",
+            "affected_metrics": [
+              "total_co2",
+              "total_nox",
+              "total_fuel_consumption"
+            ],
+            "estimated_improvement": "15-30% reduction in emissions with modal shift and efficiency gains",
+            "implementation_complexity": "High",
+            "cost_category": "$$$ - Long-term policy and infrastructure changes"
+          },
+          "deviation_percentage": 57192.4
         },
         {
           "id": "good_flow",
@@ -159215,36 +159521,117 @@
           "category": "efficiency",
           "kpi": "flow_rate",
           "threshold": 0.5,
-          "actual_value": 3.6913925822253324
+          "actual_value": 3.6913925822253324,
+          "severity_score": 0,
+          "detailed_actions": [
+            "MEDIUM-TERM: Coordinate signals along arterial corridors for progression",
+            "LONG-TERM: Evaluate transit alternatives to reduce vehicle dependency",
+            "LONG-TERM: Implement smart city technologies for predictive traffic management"
+          ],
+          "impact_assessment": {
+            "severity_level": "low",
+            "affected_metrics": [
+              "throughput",
+              "avg_travel_time",
+              "flow_rate"
+            ],
+            "estimated_improvement": "10-20% improvement in network efficiency",
+            "implementation_complexity": "Low to Medium",
+            "cost_category": "$ to $$ - Technology and optimization focused"
+          },
+          "deviation_percentage": 638.3
         }
       ],
       "session_1761754769007_xbs6hk9cn": [
         {
           "id": "high_co2_emissions",
-          "message": "High CO2 emissions detected (1915425.0g). Consider promoting public transport or electric vehicles.",
-          "priority": "medium",
+          "message": "High CO2 emissions detected (1915425.0g). Consider promoting public transport or electric vehicles. Average of 4.06kg CO\u2082 per completed trip.",
+          "priority": "high",
           "category": "environmental",
           "kpi": "total_co2",
           "threshold": 1000,
-          "actual_value": 1915425.0182300187
+          "actual_value": 1915425.0182300187,
+          "severity_score": 100,
+          "detailed_actions": [
+            "SHORT-TERM: Optimize traffic flow to reduce stop-and-go conditions",
+            "SHORT-TERM: Implement low-emission zones in high-pollution areas",
+            "MEDIUM-TERM: Develop car-sharing and ride-pooling programs",
+            "MEDIUM-TERM: Create dedicated bus and HOV lanes to encourage shared transport",
+            "LONG-TERM: Transition public vehicle fleets to zero-emission technologies",
+            "LONG-TERM: Implement comprehensive active transportation infrastructure (cycling, walking)"
+          ],
+          "impact_assessment": {
+            "severity_level": "critical",
+            "affected_metrics": [
+              "total_co2",
+              "total_nox",
+              "total_fuel_consumption"
+            ],
+            "estimated_improvement": "15-30% reduction in emissions with modal shift and efficiency gains",
+            "implementation_complexity": "High",
+            "cost_category": "$$$ - Long-term policy and infrastructure changes"
+          },
+          "deviation_percentage": 191442.5
         },
         {
           "id": "high_nox_emissions",
-          "message": "High NOx emissions detected (715.2g). Consider diesel vehicle restrictions or emission standards.",
-          "priority": "medium",
+          "message": "High NOx emissions detected (715.2g). Consider diesel vehicle restrictions or emission standards. Both NOx and CO\u2082 emissions are elevated, suggesting need for comprehensive emission controls.",
+          "priority": "high",
           "category": "environmental",
           "kpi": "total_nox",
           "threshold": 50,
-          "actual_value": 715.1760599996375
+          "actual_value": 715.1760599996375,
+          "severity_score": 100,
+          "detailed_actions": [
+            "SHORT-TERM: Optimize traffic flow to reduce stop-and-go conditions",
+            "SHORT-TERM: Implement low-emission zones in high-pollution areas",
+            "MEDIUM-TERM: Develop car-sharing and ride-pooling programs",
+            "MEDIUM-TERM: Create dedicated bus and HOV lanes to encourage shared transport",
+            "LONG-TERM: Transition public vehicle fleets to zero-emission technologies",
+            "LONG-TERM: Implement comprehensive active transportation infrastructure (cycling, walking)"
+          ],
+          "impact_assessment": {
+            "severity_level": "critical",
+            "affected_metrics": [
+              "total_co2",
+              "total_nox",
+              "total_fuel_consumption"
+            ],
+            "estimated_improvement": "15-30% reduction in emissions with modal shift and efficiency gains",
+            "implementation_complexity": "High",
+            "cost_category": "$$$ - Long-term policy and infrastructure changes"
+          },
+          "deviation_percentage": 1330.4
         },
         {
           "id": "high_fuel_consumption",
-          "message": "High fuel consumption detected (616506.5g). Optimize traffic flow to reduce stop-and-go driving.",
-          "priority": "medium",
+          "message": "High fuel consumption detected (616506.5g). Optimize traffic flow to reduce stop-and-go driving. Average fuel consumption: 1306.2g per vehicle.",
+          "priority": "high",
           "category": "environmental",
           "kpi": "total_fuel_consumption",
           "threshold": 500,
-          "actual_value": 616506.4603903376
+          "actual_value": 616506.4603903376,
+          "severity_score": 100,
+          "detailed_actions": [
+            "SHORT-TERM: Optimize traffic flow to reduce stop-and-go conditions",
+            "SHORT-TERM: Implement low-emission zones in high-pollution areas",
+            "MEDIUM-TERM: Develop car-sharing and ride-pooling programs",
+            "MEDIUM-TERM: Create dedicated bus and HOV lanes to encourage shared transport",
+            "LONG-TERM: Transition public vehicle fleets to zero-emission technologies",
+            "LONG-TERM: Implement comprehensive active transportation infrastructure (cycling, walking)"
+          ],
+          "impact_assessment": {
+            "severity_level": "critical",
+            "affected_metrics": [
+              "total_co2",
+              "total_nox",
+              "total_fuel_consumption"
+            ],
+            "estimated_improvement": "15-30% reduction in emissions with modal shift and efficiency gains",
+            "implementation_complexity": "High",
+            "cost_category": "$$$ - Long-term policy and infrastructure changes"
+          },
+          "deviation_percentage": 123201.3
         },
         {
           "id": "good_flow",
@@ -159253,36 +159640,117 @@
           "category": "efficiency",
           "kpi": "flow_rate",
           "threshold": 0.5,
-          "actual_value": 7.67729342875732
+          "actual_value": 7.67729342875732,
+          "severity_score": 0,
+          "detailed_actions": [
+            "MEDIUM-TERM: Coordinate signals along arterial corridors for progression",
+            "LONG-TERM: Evaluate transit alternatives to reduce vehicle dependency",
+            "LONG-TERM: Implement smart city technologies for predictive traffic management"
+          ],
+          "impact_assessment": {
+            "severity_level": "low",
+            "affected_metrics": [
+              "throughput",
+              "avg_travel_time",
+              "flow_rate"
+            ],
+            "estimated_improvement": "10-20% improvement in network efficiency",
+            "implementation_complexity": "Low to Medium",
+            "cost_category": "$ to $$ - Technology and optimization focused"
+          },
+          "deviation_percentage": 1435.5
         }
       ],
       "session_1761754483469_qnf969i9r": [
         {
           "id": "high_co2_emissions",
-          "message": "High CO2 emissions detected (518498.6g). Consider promoting public transport or electric vehicles.",
-          "priority": "medium",
+          "message": "High CO2 emissions detected (518498.6g). Consider promoting public transport or electric vehicles. Average of 0.86kg CO\u2082 per completed trip.",
+          "priority": "high",
           "category": "environmental",
           "kpi": "total_co2",
           "threshold": 1000,
-          "actual_value": 518498.57240000257
+          "actual_value": 518498.57240000257,
+          "severity_score": 100,
+          "detailed_actions": [
+            "SHORT-TERM: Optimize traffic flow to reduce stop-and-go conditions",
+            "SHORT-TERM: Implement low-emission zones in high-pollution areas",
+            "MEDIUM-TERM: Develop car-sharing and ride-pooling programs",
+            "MEDIUM-TERM: Create dedicated bus and HOV lanes to encourage shared transport",
+            "LONG-TERM: Transition public vehicle fleets to zero-emission technologies",
+            "LONG-TERM: Implement comprehensive active transportation infrastructure (cycling, walking)"
+          ],
+          "impact_assessment": {
+            "severity_level": "critical",
+            "affected_metrics": [
+              "total_co2",
+              "total_nox",
+              "total_fuel_consumption"
+            ],
+            "estimated_improvement": "15-30% reduction in emissions with modal shift and efficiency gains",
+            "implementation_complexity": "High",
+            "cost_category": "$$$ - Long-term policy and infrastructure changes"
+          },
+          "deviation_percentage": 51749.9
         },
         {
           "id": "high_nox_emissions",
           "message": "High NOx emissions detected (196.2g). Consider diesel vehicle restrictions or emission standards.",
-          "priority": "medium",
+          "priority": "high",
           "category": "environmental",
           "kpi": "total_nox",
           "threshold": 50,
-          "actual_value": 196.21084999994204
+          "actual_value": 196.21084999994204,
+          "severity_score": 100,
+          "detailed_actions": [
+            "SHORT-TERM: Optimize traffic flow to reduce stop-and-go conditions",
+            "SHORT-TERM: Implement low-emission zones in high-pollution areas",
+            "MEDIUM-TERM: Develop car-sharing and ride-pooling programs",
+            "MEDIUM-TERM: Create dedicated bus and HOV lanes to encourage shared transport",
+            "LONG-TERM: Transition public vehicle fleets to zero-emission technologies",
+            "LONG-TERM: Implement comprehensive active transportation infrastructure (cycling, walking)"
+          ],
+          "impact_assessment": {
+            "severity_level": "critical",
+            "affected_metrics": [
+              "total_co2",
+              "total_nox",
+              "total_fuel_consumption"
+            ],
+            "estimated_improvement": "15-30% reduction in emissions with modal shift and efficiency gains",
+            "implementation_complexity": "High",
+            "cost_category": "$$$ - Long-term policy and infrastructure changes"
+          },
+          "deviation_percentage": 292.4
         },
         {
           "id": "high_fuel_consumption",
-          "message": "High fuel consumption detected (166903.3g). Optimize traffic flow to reduce stop-and-go driving.",
-          "priority": "medium",
+          "message": "High fuel consumption detected (166903.3g). Optimize traffic flow to reduce stop-and-go driving. Average fuel consumption: 278.2g per vehicle.",
+          "priority": "high",
           "category": "environmental",
           "kpi": "total_fuel_consumption",
           "threshold": 500,
-          "actual_value": 166903.27399996427
+          "actual_value": 166903.27399996427,
+          "severity_score": 100,
+          "detailed_actions": [
+            "SHORT-TERM: Optimize traffic flow to reduce stop-and-go conditions",
+            "SHORT-TERM: Implement low-emission zones in high-pollution areas",
+            "MEDIUM-TERM: Develop car-sharing and ride-pooling programs",
+            "MEDIUM-TERM: Create dedicated bus and HOV lanes to encourage shared transport",
+            "LONG-TERM: Transition public vehicle fleets to zero-emission technologies",
+            "LONG-TERM: Implement comprehensive active transportation infrastructure (cycling, walking)"
+          ],
+          "impact_assessment": {
+            "severity_level": "critical",
+            "affected_metrics": [
+              "total_co2",
+              "total_nox",
+              "total_fuel_consumption"
+            ],
+            "estimated_improvement": "15-30% reduction in emissions with modal shift and efficiency gains",
+            "implementation_complexity": "High",
+            "cost_category": "$$$ - Long-term policy and infrastructure changes"
+          },
+          "deviation_percentage": 33280.7
         },
         {
           "id": "good_flow",
@@ -159291,7 +159759,25 @@
           "category": "efficiency",
           "kpi": "flow_rate",
           "threshold": 0.5,
-          "actual_value": 8.882309400444116
+          "actual_value": 8.882309400444116,
+          "severity_score": 0,
+          "detailed_actions": [
+            "MEDIUM-TERM: Coordinate signals along arterial corridors for progression",
+            "LONG-TERM: Evaluate transit alternatives to reduce vehicle dependency",
+            "LONG-TERM: Implement smart city technologies for predictive traffic management"
+          ],
+          "impact_assessment": {
+            "severity_level": "low",
+            "affected_metrics": [
+              "throughput",
+              "avg_travel_time",
+              "flow_rate"
+            ],
+            "estimated_improvement": "10-20% improvement in network efficiency",
+            "implementation_complexity": "Low to Medium",
+            "cost_category": "$ to $$ - Technology and optimization focused"
+          },
+          "deviation_percentage": 1676.5
         }
       ]
     },
@@ -159311,15 +159797,15 @@
     },
     "priority_breakdown": {
       "session_1761754891534_yo6d2jlk4": {
-        "medium": 3,
+        "high": 3,
         "low": 1
       },
       "session_1761754769007_xbs6hk9cn": {
-        "medium": 3,
+        "high": 3,
         "low": 1
       },
       "session_1761754483469_qnf969i9r": {
-        "medium": 3,
+        "high": 3,
         "low": 1
       }
     }
