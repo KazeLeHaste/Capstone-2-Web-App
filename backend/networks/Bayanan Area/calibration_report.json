@@ -1,0 +1,27 @@
+{
+  "success": true,
+  "network": "Bayanan Area",
+  "btmd_data": "Bacoor Blvd. and Bayanan Road Intersection (Bayanan Area)",
+  "simulation_hours": 2.0,
+  "time_of_day": "morning_peak",
+  "traffic_intensity": 1.0,
+  "target_total_vehicles": 1522,
+  "target_vehicles_per_hour": 761,
+  "btmd_avg_per_hour": 619,
+  "btmd_peak_per_hour": 763,
+  "vehicle_breakdown": {
+    "passenger": 717,
+    "motorcycle": 304,
+    "truck": 50,
+    "jeepney": 447,
+    "bus": 0
+  },
+  "calibrated_files": [
+    "networks\\Bayanan Area\\routes\\osm.passenger.flows.xml",
+    "networks\\Bayanan Area\\routes\\osm.motorcycle.flows.xml",
+    "networks\\Bayanan Area\\routes\\osm.truck.flows.xml",
+    "networks\\Bayanan Area\\routes\\osm.jeepney.flows.xml",
+    "networks\\Bayanan Area\\routes\\osm.bus.flows.xml"
+  ],
+  "timestamp": "2025-12-06T20:56:43.288385"
+}

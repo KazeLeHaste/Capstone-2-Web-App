@@ -1,0 +1,505 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- generated on 2025-12-06 21:09:45 by Eclipse SUMO duarouter Version 1.24.0
+<duarouterConfiguration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/duarouterConfiguration.xsd">
+
+    <input>
+        <net-file value="C:\Users\kgaqu\OneDrive\Documents\4th Year\Capstone 2\System Final Version\backend\networks\Perpetual Molino Area\Perpetual Molino Area.net.xml.gz"/>
+        <route-files value="C:\Users\kgaqu\OneDrive\Documents\4th Year\Capstone 2\System Final Version\backend\networks\Perpetual Molino Area\routes\osm.truck.trips.xml"/>
+    </input>
+
+    <output>
+        <output-file value="C:\Users\kgaqu\OneDrive\Documents\4th Year\Capstone 2\System Final Version\backend\networks\Perpetual Molino Area\routes\osm.truck.rou.xml"/>
+    </output>
+
+    <processing>
+        <remove-loops value="true"/>
+        <repair value="true"/>
+    </processing>
+
+    <report>
+        <no-warnings value="false"/>
+        <ignore-errors value="true"/>
+        <no-step-log value="true"/>
+    </report>
+
+</duarouterConfiguration>
+-->
+
+<routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/routes_file.xsd">
+    <vType id="calibrated_truck" length="7.50" vClass="truck" width="2.40"/>
+    <vehicle id="truck_0" type="calibrated_truck" depart="0.00" departLane="best" departSpeed="max">
+        <route edges="-282194769#1 -690977716#1"/>
+    </vehicle>
+    <vehicle id="truck_1" type="calibrated_truck" depart="28.02" departLane="best" departSpeed="max">
+        <route edges="109973440 183543973#0"/>
+    </vehicle>
+    <vehicle id="truck_3" type="calibrated_truck" depart="84.05" departLane="best" departSpeed="max">
+        <route edges="109973440 -690977716#1"/>
+    </vehicle>
+    <vehicle id="truck_4" type="calibrated_truck" depart="112.06" departLane="best" departSpeed="max">
+        <route edges="-282194769#1 -690977716#1"/>
+    </vehicle>
+    <vehicle id="truck_6" type="calibrated_truck" depart="168.09" departLane="best" departSpeed="max">
+        <route edges="-282194769#1 -690977716#1"/>
+    </vehicle>
+    <vehicle id="truck_7" type="calibrated_truck" depart="196.11" departLane="best" departSpeed="max">
+        <route edges="-282194769#1 -183541938#7"/>
+    </vehicle>
+    <vehicle id="truck_8" type="calibrated_truck" depart="224.12" departLane="best" departSpeed="max">
+        <route edges="109973440 -690977716#1"/>
+    </vehicle>
+    <vehicle id="truck_9" type="calibrated_truck" depart="252.14" departLane="best" departSpeed="max">
+        <route edges="109973440 -690977716#1"/>
+    </vehicle>
+    <vehicle id="truck_10" type="calibrated_truck" depart="280.16" departLane="best" departSpeed="max">
+        <route edges="109973440 183543973#0"/>
+    </vehicle>
+    <vehicle id="truck_11" type="calibrated_truck" depart="308.17" departLane="best" departSpeed="max">
+        <route edges="-282194769#1 -690977716#1"/>
+    </vehicle>
+    <vehicle id="truck_12" type="calibrated_truck" depart="336.19" departLane="best" departSpeed="max">
+        <route edges="-282194769#1 -690977716#1"/>
+    </vehicle>
+    <vehicle id="truck_16" type="calibrated_truck" depart="448.25" departLane="best" departSpeed="max">
+        <route edges="690977719#0 183543973#0"/>
+    </vehicle>
+    <vehicle id="truck_18" type="calibrated_truck" depart="504.28" departLane="best" departSpeed="max">
+        <route edges="109973440 183543973#0"/>
+    </vehicle>
+    <vehicle id="truck_19" type="calibrated_truck" depart="532.30" departLane="best" departSpeed="max">
+        <route edges="690977719#0 -183541938#7"/>
+    </vehicle>
+    <vehicle id="truck_22" type="calibrated_truck" depart="616.34" departLane="best" departSpeed="max">
+        <route edges="109973440 -690977716#1"/>
+    </vehicle>
+    <vehicle id="truck_24" type="calibrated_truck" depart="672.37" departLane="best" departSpeed="max">
+        <route edges="690977719#0 -183541938#7"/>
+    </vehicle>
+    <vehicle id="truck_25" type="calibrated_truck" depart="700.39" departLane="best" departSpeed="max">
+        <route edges="-282194769#1 -183541938#7"/>
+    </vehicle>
+    <vehicle id="truck_26" type="calibrated_truck" depart="728.40" departLane="best" departSpeed="max">
+        <route edges="109973440 183543973#0"/>
+    </vehicle>
+    <vehicle id="truck_27" type="calibrated_truck" depart="756.42" departLane="best" departSpeed="max">
+        <route edges="690977719#0 183543973#0"/>
+    </vehicle>
+    <vehicle id="truck_29" type="calibrated_truck" depart="812.45" departLane="best" departSpeed="max">
+        <route edges="109973440 183543973#0"/>
+    </vehicle>
+    <vehicle id="truck_30" type="calibrated_truck" depart="840.47" departLane="best" departSpeed="max">
+        <route edges="690977719#0 183543973#0"/>
+    </vehicle>
+    <vehicle id="truck_31" type="calibrated_truck" depart="868.48" departLane="best" departSpeed="max">
+        <route edges="-282194769#1 -183541938#7"/>
+    </vehicle>
+    <vehicle id="truck_32" type="calibrated_truck" depart="896.50" departLane="best" departSpeed="max">
+        <route edges="-282194769#1 -690977716#1"/>
+    </vehicle>
+    <vehicle id="truck_33" type="calibrated_truck" depart="924.51" departLane="best" departSpeed="max">
+        <route edges="-282194769#1 -690977716#1"/>
+    </vehicle>
+    <vehicle id="truck_34" type="calibrated_truck" depart="952.53" departLane="best" departSpeed="max">
+        <route edges="109973440 183543973#0"/>
+    </vehicle>
+    <vehicle id="truck_36" type="calibrated_truck" depart="1008.56" departLane="best" departSpeed="max">
+        <route edges="109973440 -690977716#1"/>
+    </vehicle>
+    <vehicle id="truck_38" type="calibrated_truck" depart="1064.59" departLane="best" departSpeed="max">
+        <route edges="690977719#0 -183541938#7"/>
+    </vehicle>
+    <vehicle id="truck_39" type="calibrated_truck" depart="1092.61" departLane="best" departSpeed="max">
+        <route edges="-282194769#1 -183541938#7"/>
+    </vehicle>
+    <vehicle id="truck_42" type="calibrated_truck" depart="1176.65" departLane="best" departSpeed="max">
+        <route edges="-282194769#1 -183541938#7"/>
+    </vehicle>
+    <vehicle id="truck_44" type="calibrated_truck" depart="1232.68" departLane="best" departSpeed="max">
+        <route edges="-282194769#1 -690977716#1"/>
+    </vehicle>
+    <vehicle id="truck_46" type="calibrated_truck" depart="1288.72" departLane="best" departSpeed="max">
+        <route edges="109973440 183543973#0"/>
+    </vehicle>
+    <vehicle id="truck_47" type="calibrated_truck" depart="1316.73" departLane="best" departSpeed="max">
+        <route edges="-282194769#1 -690977716#1"/>
+    </vehicle>
+    <vehicle id="truck_49" type="calibrated_truck" depart="1372.76" departLane="best" departSpeed="max">
+        <route edges="690977719#0 -183541938#7"/>
+    </vehicle>
+    <vehicle id="truck_51" type="calibrated_truck" depart="1428.79" departLane="best" departSpeed="max">
+        <route edges="-282194769#1 -690977716#1"/>
+    </vehicle>
+    <vehicle id="truck_52" type="calibrated_truck" depart="1456.81" departLane="best" departSpeed="max">
+        <route edges="-282194769#1 -183541938#7"/>
+    </vehicle>
+    <vehicle id="truck_53" type="calibrated_truck" depart="1484.82" departLane="best" departSpeed="max">
+        <route edges="109973440 -690977716#1"/>
+    </vehicle>
+    <vehicle id="truck_55" type="calibrated_truck" depart="1540.86" departLane="best" departSpeed="max">
+        <route edges="690977719#0 -183541938#7"/>
+    </vehicle>
+    <vehicle id="truck_56" type="calibrated_truck" depart="1568.87" departLane="best" departSpeed="max">
+        <route edges="109973440 -690977716#1"/>
+    </vehicle>
+    <vehicle id="truck_59" type="calibrated_truck" depart="1652.92" departLane="best" departSpeed="max">
+        <route edges="-282194769#1 -183541938#7"/>
+    </vehicle>
+    <vehicle id="truck_60" type="calibrated_truck" depart="1680.93" departLane="best" departSpeed="max">
+        <route edges="690977719#0 183543973#0"/>
+    </vehicle>
+    <vehicle id="truck_63" type="calibrated_truck" depart="1764.98" departLane="best" departSpeed="max">
+        <route edges="109973440 183543973#0"/>
+    </vehicle>
+    <vehicle id="truck_65" type="calibrated_truck" depart="1821.01" departLane="best" departSpeed="max">
+        <route edges="690977719#0 183543973#0"/>
+    </vehicle>
+    <vehicle id="truck_66" type="calibrated_truck" depart="1849.03" departLane="best" departSpeed="max">
+        <route edges="-282194769#1 -183541938#7"/>
+    </vehicle>
+    <vehicle id="truck_67" type="calibrated_truck" depart="1877.04" departLane="best" departSpeed="max">
+        <route edges="-282194769#1 -183541938#7"/>
+    </vehicle>
+    <vehicle id="truck_69" type="calibrated_truck" depart="1933.07" departLane="best" departSpeed="max">
+        <route edges="109973440 183543973#0"/>
+    </vehicle>
+    <vehicle id="truck_71" type="calibrated_truck" depart="1989.11" departLane="best" departSpeed="max">
+        <route edges="109973440 -690977716#1"/>
+    </vehicle>
+    <vehicle id="truck_72" type="calibrated_truck" depart="2017.12" departLane="best" departSpeed="max">
+        <route edges="109973440 183543973#0"/>
+    </vehicle>
+    <vehicle id="truck_73" type="calibrated_truck" depart="2045.14" departLane="best" departSpeed="max">
+        <route edges="109973440 183543973#0"/>
+    </vehicle>
+    <vehicle id="truck_74" type="calibrated_truck" depart="2073.15" departLane="best" departSpeed="max">
+        <route edges="690977719#0 183543973#0"/>
+    </vehicle>
+    <vehicle id="truck_76" type="calibrated_truck" depart="2129.18" departLane="best" departSpeed="max">
+        <route edges="690977719#0 183543973#0"/>
+    </vehicle>
+    <vehicle id="truck_77" type="calibrated_truck" depart="2157.20" departLane="best" departSpeed="max">
+        <route edges="690977719#0 183543973#0"/>
+    </vehicle>
+    <vehicle id="truck_78" type="calibrated_truck" depart="2185.21" departLane="best" departSpeed="max">
+        <route edges="690977719#0 183543973#0"/>
+    </vehicle>
+    <vehicle id="truck_79" type="calibrated_truck" depart="2213.23" departLane="best" departSpeed="max">
+        <route edges="109973440 183543973#0"/>
+    </vehicle>
+    <vehicle id="truck_80" type="calibrated_truck" depart="2241.25" departLane="best" departSpeed="max">
+        <route edges="-282194769#1 -690977716#1"/>
+    </vehicle>
+    <vehicle id="truck_82" type="calibrated_truck" depart="2297.28" departLane="best" departSpeed="max">
+        <route edges="690977719#0 183543973#0"/>
+    </vehicle>
+    <vehicle id="truck_84" type="calibrated_truck" depart="2353.31" departLane="best" departSpeed="max">
+        <route edges="690977719#0 -183541938#7"/>
+    </vehicle>
+    <vehicle id="truck_86" type="calibrated_truck" depart="2409.34" departLane="best" departSpeed="max">
+        <route edges="109973440 183543973#0"/>
+    </vehicle>
+    <vehicle id="truck_87" type="calibrated_truck" depart="2437.35" departLane="best" departSpeed="max">
+        <route edges="-282194769#1 -183541938#7"/>
+    </vehicle>
+    <vehicle id="truck_88" type="calibrated_truck" depart="2465.37" departLane="best" departSpeed="max">
+        <route edges="-282194769#1 -690977716#1"/>
+    </vehicle>
+    <vehicle id="truck_89" type="calibrated_truck" depart="2493.39" departLane="best" departSpeed="max">
+        <route edges="-282194769#1 -690977716#1"/>
+    </vehicle>
+    <vehicle id="truck_90" type="calibrated_truck" depart="2521.40" departLane="best" departSpeed="max">
+        <route edges="-282194769#1 -183541938#7"/>
+    </vehicle>
+    <vehicle id="truck_92" type="calibrated_truck" depart="2577.43" departLane="best" departSpeed="max">
+        <route edges="-282194769#1 -690977716#1"/>
+    </vehicle>
+    <vehicle id="truck_94" type="calibrated_truck" depart="2633.46" departLane="best" departSpeed="max">
+        <route edges="109973440 183543973#0"/>
+    </vehicle>
+    <vehicle id="truck_95" type="calibrated_truck" depart="2661.48" departLane="best" departSpeed="max">
+        <route edges="-282194769#1 -690977716#1"/>
+    </vehicle>
+    <vehicle id="truck_96" type="calibrated_truck" depart="2689.49" departLane="best" departSpeed="max">
+        <route edges="-282194769#1 -183541938#7"/>
+    </vehicle>
+    <vehicle id="truck_100" type="calibrated_truck" depart="2801.56" departLane="best" departSpeed="max">
+        <route edges="109973440 -690977716#1"/>
+    </vehicle>
+    <vehicle id="truck_101" type="calibrated_truck" depart="2829.57" departLane="best" departSpeed="max">
+        <route edges="-282194769#1 -690977716#1"/>
+    </vehicle>
+    <vehicle id="truck_102" type="calibrated_truck" depart="2857.59" departLane="best" departSpeed="max">
+        <route edges="109973440 183543973#0"/>
+    </vehicle>
+    <vehicle id="truck_104" type="calibrated_truck" depart="2913.62" departLane="best" departSpeed="max">
+        <route edges="-282194769#1 -690977716#1"/>
+    </vehicle>
+    <vehicle id="truck_105" type="calibrated_truck" depart="2941.63" departLane="best" departSpeed="max">
+        <route edges="109973440 183543973#0"/>
+    </vehicle>
+    <vehicle id="truck_106" type="calibrated_truck" depart="2969.65" departLane="best" departSpeed="max">
+        <route edges="690977719#0 183543973#0"/>
+    </vehicle>
+    <vehicle id="truck_111" type="calibrated_truck" depart="3109.73" departLane="best" departSpeed="max">
+        <route edges="-282194769#1 -690977716#1"/>
+    </vehicle>
+    <vehicle id="truck_112" type="calibrated_truck" depart="3137.74" departLane="best" departSpeed="max">
+        <route edges="-282194769#1 -183541938#7"/>
+    </vehicle>
+    <vehicle id="truck_113" type="calibrated_truck" depart="3165.76" departLane="best" departSpeed="max">
+        <route edges="690977719#0 183543973#0"/>
+    </vehicle>
+    <vehicle id="truck_114" type="calibrated_truck" depart="3193.77" departLane="best" departSpeed="max">
+        <route edges="-282194769#1 -183541938#7"/>
+    </vehicle>
+    <vehicle id="truck_115" type="calibrated_truck" depart="3221.79" departLane="best" departSpeed="max">
+        <route edges="690977719#0 183543973#0"/>
+    </vehicle>
+    <vehicle id="truck_117" type="calibrated_truck" depart="3277.82" departLane="best" departSpeed="max">
+        <route edges="109973440 -690977716#1"/>
+    </vehicle>
+    <vehicle id="truck_119" type="calibrated_truck" depart="3333.85" departLane="best" departSpeed="max">
+        <route edges="109973440 183543973#0"/>
+    </vehicle>
+    <vehicle id="truck_120" type="calibrated_truck" depart="3361.87" departLane="best" departSpeed="max">
+        <route edges="-282194769#1 -690977716#1"/>
+    </vehicle>
+    <vehicle id="truck_121" type="calibrated_truck" depart="3389.88" departLane="best" departSpeed="max">
+        <route edges="-282194769#1 -690977716#1"/>
+    </vehicle>
+    <vehicle id="truck_122" type="calibrated_truck" depart="3417.90" departLane="best" departSpeed="max">
+        <route edges="109973440 -690977716#1"/>
+    </vehicle>
+    <vehicle id="truck_124" type="calibrated_truck" depart="3473.93" departLane="best" departSpeed="max">
+        <route edges="109973440 -690977716#1"/>
+    </vehicle>
+    <vehicle id="truck_125" type="calibrated_truck" depart="3501.95" departLane="best" departSpeed="max">
+        <route edges="109973440 -690977716#1"/>
+    </vehicle>
+    <vehicle id="truck_127" type="calibrated_truck" depart="3557.98" departLane="best" departSpeed="max">
+        <route edges="-282194769#1 -690977716#1"/>
+    </vehicle>
+    <vehicle id="truck_128" type="calibrated_truck" depart="3585.99" departLane="best" departSpeed="max">
+        <route edges="690977719#0 183543973#0"/>
+    </vehicle>
+    <vehicle id="truck_130" type="calibrated_truck" depart="3642.02" departLane="best" departSpeed="max">
+        <route edges="-282194769#1 -690977716#1"/>
+    </vehicle>
+    <vehicle id="truck_132" type="calibrated_truck" depart="3698.05" departLane="best" departSpeed="max">
+        <route edges="-282194769#1 -183541938#7"/>
+    </vehicle>
+    <vehicle id="truck_135" type="calibrated_truck" depart="3782.10" departLane="best" departSpeed="max">
+        <route edges="109973440 -690977716#1"/>
+    </vehicle>
+    <vehicle id="truck_136" type="calibrated_truck" depart="3810.12" departLane="best" departSpeed="max">
+        <route edges="-282194769#1 -183541938#7"/>
+    </vehicle>
+    <vehicle id="truck_137" type="calibrated_truck" depart="3838.13" departLane="best" departSpeed="max">
+        <route edges="690977719#0 -183541938#7"/>
+    </vehicle>
+    <vehicle id="truck_138" type="calibrated_truck" depart="3866.15" departLane="best" departSpeed="max">
+        <route edges="690977719#0 -183541938#7"/>
+    </vehicle>
+    <vehicle id="truck_139" type="calibrated_truck" depart="3894.16" departLane="best" departSpeed="max">
+        <route edges="-282194769#1 -690977716#1"/>
+    </vehicle>
+    <vehicle id="truck_141" type="calibrated_truck" depart="3950.19" departLane="best" departSpeed="max">
+        <route edges="-282194769#1 -690977716#1"/>
+    </vehicle>
+    <vehicle id="truck_143" type="calibrated_truck" depart="4006.23" departLane="best" departSpeed="max">
+        <route edges="-282194769#1 -183541938#7"/>
+    </vehicle>
+    <vehicle id="truck_144" type="calibrated_truck" depart="4034.24" departLane="best" departSpeed="max">
+        <route edges="109973440 -690977716#1"/>
+    </vehicle>
+    <vehicle id="truck_145" type="calibrated_truck" depart="4062.26" departLane="best" departSpeed="max">
+        <route edges="109973440 -690977716#1"/>
+    </vehicle>
+    <vehicle id="truck_146" type="calibrated_truck" depart="4090.27" departLane="best" departSpeed="max">
+        <route edges="-282194769#1 -183541938#7"/>
+    </vehicle>
+    <vehicle id="truck_151" type="calibrated_truck" depart="4230.35" departLane="best" departSpeed="max">
+        <route edges="-282194769#1 -690977716#1"/>
+    </vehicle>
+    <vehicle id="truck_152" type="calibrated_truck" depart="4258.37" departLane="best" departSpeed="max">
+        <route edges="109973440 183543973#0"/>
+    </vehicle>
+    <vehicle id="truck_153" type="calibrated_truck" depart="4286.38" departLane="best" departSpeed="max">
+        <route edges="-282194769#1 -690977716#1"/>
+    </vehicle>
+    <vehicle id="truck_154" type="calibrated_truck" depart="4314.40" departLane="best" departSpeed="max">
+        <route edges="109973440 -690977716#1"/>
+    </vehicle>
+    <vehicle id="truck_156" type="calibrated_truck" depart="4370.43" departLane="best" departSpeed="max">
+        <route edges="690977719#0 -183541938#7"/>
+    </vehicle>
+    <vehicle id="truck_158" type="calibrated_truck" depart="4426.46" departLane="best" departSpeed="max">
+        <route edges="109973440 -690977716#1"/>
+    </vehicle>
+    <vehicle id="truck_160" type="calibrated_truck" depart="4482.49" departLane="best" departSpeed="max">
+        <route edges="690977719#0 -183541938#7"/>
+    </vehicle>
+    <vehicle id="truck_161" type="calibrated_truck" depart="4510.51" departLane="best" departSpeed="max">
+        <route edges="690977719#0 -183541938#7"/>
+    </vehicle>
+    <vehicle id="truck_162" type="calibrated_truck" depart="4538.52" departLane="best" departSpeed="max">
+        <route edges="690977719#0 183543973#0"/>
+    </vehicle>
+    <vehicle id="truck_167" type="calibrated_truck" depart="4678.60" departLane="best" departSpeed="max">
+        <route edges="109973440 -690977716#1"/>
+    </vehicle>
+    <vehicle id="truck_169" type="calibrated_truck" depart="4734.63" departLane="best" departSpeed="max">
+        <route edges="-282194769#1 -690977716#1"/>
+    </vehicle>
+    <vehicle id="truck_170" type="calibrated_truck" depart="4762.65" departLane="best" departSpeed="max">
+        <route edges="-282194769#1 -183541938#7"/>
+    </vehicle>
+    <vehicle id="truck_171" type="calibrated_truck" depart="4790.66" departLane="best" departSpeed="max">
+        <route edges="109973440 -690977716#1"/>
+    </vehicle>
+    <vehicle id="truck_172" type="calibrated_truck" depart="4818.68" departLane="best" departSpeed="max">
+        <route edges="-282194769#1 -183541938#7"/>
+    </vehicle>
+    <vehicle id="truck_174" type="calibrated_truck" depart="4874.71" departLane="best" departSpeed="max">
+        <route edges="109973440 -690977716#1"/>
+    </vehicle>
+    <vehicle id="truck_175" type="calibrated_truck" depart="4902.72" departLane="best" departSpeed="max">
+        <route edges="-282194769#1 -690977716#1"/>
+    </vehicle>
+    <vehicle id="truck_176" type="calibrated_truck" depart="4930.74" departLane="best" departSpeed="max">
+        <route edges="109973440 -690977716#1"/>
+    </vehicle>
+    <vehicle id="truck_177" type="calibrated_truck" depart="4958.75" departLane="best" departSpeed="max">
+        <route edges="-282194769#1 -690977716#1"/>
+    </vehicle>
+    <vehicle id="truck_178" type="calibrated_truck" depart="4986.77" departLane="best" departSpeed="max">
+        <route edges="-282194769#1 -690977716#1"/>
+    </vehicle>
+    <vehicle id="truck_180" type="calibrated_truck" depart="5042.80" departLane="best" departSpeed="max">
+        <route edges="-282194769#1 -690977716#1"/>
+    </vehicle>
+    <vehicle id="truck_182" type="calibrated_truck" depart="5098.83" departLane="best" departSpeed="max">
+        <route edges="109973440 183543973#0"/>
+    </vehicle>
+    <vehicle id="truck_186" type="calibrated_truck" depart="5210.89" departLane="best" departSpeed="max">
+        <route edges="690977719#0 -183541938#7"/>
+    </vehicle>
+    <vehicle id="truck_187" type="calibrated_truck" depart="5238.91" departLane="best" departSpeed="max">
+        <route edges="109973440 183543973#0"/>
+    </vehicle>
+    <vehicle id="truck_188" type="calibrated_truck" depart="5266.93" departLane="best" departSpeed="max">
+        <route edges="-282194769#1 -183541938#7"/>
+    </vehicle>
+    <vehicle id="truck_192" type="calibrated_truck" depart="5378.99" departLane="best" departSpeed="max">
+        <route edges="690977719#0 -183541938#7"/>
+    </vehicle>
+    <vehicle id="truck_196" type="calibrated_truck" depart="5491.05" departLane="best" departSpeed="max">
+        <route edges="109973440 -690977716#1"/>
+    </vehicle>
+    <vehicle id="truck_197" type="calibrated_truck" depart="5519.07" departLane="best" departSpeed="max">
+        <route edges="-282194769#1 -690977716#1"/>
+    </vehicle>
+    <vehicle id="truck_198" type="calibrated_truck" depart="5547.08" departLane="best" departSpeed="max">
+        <route edges="-282194769#1 -183541938#7"/>
+    </vehicle>
+    <vehicle id="truck_200" type="calibrated_truck" depart="5603.11" departLane="best" departSpeed="max">
+        <route edges="109973440 -690977716#1"/>
+    </vehicle>
+    <vehicle id="truck_201" type="calibrated_truck" depart="5631.13" departLane="best" departSpeed="max">
+        <route edges="690977719#0 -183541938#7"/>
+    </vehicle>
+    <vehicle id="truck_204" type="calibrated_truck" depart="5715.18" departLane="best" departSpeed="max">
+        <route edges="690977719#0 183543973#0"/>
+    </vehicle>
+    <vehicle id="truck_206" type="calibrated_truck" depart="5771.21" departLane="best" departSpeed="max">
+        <route edges="109973440 183543973#0"/>
+    </vehicle>
+    <vehicle id="truck_207" type="calibrated_truck" depart="5799.22" departLane="best" departSpeed="max">
+        <route edges="-282194769#1 -183541938#7"/>
+    </vehicle>
+    <vehicle id="truck_208" type="calibrated_truck" depart="5827.24" departLane="best" departSpeed="max">
+        <route edges="-282194769#1 -690977716#1"/>
+    </vehicle>
+    <vehicle id="truck_210" type="calibrated_truck" depart="5883.27" departLane="best" departSpeed="max">
+        <route edges="109973440 -690977716#1"/>
+    </vehicle>
+    <vehicle id="truck_213" type="calibrated_truck" depart="5967.32" departLane="best" departSpeed="max">
+        <route edges="690977719#0 183543973#0"/>
+    </vehicle>
+    <vehicle id="truck_214" type="calibrated_truck" depart="5995.33" departLane="best" departSpeed="max">
+        <route edges="109973440 183543973#0"/>
+    </vehicle>
+    <vehicle id="truck_217" type="calibrated_truck" depart="6079.38" departLane="best" departSpeed="max">
+        <route edges="690977719#0 183543973#0"/>
+    </vehicle>
+    <vehicle id="truck_218" type="calibrated_truck" depart="6107.39" departLane="best" departSpeed="max">
+        <route edges="690977719#0 -183541938#7"/>
+    </vehicle>
+    <vehicle id="truck_219" type="calibrated_truck" depart="6135.41" departLane="best" departSpeed="max">
+        <route edges="109973440 -690977716#1"/>
+    </vehicle>
+    <vehicle id="truck_220" type="calibrated_truck" depart="6163.42" departLane="best" departSpeed="max">
+        <route edges="-282194769#1 -183541938#7"/>
+    </vehicle>
+    <vehicle id="truck_223" type="calibrated_truck" depart="6247.47" departLane="best" departSpeed="max">
+        <route edges="109973440 183543973#0"/>
+    </vehicle>
+    <vehicle id="truck_225" type="calibrated_truck" depart="6303.50" departLane="best" departSpeed="max">
+        <route edges="-282194769#1 -183541938#7"/>
+    </vehicle>
+    <vehicle id="truck_227" type="calibrated_truck" depart="6359.53" departLane="best" departSpeed="max">
+        <route edges="690977719#0 183543973#0"/>
+    </vehicle>
+    <vehicle id="truck_228" type="calibrated_truck" depart="6387.55" departLane="best" departSpeed="max">
+        <route edges="109973440 -690977716#1"/>
+    </vehicle>
+    <vehicle id="truck_229" type="calibrated_truck" depart="6415.56" departLane="best" departSpeed="max">
+        <route edges="109973440 183543973#0"/>
+    </vehicle>
+    <vehicle id="truck_230" type="calibrated_truck" depart="6443.58" departLane="best" departSpeed="max">
+        <route edges="109973440 183543973#0"/>
+    </vehicle>
+    <vehicle id="truck_234" type="calibrated_truck" depart="6555.64" departLane="best" departSpeed="max">
+        <route edges="109973440 -690977716#1"/>
+    </vehicle>
+    <vehicle id="truck_235" type="calibrated_truck" depart="6583.66" departLane="best" departSpeed="max">
+        <route edges="690977719#0 -183541938#7"/>
+    </vehicle>
+    <vehicle id="truck_237" type="calibrated_truck" depart="6639.69" departLane="best" departSpeed="max">
+        <route edges="109973440 183543973#0"/>
+    </vehicle>
+    <vehicle id="truck_238" type="calibrated_truck" depart="6667.70" departLane="best" departSpeed="max">
+        <route edges="109973440 183543973#0"/>
+    </vehicle>
+    <vehicle id="truck_240" type="calibrated_truck" depart="6723.74" departLane="best" departSpeed="max">
+        <route edges="-282194769#1 -183541938#7"/>
+    </vehicle>
+    <vehicle id="truck_242" type="calibrated_truck" depart="6779.77" departLane="best" departSpeed="max">
+        <route edges="109973440 -690977716#1"/>
+    </vehicle>
+    <vehicle id="truck_243" type="calibrated_truck" depart="6807.78" departLane="best" departSpeed="max">
+        <route edges="109973440 -690977716#1"/>
+    </vehicle>
+    <vehicle id="truck_245" type="calibrated_truck" depart="6863.81" departLane="best" departSpeed="max">
+        <route edges="109973440 183543973#0"/>
+    </vehicle>
+    <vehicle id="truck_246" type="calibrated_truck" depart="6891.83" departLane="best" departSpeed="max">
+        <route edges="690977719#0 -183541938#7"/>
+    </vehicle>
+    <vehicle id="truck_249" type="calibrated_truck" depart="6975.88" departLane="best" departSpeed="max">
+        <route edges="109973440 183543973#0"/>
+    </vehicle>
+    <vehicle id="truck_252" type="calibrated_truck" depart="7059.92" departLane="best" departSpeed="max">
+        <route edges="109973440 -690977716#1"/>
+    </vehicle>
+    <vehicle id="truck_253" type="calibrated_truck" depart="7087.94" departLane="best" departSpeed="max">
+        <route edges="690977719#0 -183541938#7"/>
+    </vehicle>
+    <vehicle id="truck_255" type="calibrated_truck" depart="7143.97" departLane="best" departSpeed="max">
+        <route edges="109973440 -690977716#1"/>
+    </vehicle>
+    <vehicle id="truck_256" type="calibrated_truck" depart="7171.98" departLane="best" departSpeed="max">
+        <route edges="-282194769#1 -690977716#1"/>
+    </vehicle>
+</routes>

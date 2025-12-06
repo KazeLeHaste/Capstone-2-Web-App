@@ -1,0 +1,127 @@
+{
+  "success": true,
+  "calibrated_networks": [
+    {
+      "success": true,
+      "network": "SM Bacoor Area",
+      "btmd_data": "Aguinaldo Highway and Tirona highway Intersection (SM Bacoor Area)",
+      "simulation_hours": 2.0,
+      "time_of_day": "morning_peak",
+      "target_total_vehicles": 5636,
+      "target_vehicles_per_hour": 2818,
+      "vehicle_breakdown": {
+        "passenger": 2778,
+        "motorcycle": 1797,
+        "truck": 569,
+        "jeepney": 309,
+        "bus": 123
+      },
+      "calibrated_files": [
+        "networks\\SM Bacoor Area\\routes\\osm.passenger.flows.xml",
+        "networks\\SM Bacoor Area\\routes\\osm.motorcycle.flows.xml",
+        "networks\\SM Bacoor Area\\routes\\osm.truck.flows.xml",
+        "networks\\SM Bacoor Area\\routes\\osm.jeepney.flows.xml",
+        "networks\\SM Bacoor Area\\routes\\osm.bus.flows.xml"
+      ],
+      "timestamp": "2025-12-06T19:46:23.434032"
+    },
+    {
+      "success": true,
+      "network": "SM Molino Area",
+      "btmd_data": "Daang Hari Road and Molino Road Intersection (SM Molino Area)",
+      "simulation_hours": 2.0,
+      "time_of_day": "morning_peak",
+      "target_total_vehicles": 4176,
+      "target_vehicles_per_hour": 2088,
+      "vehicle_breakdown": {
+        "passenger": 2509,
+        "motorcycle": 1344,
+        "truck": 233,
+        "jeepney": 0,
+        "bus": 16
+      },
+      "calibrated_files": [
+        "networks\\SM Molino Area\\routes\\osm.passenger.flows.xml",
+        "networks\\SM Molino Area\\routes\\osm.motorcycle.flows.xml",
+        "networks\\SM Molino Area\\routes\\osm.truck.flows.xml",
+        "networks\\SM Molino Area\\routes\\osm.jeepney.flows.xml",
+        "networks\\SM Molino Area\\routes\\osm.bus.flows.xml"
+      ],
+      "timestamp": "2025-12-06T19:46:23.450575"
+    },
+    {
+      "success": true,
+      "network": "Jollibee Molino Area",
+      "btmd_data": "Bacoor Blvd. and Molino Road Intersection (Jollibee Molino Area)",
+      "simulation_hours": 2.0,
+      "time_of_day": "morning_peak",
+      "target_total_vehicles": 2980,
+      "target_vehicles_per_hour": 1490,
+      "vehicle_breakdown": {
+        "passenger": 1668,
+        "motorcycle": 953,
+        "truck": 71,
+        "jeepney": 283,
+        "bus": 0
+      },
+      "calibrated_files": [
+        "networks\\Jollibee Molino Area\\routes\\osm.passenger.flows.xml",
+        "networks\\Jollibee Molino Area\\routes\\osm.motorcycle.flows.xml",
+        "networks\\Jollibee Molino Area\\routes\\osm.truck.flows.xml",
+        "networks\\Jollibee Molino Area\\routes\\osm.jeepney.flows.xml",
+        "networks\\Jollibee Molino Area\\routes\\osm.bus.flows.xml"
+      ],
+      "timestamp": "2025-12-06T19:46:23.468334"
+    },
+    {
+      "success": true,
+      "network": "St Dominic Area",
+      "btmd_data": "Bacoor Blvd. and Aguinaldo Highway Intersection (St. Dominic Area)",
+      "simulation_hours": 2.0,
+      "time_of_day": "morning_peak",
+      "target_total_vehicles": 1800,
+      "target_vehicles_per_hour": 900,
+      "vehicle_breakdown": {
+        "passenger": 680,
+        "motorcycle": 603,
+        "truck": 325,
+        "jeepney": 129,
+        "bus": 23
+      },
+      "calibrated_files": [
+        "networks\\St Dominic Area\\routes\\osm.passenger.flows.xml",
+        "networks\\St Dominic Area\\routes\\osm.motorcycle.flows.xml",
+        "networks\\St Dominic Area\\routes\\osm.truck.flows.xml",
+        "networks\\St Dominic Area\\routes\\osm.jeepney.flows.xml",
+        "networks\\St Dominic Area\\routes\\osm.bus.flows.xml"
+      ],
+      "timestamp": "2025-12-06T19:46:23.485382"
+    },
+    {
+      "success": true,
+      "network": "Bayanan Area",
+      "btmd_data": "Bacoor Blvd. and Bayanan Road Intersection (Bayanan Area)",
+      "simulation_hours": 2.0,
+      "time_of_day": "morning_peak",
+      "target_total_vehicles": 1522,
+      "target_vehicles_per_hour": 761,
+      "vehicle_breakdown": {
+        "passenger": 717,
+        "motorcycle": 304,
+        "truck": 50,
+        "jeepney": 447,
+        "bus": 0
+      },
+      "calibrated_files": [
+        "networks\\Bayanan Area\\routes\\osm.passenger.flows.xml",
+        "networks\\Bayanan Area\\routes\\osm.motorcycle.flows.xml",
+        "networks\\Bayanan Area\\routes\\osm.truck.flows.xml",
+        "networks\\Bayanan Area\\routes\\osm.jeepney.flows.xml",
+        "networks\\Bayanan Area\\routes\\osm.bus.flows.xml"
+      ],
+      "timestamp": "2025-12-06T19:46:23.500970"
+    }
+  ],
+  "failed_networks": [],
+  "timestamp": "2025-12-06T19:46:23.414590"
+}

@@ -1,0 +1,27 @@
+{
+  "success": true,
+  "network": "SM Bacoor Area",
+  "btmd_data": "Aguinaldo Highway and Tirona highway Intersection (SM Bacoor Area)",
+  "simulation_hours": 2.0,
+  "time_of_day": "morning_peak",
+  "traffic_intensity": 1.0,
+  "target_total_vehicles": 5636,
+  "target_vehicles_per_hour": 2818,
+  "btmd_avg_per_hour": 2634,
+  "btmd_peak_per_hour": 2823,
+  "vehicle_breakdown": {
+    "passenger": 2778,
+    "motorcycle": 1797,
+    "truck": 569,
+    "jeepney": 309,
+    "bus": 123
+  },
+  "calibrated_files": [
+    "networks\\SM Bacoor Area\\routes\\osm.passenger.flows.xml",
+    "networks\\SM Bacoor Area\\routes\\osm.motorcycle.flows.xml",
+    "networks\\SM Bacoor Area\\routes\\osm.truck.flows.xml",
+    "networks\\SM Bacoor Area\\routes\\osm.jeepney.flows.xml",
+    "networks\\SM Bacoor Area\\routes\\osm.bus.flows.xml"
+  ],
+  "timestamp": "2025-12-06T20:56:45.443149"
+}

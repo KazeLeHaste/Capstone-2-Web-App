@@ -1,0 +1,1076 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- generated on 2025-12-06 21:09:46 by Eclipse SUMO duarouter Version 1.24.0
+<duarouterConfiguration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/duarouterConfiguration.xsd">
+
+    <input>
+        <net-file value="C:\Users\kgaqu\OneDrive\Documents\4th Year\Capstone 2\System Final Version\backend\networks\Perpetual Molino Area\Perpetual Molino Area.net.xml.gz"/>
+        <route-files value="C:\Users\kgaqu\OneDrive\Documents\4th Year\Capstone 2\System Final Version\backend\networks\Perpetual Molino Area\routes\osm.jeepney.trips.xml"/>
+    </input>
+
+    <output>
+        <output-file value="C:\Users\kgaqu\OneDrive\Documents\4th Year\Capstone 2\System Final Version\backend\networks\Perpetual Molino Area\routes\osm.jeepney.rou.xml"/>
+    </output>
+
+    <processing>
+        <remove-loops value="true"/>
+        <repair value="true"/>
+    </processing>
+
+    <report>
+        <no-warnings value="false"/>
+        <ignore-errors value="true"/>
+        <no-step-log value="true"/>
+    </report>
+
+</duarouterConfiguration>
+-->
+
+<routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/routes_file.xsd">
+    <vType id="calibrated_jeepney" length="6.00" vClass="bus" width="2.00" color="orange"/>
+    <vehicle id="jeepney_0" type="calibrated_jeepney" depart="0.00" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="26.05" probability="1.00000000" edges="-282194769#1 -690977716#1"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_1" type="calibrated_jeepney" depart="21.43" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="47.02" probability="1.00000000" edges="109973440 183543973#0"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_3" type="calibrated_jeepney" depart="64.29" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="60.40" probability="1.00000000" edges="109973440 -690977716#1"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_4" type="calibrated_jeepney" depart="85.71" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="26.05" probability="1.00000000" edges="-282194769#1 -690977716#1"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_6" type="calibrated_jeepney" depart="128.57" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="26.05" probability="1.00000000" edges="-282194769#1 -690977716#1"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_7" type="calibrated_jeepney" depart="150.00" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="46.54" probability="1.00000000" edges="-282194769#1 -183541938#7"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_8" type="calibrated_jeepney" depart="171.43" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="60.40" probability="1.00000000" edges="109973440 -690977716#1"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_9" type="calibrated_jeepney" depart="192.86" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="60.40" probability="1.00000000" edges="109973440 -690977716#1"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_10" type="calibrated_jeepney" depart="214.29" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="47.02" probability="1.00000000" edges="109973440 183543973#0"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_11" type="calibrated_jeepney" depart="235.71" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="26.05" probability="1.00000000" edges="-282194769#1 -690977716#1"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_12" type="calibrated_jeepney" depart="257.14" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="26.05" probability="1.00000000" edges="-282194769#1 -690977716#1"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_16" type="calibrated_jeepney" depart="342.86" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="26.13" probability="1.00000000" edges="690977719#0 183543973#0"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_18" type="calibrated_jeepney" depart="385.71" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="47.02" probability="1.00000000" edges="109973440 183543973#0"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_19" type="calibrated_jeepney" depart="407.14" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="62.62" probability="1.00000000" edges="690977719#0 -183541938#7"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_22" type="calibrated_jeepney" depart="471.43" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="60.40" probability="1.00000000" edges="109973440 -690977716#1"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_24" type="calibrated_jeepney" depart="514.29" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="62.62" probability="1.00000000" edges="690977719#0 -183541938#7"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_25" type="calibrated_jeepney" depart="535.71" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="46.54" probability="1.00000000" edges="-282194769#1 -183541938#7"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_26" type="calibrated_jeepney" depart="557.14" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="47.02" probability="1.00000000" edges="109973440 183543973#0"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_27" type="calibrated_jeepney" depart="578.57" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="26.13" probability="1.00000000" edges="690977719#0 183543973#0"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_29" type="calibrated_jeepney" depart="621.43" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="47.02" probability="1.00000000" edges="109973440 183543973#0"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_30" type="calibrated_jeepney" depart="642.86" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="26.13" probability="1.00000000" edges="690977719#0 183543973#0"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_31" type="calibrated_jeepney" depart="664.29" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="46.54" probability="1.00000000" edges="-282194769#1 -183541938#7"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_32" type="calibrated_jeepney" depart="685.71" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="26.05" probability="1.00000000" edges="-282194769#1 -690977716#1"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_33" type="calibrated_jeepney" depart="707.14" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="26.05" probability="1.00000000" edges="-282194769#1 -690977716#1"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_34" type="calibrated_jeepney" depart="728.57" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="47.02" probability="1.00000000" edges="109973440 183543973#0"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_36" type="calibrated_jeepney" depart="771.43" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="60.40" probability="1.00000000" edges="109973440 -690977716#1"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_38" type="calibrated_jeepney" depart="814.29" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="62.62" probability="1.00000000" edges="690977719#0 -183541938#7"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_39" type="calibrated_jeepney" depart="835.71" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="46.54" probability="1.00000000" edges="-282194769#1 -183541938#7"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_42" type="calibrated_jeepney" depart="900.00" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="46.54" probability="1.00000000" edges="-282194769#1 -183541938#7"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_44" type="calibrated_jeepney" depart="942.86" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="26.05" probability="1.00000000" edges="-282194769#1 -690977716#1"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_46" type="calibrated_jeepney" depart="985.71" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="47.02" probability="1.00000000" edges="109973440 183543973#0"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_47" type="calibrated_jeepney" depart="1007.14" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="26.05" probability="1.00000000" edges="-282194769#1 -690977716#1"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_49" type="calibrated_jeepney" depart="1050.00" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="62.62" probability="1.00000000" edges="690977719#0 -183541938#7"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_51" type="calibrated_jeepney" depart="1092.86" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="26.05" probability="1.00000000" edges="-282194769#1 -690977716#1"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_52" type="calibrated_jeepney" depart="1114.29" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="46.54" probability="1.00000000" edges="-282194769#1 -183541938#7"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_53" type="calibrated_jeepney" depart="1135.71" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="60.40" probability="1.00000000" edges="109973440 -690977716#1"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_55" type="calibrated_jeepney" depart="1178.57" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="62.62" probability="1.00000000" edges="690977719#0 -183541938#7"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_56" type="calibrated_jeepney" depart="1200.00" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="60.40" probability="1.00000000" edges="109973440 -690977716#1"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_59" type="calibrated_jeepney" depart="1264.29" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="46.54" probability="1.00000000" edges="-282194769#1 -183541938#7"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_60" type="calibrated_jeepney" depart="1285.71" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="26.13" probability="1.00000000" edges="690977719#0 183543973#0"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_63" type="calibrated_jeepney" depart="1350.00" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="47.02" probability="1.00000000" edges="109973440 183543973#0"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_65" type="calibrated_jeepney" depart="1392.86" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="26.13" probability="1.00000000" edges="690977719#0 183543973#0"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_66" type="calibrated_jeepney" depart="1414.29" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="46.54" probability="1.00000000" edges="-282194769#1 -183541938#7"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_67" type="calibrated_jeepney" depart="1435.71" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="46.54" probability="1.00000000" edges="-282194769#1 -183541938#7"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_69" type="calibrated_jeepney" depart="1478.57" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="47.02" probability="1.00000000" edges="109973440 183543973#0"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_71" type="calibrated_jeepney" depart="1521.43" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="60.40" probability="1.00000000" edges="109973440 -690977716#1"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_72" type="calibrated_jeepney" depart="1542.86" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="47.02" probability="1.00000000" edges="109973440 183543973#0"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_73" type="calibrated_jeepney" depart="1564.29" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="47.02" probability="1.00000000" edges="109973440 183543973#0"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_74" type="calibrated_jeepney" depart="1585.71" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="26.13" probability="1.00000000" edges="690977719#0 183543973#0"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_76" type="calibrated_jeepney" depart="1628.57" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="26.13" probability="1.00000000" edges="690977719#0 183543973#0"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_77" type="calibrated_jeepney" depart="1650.00" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="26.13" probability="1.00000000" edges="690977719#0 183543973#0"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_78" type="calibrated_jeepney" depart="1671.43" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="26.13" probability="1.00000000" edges="690977719#0 183543973#0"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_79" type="calibrated_jeepney" depart="1692.86" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="47.02" probability="1.00000000" edges="109973440 183543973#0"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_80" type="calibrated_jeepney" depart="1714.29" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="26.05" probability="1.00000000" edges="-282194769#1 -690977716#1"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_82" type="calibrated_jeepney" depart="1757.14" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="26.13" probability="1.00000000" edges="690977719#0 183543973#0"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_84" type="calibrated_jeepney" depart="1800.00" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="62.62" probability="1.00000000" edges="690977719#0 -183541938#7"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_86" type="calibrated_jeepney" depart="1842.86" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="47.02" probability="1.00000000" edges="109973440 183543973#0"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_87" type="calibrated_jeepney" depart="1864.29" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="46.54" probability="1.00000000" edges="-282194769#1 -183541938#7"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_88" type="calibrated_jeepney" depart="1885.71" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="26.05" probability="1.00000000" edges="-282194769#1 -690977716#1"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_89" type="calibrated_jeepney" depart="1907.14" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="26.05" probability="1.00000000" edges="-282194769#1 -690977716#1"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_90" type="calibrated_jeepney" depart="1928.57" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="46.54" probability="1.00000000" edges="-282194769#1 -183541938#7"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_92" type="calibrated_jeepney" depart="1971.43" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="26.05" probability="1.00000000" edges="-282194769#1 -690977716#1"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_94" type="calibrated_jeepney" depart="2014.29" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="47.02" probability="1.00000000" edges="109973440 183543973#0"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_95" type="calibrated_jeepney" depart="2035.71" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="26.05" probability="1.00000000" edges="-282194769#1 -690977716#1"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_96" type="calibrated_jeepney" depart="2057.14" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="46.54" probability="1.00000000" edges="-282194769#1 -183541938#7"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_100" type="calibrated_jeepney" depart="2142.86" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="60.40" probability="1.00000000" edges="109973440 -690977716#1"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_101" type="calibrated_jeepney" depart="2164.29" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="26.05" probability="1.00000000" edges="-282194769#1 -690977716#1"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_102" type="calibrated_jeepney" depart="2185.71" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="47.02" probability="1.00000000" edges="109973440 183543973#0"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_104" type="calibrated_jeepney" depart="2228.57" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="26.05" probability="1.00000000" edges="-282194769#1 -690977716#1"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_105" type="calibrated_jeepney" depart="2250.00" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="47.02" probability="1.00000000" edges="109973440 183543973#0"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_106" type="calibrated_jeepney" depart="2271.43" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="26.13" probability="1.00000000" edges="690977719#0 183543973#0"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_111" type="calibrated_jeepney" depart="2378.57" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="26.05" probability="1.00000000" edges="-282194769#1 -690977716#1"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_112" type="calibrated_jeepney" depart="2400.00" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="46.54" probability="1.00000000" edges="-282194769#1 -183541938#7"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_113" type="calibrated_jeepney" depart="2421.43" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="26.13" probability="1.00000000" edges="690977719#0 183543973#0"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_114" type="calibrated_jeepney" depart="2442.86" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="46.54" probability="1.00000000" edges="-282194769#1 -183541938#7"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_115" type="calibrated_jeepney" depart="2464.29" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="26.13" probability="1.00000000" edges="690977719#0 183543973#0"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_117" type="calibrated_jeepney" depart="2507.14" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="60.40" probability="1.00000000" edges="109973440 -690977716#1"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_119" type="calibrated_jeepney" depart="2550.00" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="47.02" probability="1.00000000" edges="109973440 183543973#0"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_120" type="calibrated_jeepney" depart="2571.43" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="26.05" probability="1.00000000" edges="-282194769#1 -690977716#1"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_121" type="calibrated_jeepney" depart="2592.86" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="26.05" probability="1.00000000" edges="-282194769#1 -690977716#1"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_122" type="calibrated_jeepney" depart="2614.29" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="60.40" probability="1.00000000" edges="109973440 -690977716#1"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_124" type="calibrated_jeepney" depart="2657.14" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="60.40" probability="1.00000000" edges="109973440 -690977716#1"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_125" type="calibrated_jeepney" depart="2678.57" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="60.40" probability="1.00000000" edges="109973440 -690977716#1"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_127" type="calibrated_jeepney" depart="2721.43" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="26.05" probability="1.00000000" edges="-282194769#1 -690977716#1"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_128" type="calibrated_jeepney" depart="2742.86" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="26.13" probability="1.00000000" edges="690977719#0 183543973#0"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_130" type="calibrated_jeepney" depart="2785.71" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="26.05" probability="1.00000000" edges="-282194769#1 -690977716#1"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_132" type="calibrated_jeepney" depart="2828.57" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="46.54" probability="1.00000000" edges="-282194769#1 -183541938#7"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_135" type="calibrated_jeepney" depart="2892.86" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="60.40" probability="1.00000000" edges="109973440 -690977716#1"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_136" type="calibrated_jeepney" depart="2914.29" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="46.54" probability="1.00000000" edges="-282194769#1 -183541938#7"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_137" type="calibrated_jeepney" depart="2935.71" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="62.62" probability="1.00000000" edges="690977719#0 -183541938#7"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_138" type="calibrated_jeepney" depart="2957.14" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="62.62" probability="1.00000000" edges="690977719#0 -183541938#7"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_139" type="calibrated_jeepney" depart="2978.57" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="26.05" probability="1.00000000" edges="-282194769#1 -690977716#1"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_141" type="calibrated_jeepney" depart="3021.43" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="26.05" probability="1.00000000" edges="-282194769#1 -690977716#1"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_143" type="calibrated_jeepney" depart="3064.29" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="46.54" probability="1.00000000" edges="-282194769#1 -183541938#7"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_144" type="calibrated_jeepney" depart="3085.71" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="60.40" probability="1.00000000" edges="109973440 -690977716#1"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_145" type="calibrated_jeepney" depart="3107.14" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="60.40" probability="1.00000000" edges="109973440 -690977716#1"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_146" type="calibrated_jeepney" depart="3128.57" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="46.54" probability="1.00000000" edges="-282194769#1 -183541938#7"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_151" type="calibrated_jeepney" depart="3235.71" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="26.05" probability="1.00000000" edges="-282194769#1 -690977716#1"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_152" type="calibrated_jeepney" depart="3257.14" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="47.02" probability="1.00000000" edges="109973440 183543973#0"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_153" type="calibrated_jeepney" depart="3278.57" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="26.05" probability="1.00000000" edges="-282194769#1 -690977716#1"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_154" type="calibrated_jeepney" depart="3300.00" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="60.40" probability="1.00000000" edges="109973440 -690977716#1"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_156" type="calibrated_jeepney" depart="3342.86" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="62.62" probability="1.00000000" edges="690977719#0 -183541938#7"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_158" type="calibrated_jeepney" depart="3385.71" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="60.40" probability="1.00000000" edges="109973440 -690977716#1"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_160" type="calibrated_jeepney" depart="3428.57" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="62.62" probability="1.00000000" edges="690977719#0 -183541938#7"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_161" type="calibrated_jeepney" depart="3450.00" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="62.62" probability="1.00000000" edges="690977719#0 -183541938#7"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_162" type="calibrated_jeepney" depart="3471.43" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="26.13" probability="1.00000000" edges="690977719#0 183543973#0"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_167" type="calibrated_jeepney" depart="3578.57" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="60.40" probability="1.00000000" edges="109973440 -690977716#1"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_169" type="calibrated_jeepney" depart="3621.43" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="26.05" probability="1.00000000" edges="-282194769#1 -690977716#1"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_170" type="calibrated_jeepney" depart="3642.86" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="46.54" probability="1.00000000" edges="-282194769#1 -183541938#7"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_171" type="calibrated_jeepney" depart="3664.29" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="60.40" probability="1.00000000" edges="109973440 -690977716#1"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_172" type="calibrated_jeepney" depart="3685.71" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="46.54" probability="1.00000000" edges="-282194769#1 -183541938#7"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_174" type="calibrated_jeepney" depart="3728.57" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="60.40" probability="1.00000000" edges="109973440 -690977716#1"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_175" type="calibrated_jeepney" depart="3750.00" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="26.05" probability="1.00000000" edges="-282194769#1 -690977716#1"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_176" type="calibrated_jeepney" depart="3771.43" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="60.40" probability="1.00000000" edges="109973440 -690977716#1"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_177" type="calibrated_jeepney" depart="3792.86" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="26.05" probability="1.00000000" edges="-282194769#1 -690977716#1"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_178" type="calibrated_jeepney" depart="3814.29" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="26.05" probability="1.00000000" edges="-282194769#1 -690977716#1"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_180" type="calibrated_jeepney" depart="3857.14" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="26.05" probability="1.00000000" edges="-282194769#1 -690977716#1"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_182" type="calibrated_jeepney" depart="3900.00" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="47.02" probability="1.00000000" edges="109973440 183543973#0"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_186" type="calibrated_jeepney" depart="3985.71" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="62.62" probability="1.00000000" edges="690977719#0 -183541938#7"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_187" type="calibrated_jeepney" depart="4007.14" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="47.02" probability="1.00000000" edges="109973440 183543973#0"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_188" type="calibrated_jeepney" depart="4028.57" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="46.54" probability="1.00000000" edges="-282194769#1 -183541938#7"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_192" type="calibrated_jeepney" depart="4114.29" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="62.62" probability="1.00000000" edges="690977719#0 -183541938#7"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_196" type="calibrated_jeepney" depart="4200.00" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="60.40" probability="1.00000000" edges="109973440 -690977716#1"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_197" type="calibrated_jeepney" depart="4221.43" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="26.05" probability="1.00000000" edges="-282194769#1 -690977716#1"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_198" type="calibrated_jeepney" depart="4242.86" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="46.54" probability="1.00000000" edges="-282194769#1 -183541938#7"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_200" type="calibrated_jeepney" depart="4285.71" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="60.40" probability="1.00000000" edges="109973440 -690977716#1"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_201" type="calibrated_jeepney" depart="4307.14" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="62.62" probability="1.00000000" edges="690977719#0 -183541938#7"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_204" type="calibrated_jeepney" depart="4371.43" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="26.13" probability="1.00000000" edges="690977719#0 183543973#0"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_206" type="calibrated_jeepney" depart="4414.29" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="47.02" probability="1.00000000" edges="109973440 183543973#0"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_207" type="calibrated_jeepney" depart="4435.71" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="46.54" probability="1.00000000" edges="-282194769#1 -183541938#7"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_208" type="calibrated_jeepney" depart="4457.14" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="26.05" probability="1.00000000" edges="-282194769#1 -690977716#1"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_210" type="calibrated_jeepney" depart="4500.00" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="60.40" probability="1.00000000" edges="109973440 -690977716#1"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_213" type="calibrated_jeepney" depart="4564.29" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="26.13" probability="1.00000000" edges="690977719#0 183543973#0"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_214" type="calibrated_jeepney" depart="4585.71" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="47.02" probability="1.00000000" edges="109973440 183543973#0"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_217" type="calibrated_jeepney" depart="4650.00" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="26.13" probability="1.00000000" edges="690977719#0 183543973#0"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_218" type="calibrated_jeepney" depart="4671.43" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="62.62" probability="1.00000000" edges="690977719#0 -183541938#7"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_219" type="calibrated_jeepney" depart="4692.86" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="60.40" probability="1.00000000" edges="109973440 -690977716#1"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_220" type="calibrated_jeepney" depart="4714.29" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="46.54" probability="1.00000000" edges="-282194769#1 -183541938#7"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_223" type="calibrated_jeepney" depart="4778.57" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="47.02" probability="1.00000000" edges="109973440 183543973#0"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_225" type="calibrated_jeepney" depart="4821.43" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="46.54" probability="1.00000000" edges="-282194769#1 -183541938#7"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_227" type="calibrated_jeepney" depart="4864.29" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="26.13" probability="1.00000000" edges="690977719#0 183543973#0"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_228" type="calibrated_jeepney" depart="4885.71" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="60.40" probability="1.00000000" edges="109973440 -690977716#1"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_229" type="calibrated_jeepney" depart="4907.14" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="47.02" probability="1.00000000" edges="109973440 183543973#0"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_230" type="calibrated_jeepney" depart="4928.57" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="47.02" probability="1.00000000" edges="109973440 183543973#0"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_234" type="calibrated_jeepney" depart="5014.29" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="60.40" probability="1.00000000" edges="109973440 -690977716#1"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_235" type="calibrated_jeepney" depart="5035.71" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="62.62" probability="1.00000000" edges="690977719#0 -183541938#7"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_237" type="calibrated_jeepney" depart="5078.57" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="47.02" probability="1.00000000" edges="109973440 183543973#0"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_238" type="calibrated_jeepney" depart="5100.00" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="47.02" probability="1.00000000" edges="109973440 183543973#0"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_240" type="calibrated_jeepney" depart="5142.86" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="46.54" probability="1.00000000" edges="-282194769#1 -183541938#7"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_242" type="calibrated_jeepney" depart="5185.71" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="60.40" probability="1.00000000" edges="109973440 -690977716#1"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_243" type="calibrated_jeepney" depart="5207.14" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="60.40" probability="1.00000000" edges="109973440 -690977716#1"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_245" type="calibrated_jeepney" depart="5250.00" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="47.02" probability="1.00000000" edges="109973440 183543973#0"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_246" type="calibrated_jeepney" depart="5271.43" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="62.62" probability="1.00000000" edges="690977719#0 -183541938#7"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_249" type="calibrated_jeepney" depart="5335.71" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="47.02" probability="1.00000000" edges="109973440 183543973#0"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_252" type="calibrated_jeepney" depart="5400.00" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="60.40" probability="1.00000000" edges="109973440 -690977716#1"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_253" type="calibrated_jeepney" depart="5421.43" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="62.62" probability="1.00000000" edges="690977719#0 -183541938#7"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_255" type="calibrated_jeepney" depart="5464.29" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="60.40" probability="1.00000000" edges="109973440 -690977716#1"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_256" type="calibrated_jeepney" depart="5485.71" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="26.05" probability="1.00000000" edges="-282194769#1 -690977716#1"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_257" type="calibrated_jeepney" depart="5507.14" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="62.62" probability="1.00000000" edges="690977719#0 -183541938#7"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_259" type="calibrated_jeepney" depart="5550.00" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="62.62" probability="1.00000000" edges="690977719#0 -183541938#7"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_261" type="calibrated_jeepney" depart="5592.86" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="26.13" probability="1.00000000" edges="690977719#0 183543973#0"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_262" type="calibrated_jeepney" depart="5614.29" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="46.54" probability="1.00000000" edges="-282194769#1 -183541938#7"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_263" type="calibrated_jeepney" depart="5635.71" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="60.40" probability="1.00000000" edges="109973440 -690977716#1"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_265" type="calibrated_jeepney" depart="5678.57" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="46.54" probability="1.00000000" edges="-282194769#1 -183541938#7"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_266" type="calibrated_jeepney" depart="5700.00" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="60.40" probability="1.00000000" edges="109973440 -690977716#1"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_267" type="calibrated_jeepney" depart="5721.43" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="46.54" probability="1.00000000" edges="-282194769#1 -183541938#7"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_268" type="calibrated_jeepney" depart="5742.86" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="26.13" probability="1.00000000" edges="690977719#0 183543973#0"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_269" type="calibrated_jeepney" depart="5764.29" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="62.62" probability="1.00000000" edges="690977719#0 -183541938#7"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_272" type="calibrated_jeepney" depart="5828.57" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="26.05" probability="1.00000000" edges="-282194769#1 -690977716#1"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_274" type="calibrated_jeepney" depart="5871.43" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="46.54" probability="1.00000000" edges="-282194769#1 -183541938#7"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_275" type="calibrated_jeepney" depart="5892.86" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="47.02" probability="1.00000000" edges="109973440 183543973#0"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_281" type="calibrated_jeepney" depart="6021.43" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="46.54" probability="1.00000000" edges="-282194769#1 -183541938#7"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_282" type="calibrated_jeepney" depart="6042.86" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="46.54" probability="1.00000000" edges="-282194769#1 -183541938#7"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_283" type="calibrated_jeepney" depart="6064.29" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="26.05" probability="1.00000000" edges="-282194769#1 -690977716#1"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_284" type="calibrated_jeepney" depart="6085.71" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="46.54" probability="1.00000000" edges="-282194769#1 -183541938#7"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_285" type="calibrated_jeepney" depart="6107.14" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="46.54" probability="1.00000000" edges="-282194769#1 -183541938#7"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_286" type="calibrated_jeepney" depart="6128.57" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="46.54" probability="1.00000000" edges="-282194769#1 -183541938#7"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_287" type="calibrated_jeepney" depart="6150.00" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="62.62" probability="1.00000000" edges="690977719#0 -183541938#7"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_288" type="calibrated_jeepney" depart="6171.43" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="46.54" probability="1.00000000" edges="-282194769#1 -183541938#7"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_289" type="calibrated_jeepney" depart="6192.86" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="26.05" probability="1.00000000" edges="-282194769#1 -690977716#1"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_291" type="calibrated_jeepney" depart="6235.71" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="46.54" probability="1.00000000" edges="-282194769#1 -183541938#7"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_293" type="calibrated_jeepney" depart="6278.57" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="47.02" probability="1.00000000" edges="109973440 183543973#0"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_294" type="calibrated_jeepney" depart="6300.00" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="46.54" probability="1.00000000" edges="-282194769#1 -183541938#7"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_295" type="calibrated_jeepney" depart="6321.43" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="26.13" probability="1.00000000" edges="690977719#0 183543973#0"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_298" type="calibrated_jeepney" depart="6385.71" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="26.13" probability="1.00000000" edges="690977719#0 183543973#0"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_300" type="calibrated_jeepney" depart="6428.57" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="62.62" probability="1.00000000" edges="690977719#0 -183541938#7"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_301" type="calibrated_jeepney" depart="6450.00" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="62.62" probability="1.00000000" edges="690977719#0 -183541938#7"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_302" type="calibrated_jeepney" depart="6471.43" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="26.05" probability="1.00000000" edges="-282194769#1 -690977716#1"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_303" type="calibrated_jeepney" depart="6492.86" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="46.54" probability="1.00000000" edges="-282194769#1 -183541938#7"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_304" type="calibrated_jeepney" depart="6514.29" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="26.05" probability="1.00000000" edges="-282194769#1 -690977716#1"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_305" type="calibrated_jeepney" depart="6535.71" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="26.05" probability="1.00000000" edges="-282194769#1 -690977716#1"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_306" type="calibrated_jeepney" depart="6557.14" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="26.13" probability="1.00000000" edges="690977719#0 183543973#0"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_308" type="calibrated_jeepney" depart="6600.00" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="46.54" probability="1.00000000" edges="-282194769#1 -183541938#7"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_309" type="calibrated_jeepney" depart="6621.43" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="60.40" probability="1.00000000" edges="109973440 -690977716#1"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_310" type="calibrated_jeepney" depart="6642.86" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="46.54" probability="1.00000000" edges="-282194769#1 -183541938#7"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_311" type="calibrated_jeepney" depart="6664.29" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="60.40" probability="1.00000000" edges="109973440 -690977716#1"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_312" type="calibrated_jeepney" depart="6685.71" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="60.40" probability="1.00000000" edges="109973440 -690977716#1"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_313" type="calibrated_jeepney" depart="6707.14" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="60.40" probability="1.00000000" edges="109973440 -690977716#1"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_314" type="calibrated_jeepney" depart="6728.57" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="26.13" probability="1.00000000" edges="690977719#0 183543973#0"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_316" type="calibrated_jeepney" depart="6771.43" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="26.13" probability="1.00000000" edges="690977719#0 183543973#0"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_317" type="calibrated_jeepney" depart="6792.86" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="26.05" probability="1.00000000" edges="-282194769#1 -690977716#1"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_319" type="calibrated_jeepney" depart="6835.71" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="62.62" probability="1.00000000" edges="690977719#0 -183541938#7"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_321" type="calibrated_jeepney" depart="6878.57" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="47.02" probability="1.00000000" edges="109973440 183543973#0"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_322" type="calibrated_jeepney" depart="6900.00" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="26.05" probability="1.00000000" edges="-282194769#1 -690977716#1"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_324" type="calibrated_jeepney" depart="6942.86" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="60.40" probability="1.00000000" edges="109973440 -690977716#1"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_327" type="calibrated_jeepney" depart="7007.14" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="26.05" probability="1.00000000" edges="-282194769#1 -690977716#1"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_332" type="calibrated_jeepney" depart="7114.29" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="62.62" probability="1.00000000" edges="690977719#0 -183541938#7"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_334" type="calibrated_jeepney" depart="7157.14" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="46.54" probability="1.00000000" edges="-282194769#1 -183541938#7"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="jeepney_335" type="calibrated_jeepney" depart="7178.57" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="46.54" probability="1.00000000" edges="-282194769#1 -183541938#7"/>
+        </routeDistribution>
+    </vehicle>
+</routes>

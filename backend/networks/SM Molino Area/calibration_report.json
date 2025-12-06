@@ -1,0 +1,27 @@
+{
+  "success": true,
+  "network": "SM Molino Area",
+  "btmd_data": "Daang Hari Road and Molino Road Intersection (SM Molino Area)",
+  "simulation_hours": 2.0,
+  "time_of_day": "morning_peak",
+  "traffic_intensity": 1.0,
+  "target_total_vehicles": 4176,
+  "target_vehicles_per_hour": 2088,
+  "btmd_avg_per_hour": 1916,
+  "btmd_peak_per_hour": 2085,
+  "vehicle_breakdown": {
+    "passenger": 2509,
+    "motorcycle": 1344,
+    "truck": 233,
+    "jeepney": 0,
+    "bus": 16
+  },
+  "calibrated_files": [
+    "networks\\SM Molino Area\\routes\\osm.passenger.flows.xml",
+    "networks\\SM Molino Area\\routes\\osm.motorcycle.flows.xml",
+    "networks\\SM Molino Area\\routes\\osm.truck.flows.xml",
+    "networks\\SM Molino Area\\routes\\osm.jeepney.flows.xml",
+    "networks\\SM Molino Area\\routes\\osm.bus.flows.xml"
+  ],
+  "timestamp": "2025-12-06T20:56:46.653404"
+}

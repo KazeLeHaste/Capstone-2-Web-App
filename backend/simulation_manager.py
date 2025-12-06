@@ -474,7 +474,41 @@ class SimulationManager:
                     enabled_vehicles = ['passenger']
                 
                 print(f"Enabled vehicle types: {enabled_vehicles}")
-                self._copy_and_filter_routes(routes_source_dir, routes_dest_dir, enabled_vehicles, config, is_osm_scenario=True)
+                
+                # Try to generate BTMD-calibrated flows if available
+                traffic_scale = config.get('trafficScale', config.get('traffic_scale', 1.0))
+                duration_seconds = config.get('sumo_end', config.get('endTime', 7200))
+                
+                # Import the flow generator
+                try:
+                    from btmd_flow_generator import generate_calibrated_flows_for_session, should_use_calibrated_flows
+                    
+                    if should_use_calibrated_flows(network_id):
+                        print(f"🎯 Generating BTMD-calibrated flows for {network_id} (intensity: {traffic_scale}x)")
+                        success = generate_calibrated_flows_for_session(
+                            network_name=network_id,
+                            session_dir=session_dir,
+                            traffic_scale=traffic_scale,
+                            simulation_duration=duration_seconds
+                        )
+                        
+                        if success:
+                            print(f"✅ Using BTMD-calibrated flows (intensity: {traffic_scale}x)")
+                        else:
+                            print(f"⚠️  BTMD flow generation failed, falling back to OSM defaults")
+                            self._copy_and_filter_routes(routes_source_dir, routes_dest_dir, enabled_vehicles, config, is_osm_scenario=True)
+                    else:
+                        # No BTMD data, use standard route copying
+                        self._copy_and_filter_routes(routes_source_dir, routes_dest_dir, enabled_vehicles, config, is_osm_scenario=True)
+                        
+                except ImportError as e:
+                    print(f"⚠️  BTMD flow generator not available: {e}")
+                    self._copy_and_filter_routes(routes_source_dir, routes_dest_dir, enabled_vehicles, config, is_osm_scenario=True)
+                except Exception as e:
+                    print(f"⚠️  Error generating BTMD flows: {e}")
+                    import traceback
+                    traceback.print_exc()
+                    self._copy_and_filter_routes(routes_source_dir, routes_dest_dir, enabled_vehicles, config, is_osm_scenario=True)
             
             # Copy SUMO config file AFTER route files are in place
             config_files = list(source_dir.glob("*.sumocfg"))
@@ -541,22 +575,27 @@ class SimulationManager:
                 print(f"🌟 Including enhanced route file in config: {enhanced_route_file}")
             else:
                 # Fall back to individual vehicle type files
+                # Priority: .flows.xml (BTMD calibrated) > .rou.xml (pre-compiled) > .trips.xml (runtime routing)
                 for vehicle_type in enabled_vehicles:
-                    # Check for trips file first (better realism), then route file as fallback
-                    trips_file = f"routes/osm.{vehicle_type}.trips.xml"
+                    flows_file = f"routes/osm.{vehicle_type}.flows.xml"
                     route_file = f"routes/osm.{vehicle_type}.rou.xml"
+                    trips_file = f"routes/osm.{vehicle_type}.trips.xml"
                     
-                    trips_path = dest_config.parent / trips_file
+                    flows_path = dest_config.parent / flows_file
                     route_path = dest_config.parent / route_file
+                    trips_path = dest_config.parent / trips_file
                     
-                    if trips_path.exists():
-                        route_files.append(trips_file)
-                        print(f"Including trips file in config: {trips_file}")
+                    if flows_path.exists():
+                        route_files.append(flows_file)
+                        print(f"Including BTMD flow file in config: {flows_file}")
                     elif route_path.exists():
                         route_files.append(route_file)
-                        print(f"Including route file in config: {route_file}")
+                        print(f"Including compiled route file in config: {route_file}")
+                    elif trips_path.exists():
+                        route_files.append(trips_file)
+                        print(f"Including trips file in config: {trips_file}")
                     else:
-                        print(f"No route or trips file found for {vehicle_type}, skipping")
+                        print(f"No route/flows/trips file found for {vehicle_type}, skipping")
             
             route_input = root.find('.//route-files')
             if route_input is not None:
@@ -1402,6 +1441,20 @@ class SimulationManager:
                     vehicle.set('departLane', 'best')
                 if not vehicle.get('departSpeed'):
                     vehicle.set('departSpeed', 'max')
+                # Critical: Set arrivalPos='-1' to allow despawning on dead-end edges
+                if not vehicle.get('arrivalPos'):
+                    vehicle.set('arrivalPos', '-1')
+            
+            # Also enhance flow elements
+            for flow in root.findall('.//flow'):
+                # Add optimized departure attributes if missing
+                if not flow.get('departLane'):
+                    flow.set('departLane', 'best')
+                if not flow.get('departSpeed'):
+                    flow.set('departSpeed', 'max')
+                # Critical: Set arrivalPos='-1' to allow despawning on dead-end edges
+                if not flow.get('arrivalPos'):
+                    flow.set('arrivalPos', '-1')
             
             # Also enhance trip elements
             for trip in root.findall('.//trip'):
@@ -1410,6 +1463,9 @@ class SimulationManager:
                     trip.set('departLane', 'best')
                 if not trip.get('departSpeed'):
                     trip.set('departSpeed', 'max')
+                # Critical: Set arrivalPos='-1' to allow despawning on dead-end edges
+                if not trip.get('arrivalPos'):
+                    trip.set('arrivalPos', '-1')
                     
         except Exception as e:
             print(f"⚠️  Warning: Could not enhance vehicle definitions: {e}")

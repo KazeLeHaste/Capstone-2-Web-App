@@ -1,0 +1,19 @@
+{
+  "simulation_duration": 7200,
+  "traffic_scale": 1.0,
+  "traffic_control": "existing",
+  "use_calibrated_flows": true,
+  "time_of_day": "morning_peak",
+  "data_collection": {
+    "edge_data": true,
+    "vehicle_tracking": true,
+    "emissions": true,
+    "trip_info": true
+  },
+  "network_name": "Jollibee Molino Area",
+  "calibration_info": {
+    "is_calibrated": true,
+    "target_vehicles": 2980,
+    "calibration_date": "2025-12-06T19:44:13.705414"
+  }
+}

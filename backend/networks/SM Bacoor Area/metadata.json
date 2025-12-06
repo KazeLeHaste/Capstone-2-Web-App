@@ -2,7 +2,7 @@
   "name": "SM Bacoor Area",
   "type": "osm_imported",
   "is_osm_scenario": true,
-  "import_date": "2025-10-30T00:02:26.184407",
+  "import_date": "2025-12-06T19:41:11.933157",
   "original_scenario": "SM Bacoor Area",
   "vehicle_types": [
     "passenger",
@@ -13,15 +13,15 @@
   "network_info": {
     "edges": 14,
     "junctions": 8,
-    "lanes": 67,
+    "lanes": 59,
     "boundary": "0.00,0.00,516.54,379.19",
-    "file_size": 7383
+    "file_size": 6699
   },
   "stats": {
     "total_files": 24,
     "route_files": 0,
     "trip_files": 0,
-    "total_size": 347367
+    "total_size": 347020
   },
   "description": "Imported OSM scenario: SM Bacoor Area",
   "supports_realistic_traffic": true,

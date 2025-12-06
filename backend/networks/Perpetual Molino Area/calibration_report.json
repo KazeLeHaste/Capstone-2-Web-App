@@ -1,0 +1,35 @@
+{
+  "success": true,
+  "network": "Perpetual Molino Area",
+  "btmd_data": "Average BTMD Intersection (Calculated)",
+  "using_averaged_data": true,
+  "simulation_hours": 2.0,
+  "time_of_day": "morning_peak",
+  "traffic_intensity": 1.0,
+  "target_total_vehicles": 3264,
+  "target_vehicles_per_hour": 1632,
+  "btmd_avg_per_hour": 1484,
+  "btmd_peak_per_hour": 1626,
+  "vehicle_breakdown": {
+    "passenger": 1633,
+    "motorcycle": 976,
+    "truck": 257,
+    "jeepney": 336,
+    "bus": 25
+  },
+  "calibrated_files": [
+    "networks\\Perpetual Molino Area\\routes\\osm.passenger.flows.xml",
+    "networks\\Perpetual Molino Area\\routes\\osm.motorcycle.flows.xml",
+    "networks\\Perpetual Molino Area\\routes\\osm.truck.flows.xml",
+    "networks\\Perpetual Molino Area\\routes\\osm.jeepney.flows.xml",
+    "networks\\Perpetual Molino Area\\routes\\osm.bus.flows.xml"
+  ],
+  "timestamp": "2025-12-06T21:09:46.353136",
+  "source_intersections": [
+    "SM Bacoor Area",
+    "SM Molino Area",
+    "Jollibee Molino Area",
+    "St Dominic Area",
+    "Bayanan Area"
+  ]
+}

@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- generated on 2025-12-06 20:56:46 by Eclipse SUMO duarouter Version 1.24.0
+<duarouterConfiguration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/duarouterConfiguration.xsd">
+
+    <input>
+        <net-file value="C:\Users\kgaqu\OneDrive\Documents\4th Year\Capstone 2\System Final Version\backend\networks\SM Molino Area\SM Molino Area.net.xml.gz"/>
+        <route-files value="C:\Users\kgaqu\OneDrive\Documents\4th Year\Capstone 2\System Final Version\backend\networks\SM Molino Area\routes\osm.bus.trips.xml"/>
+    </input>
+
+    <output>
+        <output-file value="C:\Users\kgaqu\OneDrive\Documents\4th Year\Capstone 2\System Final Version\backend\networks\SM Molino Area\routes\osm.bus.rou.xml"/>
+    </output>
+
+    <processing>
+        <remove-loops value="true"/>
+        <repair value="true"/>
+    </processing>
+
+    <report>
+        <no-warnings value="false"/>
+        <ignore-errors value="true"/>
+        <no-step-log value="true"/>
+    </report>
+
+</duarouterConfiguration>
+-->
+
+<routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/routes_file.xsd">
+    <vType id="calibrated_bus" length="12.00" vClass="bus" width="2.50" personCapacity="50"/>
+    <vehicle id="bus_0" type="calibrated_bus" depart="0.00" departLane="best" departSpeed="max">
+        <route edges="580815653#0 158466192#0 561748193 427550891#0"/>
+    </vehicle>
+    <vehicle id="bus_2" type="calibrated_bus" depart="900.00" departLane="best" departSpeed="max">
+        <route edges="366949696 427550891#0"/>
+    </vehicle>
+    <vehicle id="bus_5" type="calibrated_bus" depart="2250.00" departLane="best" departSpeed="max">
+        <route edges="870991319#0 427551860 561748193 427550891#0"/>
+    </vehicle>
+    <vehicle id="bus_6" type="calibrated_bus" depart="2700.00" departLane="best" departSpeed="max">
+        <route edges="580815653#0 158466192#0 561748193 427550891#0"/>
+    </vehicle>
+    <vehicle id="bus_7" type="calibrated_bus" depart="3150.00" departLane="best" departSpeed="max">
+        <route edges="366949696 427550891#0"/>
+    </vehicle>
+    <vehicle id="bus_9" type="calibrated_bus" depart="4050.00" departLane="best" departSpeed="max">
+        <route edges="366949696 561748189 683268248#0"/>
+    </vehicle>
+    <vehicle id="bus_10" type="calibrated_bus" depart="4500.00" departLane="best" departSpeed="max">
+        <route edges="870991319#0 427551860 561748193 427550891#0"/>
+    </vehicle>
+    <vehicle id="bus_11" type="calibrated_bus" depart="4950.00" departLane="best" departSpeed="max">
+        <route edges="870991319#0 624604435#0 683268248#0"/>
+    </vehicle>
+    <vehicle id="bus_13" type="calibrated_bus" depart="5850.00" departLane="best" departSpeed="max">
+        <route edges="366949696 561748189 683268248#0"/>
+    </vehicle>
+    <vehicle id="bus_14" type="calibrated_bus" depart="6300.00" departLane="best" departSpeed="max">
+        <route edges="870991319#0 427551860 561748193 624604434"/>
+    </vehicle>
+</routes>

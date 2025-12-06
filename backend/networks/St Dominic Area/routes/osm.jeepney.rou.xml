@@ -1,0 +1,286 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- generated on 2025-12-06 20:56:43 by Eclipse SUMO duarouter Version 1.24.0
+<duarouterConfiguration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/duarouterConfiguration.xsd">
+
+    <input>
+        <net-file value="C:\Users\kgaqu\OneDrive\Documents\4th Year\Capstone 2\System Final Version\backend\networks\St Dominic Area\St Dominic Area.net.xml.gz"/>
+        <route-files value="C:\Users\kgaqu\OneDrive\Documents\4th Year\Capstone 2\System Final Version\backend\networks\St Dominic Area\routes\osm.jeepney.trips.xml"/>
+    </input>
+
+    <output>
+        <output-file value="C:\Users\kgaqu\OneDrive\Documents\4th Year\Capstone 2\System Final Version\backend\networks\St Dominic Area\routes\osm.jeepney.rou.xml"/>
+    </output>
+
+    <processing>
+        <remove-loops value="true"/>
+        <repair value="true"/>
+    </processing>
+
+    <report>
+        <no-warnings value="false"/>
+        <ignore-errors value="true"/>
+        <no-step-log value="true"/>
+    </report>
+
+</duarouterConfiguration>
+-->
+
+<routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/routes_file.xsd">
+    <vType id="calibrated_jeepney" length="6.00" vClass="bus" width="2.00" color="orange"/>
+    <vehicle id="jeepney_0" type="calibrated_jeepney" depart="0.00" departLane="best" departSpeed="max">
+        <route edges="1392084244#0 712245744#0 1054315845#0"/>
+    </vehicle>
+    <vehicle id="jeepney_1" type="calibrated_jeepney" depart="55.81" departLane="best" departSpeed="max">
+        <route edges="712245744#0 653727191#0"/>
+    </vehicle>
+    <vehicle id="jeepney_2" type="calibrated_jeepney" depart="111.63" departLane="best" departSpeed="max">
+        <route edges="555020953#0 1326404883"/>
+    </vehicle>
+    <vehicle id="jeepney_3" type="calibrated_jeepney" depart="167.44" departLane="best" departSpeed="max">
+        <route edges="555020953#0 1054315845#0"/>
+    </vehicle>
+    <vehicle id="jeepney_6" type="calibrated_jeepney" depart="334.88" departLane="best" departSpeed="max">
+        <route edges="1054315844#0 555020953#0 1054315845#0"/>
+    </vehicle>
+    <vehicle id="jeepney_7" type="calibrated_jeepney" depart="390.70" departLane="best" departSpeed="max">
+        <route edges="712245744#0 1054315845#0"/>
+    </vehicle>
+    <vehicle id="jeepney_8" type="calibrated_jeepney" depart="446.51" departLane="best" departSpeed="max">
+        <route edges="555020953#0 1326404883"/>
+    </vehicle>
+    <vehicle id="jeepney_9" type="calibrated_jeepney" depart="502.33" departLane="best" departSpeed="max">
+        <route edges="564298145 -712245744#1 -564298126#9"/>
+    </vehicle>
+    <vehicle id="jeepney_12" type="calibrated_jeepney" depart="669.77" departLane="best" departSpeed="max">
+        <route edges="1054315844#0 555020953#0 1326404883"/>
+    </vehicle>
+    <vehicle id="jeepney_14" type="calibrated_jeepney" depart="781.40" departLane="best" departSpeed="max">
+        <route edges="-1392084250 1054315845#0"/>
+    </vehicle>
+    <vehicle id="jeepney_17" type="calibrated_jeepney" depart="948.84" departLane="best" departSpeed="max">
+        <route edges="555020953#0 1326404883"/>
+    </vehicle>
+    <vehicle id="jeepney_18" type="calibrated_jeepney" depart="1004.65" departLane="best" departSpeed="max">
+        <route edges="-1392084250 1054315845#0"/>
+    </vehicle>
+    <vehicle id="jeepney_20" type="calibrated_jeepney" depart="1116.28" departLane="best" departSpeed="max">
+        <route edges="712245744#0 653727191#0"/>
+    </vehicle>
+    <vehicle id="jeepney_21" type="calibrated_jeepney" depart="1172.09" departLane="best" departSpeed="max">
+        <route edges="-1392084250 -712245744#1 -564298126#9"/>
+    </vehicle>
+    <vehicle id="jeepney_22" type="calibrated_jeepney" depart="1227.91" departLane="best" departSpeed="max">
+        <route edges="-1392084250 1054315845#0"/>
+    </vehicle>
+    <vehicle id="jeepney_24" type="calibrated_jeepney" depart="1339.53" departLane="best" departSpeed="max">
+        <route edges="564298145 1054315845#0"/>
+    </vehicle>
+    <vehicle id="jeepney_25" type="calibrated_jeepney" depart="1395.35" departLane="best" departSpeed="max">
+        <route edges="1054315844#0 555020953#0 1054315845#0"/>
+    </vehicle>
+    <vehicle id="jeepney_26" type="calibrated_jeepney" depart="1451.16" departLane="best" departSpeed="max">
+        <route edges="564298145 653727191#0"/>
+    </vehicle>
+    <vehicle id="jeepney_28" type="calibrated_jeepney" depart="1562.79" departLane="best" departSpeed="max">
+        <route edges="-1392084250 -712245744#1 -564298126#9"/>
+    </vehicle>
+    <vehicle id="jeepney_29" type="calibrated_jeepney" depart="1618.60" departLane="best" departSpeed="max">
+        <route edges="555020953#0 1054315845#0"/>
+    </vehicle>
+    <vehicle id="jeepney_30" type="calibrated_jeepney" depart="1674.42" departLane="best" departSpeed="max">
+        <route edges="712245744#0 1326404883"/>
+    </vehicle>
+    <vehicle id="jeepney_31" type="calibrated_jeepney" depart="1730.23" departLane="best" departSpeed="max">
+        <route edges="-1392084250 1054315845#0"/>
+    </vehicle>
+    <vehicle id="jeepney_32" type="calibrated_jeepney" depart="1786.05" departLane="best" departSpeed="max">
+        <route edges="555020953#0 1054315845#0"/>
+    </vehicle>
+    <vehicle id="jeepney_33" type="calibrated_jeepney" depart="1841.86" departLane="best" departSpeed="max">
+        <route edges="1054315844#0 555020953#0 653727191#0"/>
+    </vehicle>
+    <vehicle id="jeepney_34" type="calibrated_jeepney" depart="1897.67" departLane="best" departSpeed="max">
+        <route edges="1054315844#0 555020953#0 653727191#0"/>
+    </vehicle>
+    <vehicle id="jeepney_35" type="calibrated_jeepney" depart="1953.49" departLane="best" departSpeed="max">
+        <route edges="555020953#0 653727191#0"/>
+    </vehicle>
+    <vehicle id="jeepney_36" type="calibrated_jeepney" depart="2009.30" departLane="best" departSpeed="max">
+        <route edges="-1392084250 1326404883"/>
+    </vehicle>
+    <vehicle id="jeepney_37" type="calibrated_jeepney" depart="2065.12" departLane="best" departSpeed="max">
+        <route edges="1392084244#0 712245744#0 653727191#0"/>
+    </vehicle>
+    <vehicle id="jeepney_38" type="calibrated_jeepney" depart="2120.93" departLane="best" departSpeed="max">
+        <route edges="1392084244#0 712245744#0 1054315845#0"/>
+    </vehicle>
+    <vehicle id="jeepney_42" type="calibrated_jeepney" depart="2344.19" departLane="best" departSpeed="max">
+        <route edges="1054315844#0 555020953#0 653727191#0"/>
+    </vehicle>
+    <vehicle id="jeepney_44" type="calibrated_jeepney" depart="2455.81" departLane="best" departSpeed="max">
+        <route edges="555020953#0 653727191#0"/>
+    </vehicle>
+    <vehicle id="jeepney_45" type="calibrated_jeepney" depart="2511.63" departLane="best" departSpeed="max">
+        <route edges="712245744#0 1326404883"/>
+    </vehicle>
+    <vehicle id="jeepney_46" type="calibrated_jeepney" depart="2567.44" departLane="best" departSpeed="max">
+        <route edges="712245744#0 653727191#0"/>
+    </vehicle>
+    <vehicle id="jeepney_47" type="calibrated_jeepney" depart="2623.26" departLane="best" departSpeed="max">
+        <route edges="1054315844#0 555020953#0 653727191#0"/>
+    </vehicle>
+    <vehicle id="jeepney_48" type="calibrated_jeepney" depart="2679.07" departLane="best" departSpeed="max">
+        <route edges="712245744#0 1326404883"/>
+    </vehicle>
+    <vehicle id="jeepney_49" type="calibrated_jeepney" depart="2734.88" departLane="best" departSpeed="max">
+        <route edges="564298145 653727191#0"/>
+    </vehicle>
+    <vehicle id="jeepney_52" type="calibrated_jeepney" depart="2902.33" departLane="best" departSpeed="max">
+        <route edges="555020953#0 653727191#0"/>
+    </vehicle>
+    <vehicle id="jeepney_53" type="calibrated_jeepney" depart="2958.14" departLane="best" departSpeed="max">
+        <route edges="555020953#0 1326404883"/>
+    </vehicle>
+    <vehicle id="jeepney_55" type="calibrated_jeepney" depart="3069.77" departLane="best" departSpeed="max">
+        <route edges="564298145 653727191#0"/>
+    </vehicle>
+    <vehicle id="jeepney_58" type="calibrated_jeepney" depart="3237.21" departLane="best" departSpeed="max">
+        <route edges="1054315844#0 555020953#0 653727191#0"/>
+    </vehicle>
+    <vehicle id="jeepney_59" type="calibrated_jeepney" depart="3293.02" departLane="best" departSpeed="max">
+        <route edges="555020953#0 1326404883"/>
+    </vehicle>
+    <vehicle id="jeepney_60" type="calibrated_jeepney" depart="3348.84" departLane="best" departSpeed="max">
+        <route edges="564298145 -712245744#1"/>
+    </vehicle>
+    <vehicle id="jeepney_61" type="calibrated_jeepney" depart="3404.65" departLane="best" departSpeed="max">
+        <route edges="712245744#0 1054315845#0"/>
+    </vehicle>
+    <vehicle id="jeepney_62" type="calibrated_jeepney" depart="3460.47" departLane="best" departSpeed="max">
+        <route edges="712245744#0 1326404883"/>
+    </vehicle>
+    <vehicle id="jeepney_63" type="calibrated_jeepney" depart="3516.28" departLane="best" departSpeed="max">
+        <route edges="1392084244#0 712245744#0 1326404883"/>
+    </vehicle>
+    <vehicle id="jeepney_65" type="calibrated_jeepney" depart="3627.91" departLane="best" departSpeed="max">
+        <route edges="564298145 1054315845#0"/>
+    </vehicle>
+    <vehicle id="jeepney_67" type="calibrated_jeepney" depart="3739.53" departLane="best" departSpeed="max">
+        <route edges="564298145 -712245744#1"/>
+    </vehicle>
+    <vehicle id="jeepney_68" type="calibrated_jeepney" depart="3795.35" departLane="best" departSpeed="max">
+        <route edges="564298145 653727191#0"/>
+    </vehicle>
+    <vehicle id="jeepney_69" type="calibrated_jeepney" depart="3851.16" departLane="best" departSpeed="max">
+        <route edges="564298145 1054315845#0"/>
+    </vehicle>
+    <vehicle id="jeepney_70" type="calibrated_jeepney" depart="3906.98" departLane="best" departSpeed="max">
+        <route edges="1392084244#0 712245744#0 1054315845#0"/>
+    </vehicle>
+    <vehicle id="jeepney_73" type="calibrated_jeepney" depart="4074.42" departLane="best" departSpeed="max">
+        <route edges="712245744#0 653727191#0"/>
+    </vehicle>
+    <vehicle id="jeepney_74" type="calibrated_jeepney" depart="4130.23" departLane="best" departSpeed="max">
+        <route edges="1054315844#0 555020953#0 1326404883"/>
+    </vehicle>
+    <vehicle id="jeepney_75" type="calibrated_jeepney" depart="4186.05" departLane="best" departSpeed="max">
+        <route edges="1054315844#0 555020953#0 1054315845#0"/>
+    </vehicle>
+    <vehicle id="jeepney_76" type="calibrated_jeepney" depart="4241.86" departLane="best" departSpeed="max">
+        <route edges="1392084244#0 712245744#0 653727191#0"/>
+    </vehicle>
+    <vehicle id="jeepney_78" type="calibrated_jeepney" depart="4353.49" departLane="best" departSpeed="max">
+        <route edges="564298145 1054315845#0"/>
+    </vehicle>
+    <vehicle id="jeepney_79" type="calibrated_jeepney" depart="4409.30" departLane="best" departSpeed="max">
+        <route edges="1392084244#0 712245744#0 653727191#0"/>
+    </vehicle>
+    <vehicle id="jeepney_82" type="calibrated_jeepney" depart="4576.74" departLane="best" departSpeed="max">
+        <route edges="555020953#0 653727191#0"/>
+    </vehicle>
+    <vehicle id="jeepney_84" type="calibrated_jeepney" depart="4688.37" departLane="best" departSpeed="max">
+        <route edges="564298145 1054315845#0"/>
+    </vehicle>
+    <vehicle id="jeepney_85" type="calibrated_jeepney" depart="4744.19" departLane="best" departSpeed="max">
+        <route edges="564298145 653727191#0"/>
+    </vehicle>
+    <vehicle id="jeepney_86" type="calibrated_jeepney" depart="4800.00" departLane="best" departSpeed="max">
+        <route edges="1054315844#0 555020953#0 1054315845#0"/>
+    </vehicle>
+    <vehicle id="jeepney_87" type="calibrated_jeepney" depart="4855.81" departLane="best" departSpeed="max">
+        <route edges="712245744#0 653727191#0"/>
+    </vehicle>
+    <vehicle id="jeepney_88" type="calibrated_jeepney" depart="4911.63" departLane="best" departSpeed="max">
+        <route edges="-1392084250 1326404883"/>
+    </vehicle>
+    <vehicle id="jeepney_89" type="calibrated_jeepney" depart="4967.44" departLane="best" departSpeed="max">
+        <route edges="712245744#0 1326404883"/>
+    </vehicle>
+    <vehicle id="jeepney_90" type="calibrated_jeepney" depart="5023.26" departLane="best" departSpeed="max">
+        <route edges="564298145 1054315845#0"/>
+    </vehicle>
+    <vehicle id="jeepney_93" type="calibrated_jeepney" depart="5190.70" departLane="best" departSpeed="max">
+        <route edges="555020953#0 1326404883"/>
+    </vehicle>
+    <vehicle id="jeepney_96" type="calibrated_jeepney" depart="5358.14" departLane="best" departSpeed="max">
+        <route edges="-1392084250 -712245744#1 -564298126#9"/>
+    </vehicle>
+    <vehicle id="jeepney_97" type="calibrated_jeepney" depart="5413.95" departLane="best" departSpeed="max">
+        <route edges="564298145 -712245744#1"/>
+    </vehicle>
+    <vehicle id="jeepney_99" type="calibrated_jeepney" depart="5525.58" departLane="best" departSpeed="max">
+        <route edges="1392084244#0 712245744#0 1326404883"/>
+    </vehicle>
+    <vehicle id="jeepney_100" type="calibrated_jeepney" depart="5581.40" departLane="best" departSpeed="max">
+        <route edges="1392084244#0 712245744#0 653727191#0"/>
+    </vehicle>
+    <vehicle id="jeepney_101" type="calibrated_jeepney" depart="5637.21" departLane="best" departSpeed="max">
+        <route edges="1054315844#0 555020953#0 653727191#0"/>
+    </vehicle>
+    <vehicle id="jeepney_103" type="calibrated_jeepney" depart="5748.84" departLane="best" departSpeed="max">
+        <route edges="1054315844#0 555020953#0 1054315845#0"/>
+    </vehicle>
+    <vehicle id="jeepney_104" type="calibrated_jeepney" depart="5804.65" departLane="best" departSpeed="max">
+        <route edges="555020953#0 1326404883"/>
+    </vehicle>
+    <vehicle id="jeepney_105" type="calibrated_jeepney" depart="5860.47" departLane="best" departSpeed="max">
+        <route edges="712245744#0 653727191#0"/>
+    </vehicle>
+    <vehicle id="jeepney_109" type="calibrated_jeepney" depart="6083.72" departLane="best" departSpeed="max">
+        <route edges="712245744#0 1054315845#0"/>
+    </vehicle>
+    <vehicle id="jeepney_110" type="calibrated_jeepney" depart="6139.53" departLane="best" departSpeed="max">
+        <route edges="1392084244#0 712245744#0 1054315845#0"/>
+    </vehicle>
+    <vehicle id="jeepney_111" type="calibrated_jeepney" depart="6195.35" departLane="best" departSpeed="max">
+        <route edges="555020953#0 1054315845#0"/>
+    </vehicle>
+    <vehicle id="jeepney_112" type="calibrated_jeepney" depart="6251.16" departLane="best" departSpeed="max">
+        <route edges="712245744#0 653727191#0"/>
+    </vehicle>
+    <vehicle id="jeepney_114" type="calibrated_jeepney" depart="6362.79" departLane="best" departSpeed="max">
+        <route edges="555020953#0 653727191#0"/>
+    </vehicle>
+    <vehicle id="jeepney_118" type="calibrated_jeepney" depart="6586.05" departLane="best" departSpeed="max">
+        <route edges="564298145 -712245744#1"/>
+    </vehicle>
+    <vehicle id="jeepney_120" type="calibrated_jeepney" depart="6697.67" departLane="best" departSpeed="max">
+        <route edges="1054315844#0 555020953#0 1326404883"/>
+    </vehicle>
+    <vehicle id="jeepney_121" type="calibrated_jeepney" depart="6753.49" departLane="best" departSpeed="max">
+        <route edges="712245744#0 1054315845#0"/>
+    </vehicle>
+    <vehicle id="jeepney_123" type="calibrated_jeepney" depart="6865.12" departLane="best" departSpeed="max">
+        <route edges="-1392084250 -712245744#1"/>
+    </vehicle>
+    <vehicle id="jeepney_125" type="calibrated_jeepney" depart="6976.74" departLane="best" departSpeed="max">
+        <route edges="1392084244#0 712245744#0 1054315845#0"/>
+    </vehicle>
+    <vehicle id="jeepney_126" type="calibrated_jeepney" depart="7032.56" departLane="best" departSpeed="max">
+        <route edges="1392084244#0 712245744#0 1054315845#0"/>
+    </vehicle>
+    <vehicle id="jeepney_128" type="calibrated_jeepney" depart="7144.19" departLane="best" departSpeed="max">
+        <route edges="1392084244#0 712245744#0 653727191#0"/>
+    </vehicle>
+</routes>

@@ -1,0 +1,27 @@
+{
+  "success": true,
+  "network": "Jollibee Molino Area",
+  "btmd_data": "Bacoor Blvd. and Molino Road Intersection (Jollibee Molino Area)",
+  "simulation_hours": 2.0,
+  "time_of_day": "morning_peak",
+  "traffic_intensity": 1.0,
+  "target_total_vehicles": 2980,
+  "target_vehicles_per_hour": 1490,
+  "btmd_avg_per_hour": 1380,
+  "btmd_peak_per_hour": 1485,
+  "vehicle_breakdown": {
+    "passenger": 1668,
+    "motorcycle": 953,
+    "truck": 71,
+    "jeepney": 283,
+    "bus": 0
+  },
+  "calibrated_files": [
+    "networks\\Jollibee Molino Area\\routes\\osm.passenger.flows.xml",
+    "networks\\Jollibee Molino Area\\routes\\osm.motorcycle.flows.xml",
+    "networks\\Jollibee Molino Area\\routes\\osm.truck.flows.xml",
+    "networks\\Jollibee Molino Area\\routes\\osm.jeepney.flows.xml",
+    "networks\\Jollibee Molino Area\\routes\\osm.bus.flows.xml"
+  ],
+  "timestamp": "2025-12-06T20:56:47.612882"
+}

@@ -1,0 +1,27 @@
+{
+  "success": true,
+  "network": "St Dominic Area",
+  "btmd_data": "Bacoor Blvd. and Aguinaldo Highway Intersection (St. Dominic Area)",
+  "simulation_hours": 2.0,
+  "time_of_day": "morning_peak",
+  "traffic_intensity": 1.0,
+  "target_total_vehicles": 1800,
+  "target_vehicles_per_hour": 900,
+  "btmd_avg_per_hour": 874,
+  "btmd_peak_per_hour": 974,
+  "vehicle_breakdown": {
+    "passenger": 680,
+    "motorcycle": 603,
+    "truck": 325,
+    "jeepney": 129,
+    "bus": 23
+  },
+  "calibrated_files": [
+    "networks\\St Dominic Area\\routes\\osm.passenger.flows.xml",
+    "networks\\St Dominic Area\\routes\\osm.motorcycle.flows.xml",
+    "networks\\St Dominic Area\\routes\\osm.truck.flows.xml",
+    "networks\\St Dominic Area\\routes\\osm.jeepney.flows.xml",
+    "networks\\St Dominic Area\\routes\\osm.bus.flows.xml"
+  ],
+  "timestamp": "2025-12-06T20:56:44.201574"
+}

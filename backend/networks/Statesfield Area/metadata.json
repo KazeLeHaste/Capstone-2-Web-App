@@ -2,7 +2,7 @@
   "name": "Statesfield Area",
   "type": "osm_imported",
   "is_osm_scenario": true,
-  "import_date": "2025-10-30T00:02:26.324792",
+  "import_date": "2025-12-06T19:41:23.490863",
   "original_scenario": "Statesfield Area",
   "vehicle_types": [
     "passenger",
@@ -13,15 +13,15 @@
   "network_info": {
     "edges": 10,
     "junctions": 6,
-    "lanes": 43,
+    "lanes": 31,
     "boundary": "0.00,0.00,165.76,437.91",
-    "file_size": 5475
+    "file_size": 4589
   },
   "stats": {
     "total_files": 24,
     "route_files": 0,
     "trip_files": 0,
-    "total_size": 487705
+    "total_size": 186515
   },
   "description": "Imported OSM scenario: Statesfield Area",
   "supports_realistic_traffic": true,

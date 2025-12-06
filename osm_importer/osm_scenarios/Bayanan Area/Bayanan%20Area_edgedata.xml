@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- generated on 2025-12-03 21:21:58 by Eclipse SUMO GUI Version 1.24.0
+<sumoConfiguration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/sumoConfiguration.xsd">
+
+    <input>
+        <net-file value="C:\Users\kgaqu\OneDrive\Documents\4th Year\Capstone 2\System Final Version\osm_importer\osm_scenarios\Bayanan Area\osm.net.xml.gz"/>
+        <route-files value="C:\Users\kgaqu\OneDrive\Documents\4th Year\Capstone 2\System Final Version\osm_importer\osm_scenarios\Bayanan Area\osm.bus.trips.xml,C:\Users\kgaqu\OneDrive\Documents\4th Year\Capstone 2\System Final Version\osm_importer\osm_scenarios\Bayanan Area\osm.motorcycle.trips.xml,C:\Users\kgaqu\OneDrive\Documents\4th Year\Capstone 2\System Final Version\osm_importer\osm_scenarios\Bayanan Area\osm.passenger.trips.xml,C:\Users\kgaqu\OneDrive\Documents\4th Year\Capstone 2\System Final Version\osm_importer\osm_scenarios\Bayanan Area\osm.truck.trips.xml"/>
+        <additional-files value="C:\Users\kgaqu\OneDrive\Documents\4th Year\Capstone 2\System Final Version\osm_importer\osm_scenarios\Bayanan Area\osm.poly.xml.gz,C:\Users\kgaqu\OneDrive\Documents\4th Year\Capstone 2\System Final Version\osm_importer\osm_scenarios\Bayanan Area\output.add.xml"/>
+    </input>
+
+    <output>
+        <emission-output value="C:\Users\kgaqu\OneDrive\Documents\4th Year\Capstone 2\System Final Version\osm_importer\osm_scenarios\Bayanan Area\Bayanan%2520Area_emissions.xml"/>
+        <summary-output value="C:\Users\kgaqu\OneDrive\Documents\4th Year\Capstone 2\System Final Version\osm_importer\osm_scenarios\Bayanan Area\Bayanan%2520Area_summary.xml"/>
+        <tripinfo-output value="C:\Users\kgaqu\OneDrive\Documents\4th Year\Capstone 2\System Final Version\osm_importer\osm_scenarios\Bayanan Area\tripinfos.xml"/>
+        <edgedata-output value="C:\Users\kgaqu\OneDrive\Documents\4th Year\Capstone 2\System Final Version\osm_importer\osm_scenarios\Bayanan Area\Bayanan%2520Area_edgedata.xml"/>
+        <statistic-output value="C:\Users\kgaqu\OneDrive\Documents\4th Year\Capstone 2\System Final Version\osm_importer\osm_scenarios\Bayanan Area\stats.xml"/>
+    </output>
+
+    <processing>
+        <ignore-route-errors value="true"/>
+        <tls.actuated.jam-threshold value="30"/>
+    </processing>
+
+    <routing>
+        <device.rerouting.adaptation-steps value="18"/>
+        <device.rerouting.adaptation-interval value="10"/>
+    </routing>
+
+    <report>
+        <verbose value="true"/>
+        <duration-log.statistics value="true"/>
+        <no-step-log value="true"/>
+    </report>
+
+    <gui_only>
+        <gui-settings-file value="C:\Users\kgaqu\OneDrive\Documents\4th Year\Capstone 2\System Final Version\osm_importer\osm_scenarios\Bayanan Area\osm.view.xml"/>
+    </gui_only>
+
+</sumoConfiguration>
+-->
+
+<meandata xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/meandata_file.xsd">
+    <interval begin="0.00" end="492.00" id="DEFAULT_EDGEDATA">
+        <edge id="-130048902#1" sampledSeconds="404.41" traveltime="39.83" overlapTraveltime="41.14" density="2.33" laneDensity="2.33" occupancy="1.37" waitingTime="31.00" timeLoss="77.07" speed="8.73" speedRelative="0.79" departed="10" arrived="0" entered="0" left="10" laneChangedFrom="0" laneChangedTo="0"/>
+        <edge id="-665787530" sampledSeconds="239.61" traveltime="33.77" overlapTraveltime="34.44" density="1.39" laneDensity="1.39" occupancy="0.98" waitingTime="0.00" timeLoss="9.58" speed="10.39" speedRelative="0.94" departed="0" arrived="7" entered="7" left="0" laneChangedFrom="0" laneChangedTo="0"/>
+        <edge id="129113596#0" sampledSeconds="30.18" traveltime="9.92" overlapTraveltime="10.19" density="0.40" laneDensity="0.13" occupancy="0.05" waitingTime="0.00" timeLoss="1.65" speed="15.28" speedRelative="0.92" departed="0" arrived="3" entered="3" left="0" laneChangedFrom="0" laneChangedTo="0"/>
+        <edge id="130048903#0" sampledSeconds="22.29" traveltime="4.24" overlapTraveltime="4.47" density="0.84" laneDensity="0.28" occupancy="0.09" waitingTime="0.00" timeLoss="4.69" speed="12.88" speedRelative="0.77" departed="0" arrived="2" entered="5" left="3" laneChangedFrom="0" laneChangedTo="0"/>
+        <edge id="130049554#0" sampledSeconds="73.44" traveltime="19.08" overlapTraveltime="19.96" density="0.63" laneDensity="0.21" occupancy="0.09" waitingTime="7.00" timeLoss="16.52" speed="12.06" speedRelative="0.72" departed="4" arrived="0" entered="0" left="3" laneChangedFrom="0" laneChangedTo="0"/>
+        <edge id="183710979#0" sampledSeconds="96.02" traveltime="32.00" overlapTraveltime="32.97" density="0.56" laneDensity="0.56" occupancy="0.57" waitingTime="0.00" timeLoss="2.75" speed="10.95" speedRelative="0.99" departed="3" arrived="0" entered="0" left="3" laneChangedFrom="0" laneChangedTo="0"/>
+        <edge id="665787524" sampledSeconds="24.90" traveltime="12.32" overlapTraveltime="12.74" density="0.24" laneDensity="0.08" occupancy="0.04" waitingTime="0.00" timeLoss="1.29" speed="17.22" speedRelative="1.03" departed="2" arrived="0" entered="0" left="2" laneChangedFrom="0" laneChangedTo="0"/>
+        <edge id="665787533" sampledSeconds="130.57" traveltime="32.54" overlapTraveltime="33.37" density="0.75" laneDensity="0.75" occupancy="0.67" waitingTime="0.00" timeLoss="4.71" speed="10.86" speedRelative="0.98" departed="0" arrived="4" entered="4" left="0" laneChangedFrom="0" laneChangedTo="0"/>
+        <edge id="795097767#0" sampledSeconds="30.82" traveltime="15.17" overlapTraveltime="15.49" density="0.26" laneDensity="0.09" occupancy="0.04" waitingTime="0.00" timeLoss="1.73" speed="15.81" speedRelative="0.95" departed="0" arrived="2" entered="2" left="0" laneChangedFrom="0" laneChangedTo="0"/>
+    </interval>
+</meandata>

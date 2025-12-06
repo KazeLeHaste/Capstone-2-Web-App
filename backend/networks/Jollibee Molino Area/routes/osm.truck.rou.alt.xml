@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- generated on 2025-12-06 20:56:47 by Eclipse SUMO duarouter Version 1.24.0
+<duarouterConfiguration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/duarouterConfiguration.xsd">
+
+    <input>
+        <net-file value="C:\Users\kgaqu\OneDrive\Documents\4th Year\Capstone 2\System Final Version\backend\networks\Jollibee Molino Area\Jollibee Molino Area.net.xml.gz"/>
+        <route-files value="C:\Users\kgaqu\OneDrive\Documents\4th Year\Capstone 2\System Final Version\backend\networks\Jollibee Molino Area\routes\osm.truck.trips.xml"/>
+    </input>
+
+    <output>
+        <output-file value="C:\Users\kgaqu\OneDrive\Documents\4th Year\Capstone 2\System Final Version\backend\networks\Jollibee Molino Area\routes\osm.truck.rou.xml"/>
+    </output>
+
+    <processing>
+        <remove-loops value="true"/>
+        <repair value="true"/>
+    </processing>
+
+    <report>
+        <no-warnings value="false"/>
+        <ignore-errors value="true"/>
+        <no-step-log value="true"/>
+    </report>
+
+</duarouterConfiguration>
+-->
+
+<routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/routes_file.xsd">
+    <vType id="calibrated_truck" length="7.50" vClass="truck" width="2.40"/>
+    <vehicle id="truck_0" type="calibrated_truck" depart="0.00" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="81.75" probability="1.00000000" edges="1019458712 -5031527 -109972547#1 820090516#0 183543979#0 109971518#0"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="truck_2" type="calibrated_truck" depart="202.82" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="76.20" probability="1.00000000" edges="130046557#0 -183543979#1 -820090516#2 109972547#0 109972547#2"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="truck_3" type="calibrated_truck" depart="304.23" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="81.75" probability="1.00000000" edges="1019458712 -5031527 -109972547#1 820090516#0 183543979#0 109971518#0"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="truck_4" type="calibrated_truck" depart="405.63" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="76.30" probability="1.00000000" edges="-5031527 -109972547#1 820090516#0 183543979#0 109971518#0"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="truck_5" type="calibrated_truck" depart="507.04" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="81.75" probability="1.00000000" edges="1019458712 -5031527 -109972547#1 820090516#0 183543979#0 109971518#0"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="truck_6" type="calibrated_truck" depart="608.45" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="76.20" probability="1.00000000" edges="130046557#0 -183543979#1 -820090516#2 109972547#0 109972547#2"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="truck_13" type="calibrated_truck" depart="1318.31" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="79.81" probability="1.00000000" edges="130046557#0 -183543979#1 -820090516#2 109972547#0 109972547#2 -1019458712"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="truck_14" type="calibrated_truck" depart="1419.72" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="81.75" probability="1.00000000" edges="1019458712 -5031527 -109972547#1 820090516#0 183543979#0 109971518#0"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="truck_15" type="calibrated_truck" depart="1521.13" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="76.30" probability="1.00000000" edges="-5031527 -109972547#1 820090516#0 183543979#0 109971518#0"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="truck_16" type="calibrated_truck" depart="1622.54" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="13.03" probability="1.00000000" edges="-158466193#1 -1019458712"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="truck_17" type="calibrated_truck" depart="1723.94" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="84.18" probability="1.00000000" edges="-158466193#1 -5031527 -109972547#1 820090516#0 183543979#0 109971518#0"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="truck_18" type="calibrated_truck" depart="1825.35" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="76.30" probability="1.00000000" edges="-5031527 -109972547#1 820090516#0 183543979#0 109971518#0"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="truck_19" type="calibrated_truck" depart="1926.76" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="76.30" probability="1.00000000" edges="-5031527 -109972547#1 820090516#0 183543979#0 109971518#0"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="truck_20" type="calibrated_truck" depart="2028.17" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="13.03" probability="1.00000000" edges="-158466193#1 -1019458712"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="truck_23" type="calibrated_truck" depart="2332.39" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="84.18" probability="1.00000000" edges="-158466193#1 -5031527 -109972547#1 820090516#0 183543979#0 109971518#0"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="truck_27" type="calibrated_truck" depart="2738.03" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="79.81" probability="1.00000000" edges="130046557#0 -183543979#1 -820090516#2 109972547#0 109972547#2 -1019458712"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="truck_29" type="calibrated_truck" depart="2940.85" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="84.18" probability="1.00000000" edges="-158466193#1 -5031527 -109972547#1 820090516#0 183543979#0 109971518#0"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="truck_30" type="calibrated_truck" depart="3042.25" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="76.20" probability="1.00000000" edges="130046557#0 -183543979#1 -820090516#2 109972547#0 109972547#2"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="truck_31" type="calibrated_truck" depart="3143.66" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="84.26" probability="1.00000000" edges="130046557#0 -183543979#1 -820090516#2 109972547#0 109972547#2 158466193#1"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="truck_33" type="calibrated_truck" depart="3346.48" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="79.81" probability="1.00000000" edges="130046557#0 -183543979#1 -820090516#2 109972547#0 109972547#2 -1019458712"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="truck_42" type="calibrated_truck" depart="4259.15" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="79.81" probability="1.00000000" edges="130046557#0 -183543979#1 -820090516#2 109972547#0 109972547#2 -1019458712"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="truck_45" type="calibrated_truck" depart="4563.38" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="84.26" probability="1.00000000" edges="130046557#0 -183543979#1 -820090516#2 109972547#0 109972547#2 158466193#1"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="truck_46" type="calibrated_truck" depart="4664.79" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="81.75" probability="1.00000000" edges="1019458712 -5031527 -109972547#1 820090516#0 183543979#0 109971518#0"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="truck_48" type="calibrated_truck" depart="4867.61" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="84.26" probability="1.00000000" edges="130046557#0 -183543979#1 -820090516#2 109972547#0 109972547#2 158466193#1"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="truck_49" type="calibrated_truck" depart="4969.01" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="11.33" probability="1.00000000" edges="1019458712 158466193#1"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="truck_51" type="calibrated_truck" depart="5171.83" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="84.18" probability="1.00000000" edges="-158466193#1 -5031527 -109972547#1 820090516#0 183543979#0 109971518#0"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="truck_53" type="calibrated_truck" depart="5374.65" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="84.18" probability="1.00000000" edges="-158466193#1 -5031527 -109972547#1 820090516#0 183543979#0 109971518#0"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="truck_55" type="calibrated_truck" depart="5577.46" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="84.26" probability="1.00000000" edges="130046557#0 -183543979#1 -820090516#2 109972547#0 109972547#2 158466193#1"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="truck_59" type="calibrated_truck" depart="5983.10" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="79.81" probability="1.00000000" edges="130046557#0 -183543979#1 -820090516#2 109972547#0 109972547#2 -1019458712"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="truck_62" type="calibrated_truck" depart="6287.32" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="81.75" probability="1.00000000" edges="1019458712 -5031527 -109972547#1 820090516#0 183543979#0 109971518#0"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="truck_63" type="calibrated_truck" depart="6388.73" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="13.03" probability="1.00000000" edges="-158466193#1 -1019458712"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="truck_66" type="calibrated_truck" depart="6692.96" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="11.33" probability="1.00000000" edges="1019458712 158466193#1"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="truck_68" type="calibrated_truck" depart="6895.77" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="84.26" probability="1.00000000" edges="130046557#0 -183543979#1 -820090516#2 109972547#0 109972547#2 158466193#1"/>
+        </routeDistribution>
+    </vehicle>
+    <vehicle id="truck_69" type="calibrated_truck" depart="6997.18" departLane="best" departSpeed="max">
+        <routeDistribution last="0">
+            <route cost="79.81" probability="1.00000000" edges="130046557#0 -183543979#1 -820090516#2 109972547#0 109972547#2 -1019458712"/>
+        </routeDistribution>
+    </vehicle>
+</routes>
